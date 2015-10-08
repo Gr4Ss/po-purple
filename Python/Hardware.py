@@ -21,6 +21,7 @@ class Motor:
         ## speed > 0 is running forward
         self.__speed = 0
         self.__thread = None
+	self.__count = 0
     ## Returning the running speed of this Motor
     ## speed = 0 is not running
     ## speed < 0 is running backward
@@ -30,10 +31,16 @@ class Motor:
     
     ## Let's run a motor
     def run_motor(self):
+	exec('old_angle = BrickPi.Encoder['+self.__port+']')
 	while (self.__speed !=0):
+	     exec('angle = BrickPi.Encoder['+self.__port+']') 
+	     self.__count += (angle - old_angle)/720.
+	     old_angle = angle
              exec("BrickPi.MotorSpeed[PORT_" + self.__port + "] =" + self.__speed)
              BrickPiUpdateValues()
     def on(self,value):
+	if abs(value)>255:
+	    value = 255 if (value>0) else -255
 	self.__speed = value
 	self.__thread = threading.Tread(target=run_motor)
 	self.__thread.setDaemon('True')
@@ -45,13 +52,19 @@ class Motor:
         self.__speed = 0
 	self.__thread = None
     def update_speed(self,speed):
+	if abs(speed) > 55:
+	    speed = 255 if (speed >0) else -255
 	self.__speed = speed
     ## TO DO: Example on
         ## https://github.com/DexterInd/BrickPi_Python/blob/master/Sensor_Examples/BrickPi.py
     def rotate_angle(self):
         pass
 
-    
+    def get_count(self):
+	return self.__count
+    def reset_count(self):
+	self.__count == 0
+
 ## 
 ## A superclass concerning sensors (both the GPIO and the LEGO-MINDSTORM)
 ##
