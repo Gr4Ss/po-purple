@@ -42,7 +42,7 @@ class Motor:
 	if abs(value)>255:
 	    value = 255 if (value>0) else -255
 	self.__speed = value
-	self.__thread = threading.Thread(target=run_motor)
+	self.__thread = threading.Thread(target=self.__run_motor)
 	self.__thread.setDaemon('True')
 	self.__thread.start()
 
@@ -102,7 +102,7 @@ class DistanceSensor:
 	    return None
     def on(self):
 	self.__run = True
-	self.__thread = threading.Thread(target=update_value)
+	self.__thread = threading.Thread(target=self.__update_value)
 	self.__thread.setDaemon(True)
 	self.__thread.start()
     def off(self):
