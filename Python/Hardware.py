@@ -36,13 +36,13 @@ class Motor:
 	     exec('angle = BrickPi.Encoder['+self.__port+']') 
 	     self.__count += (angle - old_angle)/720.
 	     old_angle = angle
-             exec("BrickPi.MotorSpeed[PORT_" + self.__port + "] =" + self.__speed)
+             exec("BrickPi.MotorSpeed[PORT_" + self.__port + "] =" + str(self.__speed))
              BrickPiUpdateValues()
     def on(self,value):
 	if abs(value)>255:
 	    value = 255 if (value>0) else -255
 	self.__speed = value
-	self.__thread = threading.Tread(target=run_motor)
+	self.__thread = threading.Thread(target=run_motor)
 	self.__thread.setDaemon('True')
 	self.__thread.start()
 
@@ -52,7 +52,7 @@ class Motor:
         self.__speed = 0
 	self.__thread = None
     def update_speed(self,speed):
-	if abs(speed) > 55:
+	if abs(speed) > 255:
 	    speed = 255 if (speed >0) else -255
 	self.__speed = speed
     ## TO DO: Example on
@@ -91,7 +91,7 @@ class DistanceSensor:
         
     def add_value(self,value):
 	while (len(self.__value) >=5):
-	     self.__value = self.__value.pop(0)
+	     self.__value.pop(0)
 	self.__value.append(value)
 
     def get_value(self):
@@ -102,7 +102,7 @@ class DistanceSensor:
 	    return None
     def on(self):
 	self.__run = True
-	self.__thread = treading.Thread(target=update_value)
+	self.__thread = threading.Thread(target=update_value)
 	self.__thread.setDaemon(True)
 	self.__thread.start()
     def off(self):

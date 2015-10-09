@@ -63,10 +63,10 @@ class Car:
 	    time.sleep(1)
             self.ride_backward(2)
 	    time.sleep(1)
-   def test_distance(self):
-	self.__distance_sensor().on()
+    def test_distance(self):
+	self.__distance_sensor.on()
 	while 1:
 	    time.sleep(1)
-	    print self.__distance_sensor().get_value()
+	    print self.__distance_sensor.get_value()
     
 
