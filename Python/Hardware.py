@@ -1,14 +1,12 @@
-## Class concerning the motors of the robot.
 from BrickPi import *
 import threading
 import time
 import RPi.GPIO as GPIO
 BrickPiSetup()
-##
-## Class concerning the LEGO-MINDSTORM Motor
-## It possible to let the motor run (back and forth) at a given power rate.
-## It's possible to rotate over a given angle.
-## 
+
+# Class concerning the LEGO-MINDSTORM Motor
+# It possible to let the motor run (back and forth) at a given power rate.
+# It's possible to rotate over a given angle. 
 class Motor:
     def __init__(self,port):
         ## A motor is connected to a given port ('A','B','C','D')
@@ -22,6 +20,7 @@ class Motor:
         self.__speed = 0
         self.__thread = None
 	self.__count = 0
+	
     ## Returning the running speed of this Motor
     ## speed = 0 is not running
     ## speed < 0 is running backward
@@ -29,15 +28,34 @@ class Motor:
     def get_speed(self):
         return self.__speed
     
-    ## Let's run a motor
+    ## Let's run the motor
     def run_motor(self):
 	exec('old_angle = BrickPi.Encoder['+self.__port+']')
+	print old_angle
 	while (self.__speed !=0):
-	     exec('angle = BrickPi.Encoder['+self.__port+']') 
-	     self.__count += (angle - old_angle)/720.
+	     exec('angle = BrickPi.Encoder['+self.__port+']')
+	     print angle
+	     self.__update_count(old_angle,angle)
 	     old_angle = angle
              exec("BrickPi.MotorSpeed[PORT_" + self.__port + "] =" + str(self.__speed))
              BrickPiUpdateValues()
+    # update the value of self.__count
+    # if angle < old_angle: value = (720-old_angle) + angle
+    # else: value = angle - old_angle
+    def update_count(self,old_angle,angle):
+        if angle < old_angle:
+            value = (720 - old_angle) + angle
+        else:
+            value = angle-old_angle
+        self.__count = value
+    # A method returning the number of rotations of the motor since the last time
+    # reset_count() is executed
+    def get_count(self):
+	return self.__count
+    # A method to reset the counter
+    def reset_count(self):
+	self.__count = 0
+    # A method to turn the motor on
     def on(self,value):
 	if abs(value)>255:
 	    value = 255 if (value>0) else -255
@@ -51,6 +69,7 @@ class Motor:
     def off(self):
         self.__speed = 0
 	self.__thread = None
+    # Set the current rotation speed of the motor to a given speed
     def update_speed(self,speed):
 	if abs(speed) > 255:
 	    speed = 255 if (speed >0) else -255
@@ -60,10 +79,7 @@ class Motor:
     def rotate_angle(self):
         pass
 
-    def get_count(self):
-	return self.__count
-    def reset_count(self):
-	self.__count == 0
+   
 
 ## 
 ## A superclass concerning sensors (both the GPIO and the LEGO-MINDSTORM)

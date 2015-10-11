@@ -46,12 +46,11 @@ class Car:
 	self.__motor1.on(speed)
 	self.__motor2.on(speed)
 	while (speed != 0):
-	    distance1 = self.__motor1.get_count()
-	    distance2 = self.__motor2.get_count()
+	    distance1 = self.__motor1.get_count()*self.__perimeter
+	    distance2 = self.__motor2.get_count()*self.__perimeter
 	    speed = pid1.new_value(distance - distance1,0.01)
 	    speed_diff = pid2.new_value(distance1-distance2,0.01)
 	    self.__motor1.update_speed(speed)
-	    
 	    self.__motor2.update_speed(speed + speed_diff)
 	self.__motor1.off()
 	self.__motor2.off()
