@@ -156,11 +156,12 @@ class MindstormSensor(Sensor):
     def __init__(self,port,sensor_type):
 	Sensor.__init__(self,3)
 	self.__port = port
-	exec('BrickPi.SensorType[PORT_'+str(self.__port)+'] = TYPE_SENSOR_'+str(sensor_type))
+	exec('BrickPi.SensorType[PORT_'+str(self.__port)+'] = TYPE_SENSOR_'+ sensor_type)
     def update_value(self):
 	while self.going():
 	     BrickPiUpdateValues()
 	     exec('value = BrickPi.Sensor[PORT_'+ str(self.__port) +']')
+	     print 'a' + str(value)
 	     self.add_value(value)
-	     time.sleep(0.05)
+	     time.sleep(0.1)
 	

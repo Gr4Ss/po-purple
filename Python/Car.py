@@ -3,7 +3,7 @@ import threading
 import math
 from BrickPi import *
 import time
-
+from PID import *
 sensor_type = {'touch':'TOUCH','uv_sensor':'ULTRASONIC_CONT'}
 class Car:
     def __init__(self,radius,gear_ratio):
@@ -13,6 +13,7 @@ class Car:
 	self.__gear_ratio = gear_ratio
         self.__distance_sensor = DistanceSensor(17,4)
 	self.__touch_sensor = MindstormSensor(1,'TOUCH')
+	self.__distance_sensor2 = MindstormSensor(3,'ULTRASONIC_CONT')
     def ride_forward(self,run_time):
         start = time.time()
 	self.__motor1.on(255)
