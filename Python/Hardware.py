@@ -85,50 +85,53 @@ class Motor:
 ## A superclass concerning sensors (both the GPIO and the LEGO-MINDSTORM)
 ##
 class Sensor:
-    def __init__(self):
-        self.value = None
+    def __init__(self,nb_values):
+        self.__value = []
+	self.__nb_values = nb_values
+	self.__going = False
+	self.__thread = None
     def update_value(self):
         pass
+    def add_value(self,value):
+	while (len(self.__value) >= self.__nb_values):
+	     self.__value.pop(0)
+	self.__value.append(value)
+    def going(self):
+	return self.__going
+    def get_value(self):
+	try:
+	    copy = sorted(self.__value)
+	    while copy[0] == None:
+		copy.pop(0)
+	    return copy[len(copy)/2]
+	except:
+	    return None       
+    def on(self):
+	self.__going = True
+	self.__thread = threading.Thread(target=self.update_value)
+	self.__thread.setDaemon(True)
+	self.__thread.start()
+    def off(self):
+	self.__run = False
+	self.__thread = None
 ##
 ## A class to get the value of the distance sensor.
 ## Code conform Hands-on tutorial raspberry pi
 ## 
-class DistanceSensor:
+class DistanceSensor(Sensor):
     def __init__(self,echo_gpio,trig_gpio):
+	Sensor.__init__(self,5)
         self.__echo_gpio = echo_gpio
         self.__trig_gpio = trig_gpio
         GPIO.setmode(GPIO.BCM)
         GPIO.setup(echo_gpio, GPIO.IN, pull_up_down = GPIO.PUD_DOWN)
         GPIO.setup(trig_gpio, GPIO.OUT)
         GPIO.output(trig_gpio,False)
-        self.__value = []
-	self.__run = False
-	self.__thread = None
-        
-    def add_value(self,value):
-	while (len(self.__value) >=5):
-	     self.__value.pop(0)
-	self.__value.append(value)
-
-    def get_value(self):
-	try:
-  	    copy = sorted(self.__value)
-	    return copy[2]
-	except:
-	    return None
-    def on(self):
-	self.__run = True
-	self.__thread = threading.Thread(target=self.__update_value)
-	self.__thread.setDaemon(True)
-	self.__thread.start()
-    def off(self):
-	self.__run = False
-	self.__thread = None
     def update_value(self):
         trig_duration = 0.0001
         inttimeout = 2100
         v_snd = 340.29
-	while self.__run:
+	while self.going():
 	    GPIO.output(self.__trig_gpio,True)
        	    time.sleep(trig_duration)
 	    GPIO.output(self.__trig_gpio,False)
@@ -148,9 +151,16 @@ class DistanceSensor:
 	    else:
                 self.add_value(None)
 	    time.sleep(0.1)
-            
-class MindStormSensor:
-    def __init__():
-        pass
-    def update_value():
-        pass
+
+class MindstormSensor(Sensor):
+    def __init__(self,port,sensor_type):
+	Sensor.__init__(self,3)
+	self.__port = port
+	exec('BrickPi.SensorType[PORT_'+str(self.__port)+'] = TYPE_SENSOR_'+str(sensor_type))
+    def update_value(self):
+	while self.going():
+	     BrickPiUpdateValues()
+	     exec('value = BrickPi.Sensor[PORT_'+ str(self.__port) +']')
+	     self.add_value(value)
+	     time.sleep(0.05)
+	

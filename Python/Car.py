@@ -1,15 +1,18 @@
 from Hardware import *
-from threading import *
+import threading
+import math
 from BrickPi import *
 import time
 
+sensor_type = {'touch':'TOUCH','uv_sensor':'ULTRASONIC_CONT'}
 class Car:
     def __init__(self,radius,gear_ratio):
         self.__motor1 = Motor('A')
         self.__motor2 = Motor('D')
-	self.__perimeter = 2*pi*radius
+	self.__perimeter = 2*math.pi*radius
 	self.__gear_ratio = gear_ratio
         self.__distance_sensor = DistanceSensor(17,4)
+	self.__touch_sensor = MindstormSensor(1,'TOUCH')
     def ride_forward(self,run_time):
         start = time.time()
 	self.__motor1.on(255)
@@ -67,5 +70,11 @@ class Car:
 	while 1:
 	    time.sleep(1)
 	    print self.__distance_sensor.get_value()
+    def test_touch(self):
+	self.__touch_sensor.on()
+	while 1:
+	    time.sleep(0.5)
+	    print self.__touch_sensor.get_value()
+
     
 

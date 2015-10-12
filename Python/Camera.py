@@ -3,12 +3,12 @@ import time
 import threading
 
 
-time = 1
+interval = 1
 ## class Camera
 # A class concerning the camera of the raspberry pi.
 ##
 class Camera:
-    global time
+    global interval
     # @post The camera is set to the camera of the pi
     # @post The camera is not yet going
     # @post There is yet no thread
@@ -20,7 +20,7 @@ class Camera:
     def take_pictures(self):
         while self.__going:
             self.__camera.capture('picture.jpg')
-            time.sleep(time)
+            time.sleep(interval)
     # Start a new thread with take pictures
     # @post The thread is set to new thread
     # @post Camera is going
