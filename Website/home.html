@@ -1,0 +1,92 @@
+<!doctype HTML>
+<html>
+<head>
+	<title>Team Purple</title>
+	<meta charset="UTF-8">
+	<meta name="description" content="Team Purple">
+	<meta name="keywords" content="PID, robot, PID Robot">
+	<meta name="author" content="Team Purple">
+	<script src="https://ajax.googleapis.com/ajax/libs/jquery/1.11.3/jquery.min.js"></script>
+	<link rel='stylesheet' type='text/css' href='home_style.css'>
+	
+	
+</head>
+<body>
+<script>
+var acordeon = false;
+$(document).ready(function(){
+	var current_slide = 0;
+	var nb_of_slides = $('#header_list').children().length;
+	setInterval(function(){
+		$('#header_list').animate({'margin-left':-current_slide*100+'%'},1000,
+		function(){
+			current_slide ++;
+			if (current_slide == nb_of_slides){
+				$('#header_list').css('margin-left','0%');
+				current_slide = 0;
+			}
+		});
+
+	},3000);
+});
+$(document).ready(function(){
+	$('#acordeon_click').click(function(){
+		console.log($('#sidebar').css('left'));
+		if ($('#left').css('left') == '-250px'){
+			$('#left').animate({'left':'0px'},1000);
+			$('#right').animate({'left':'+=250px','width':'-=250px'},1000);
+			acordeon = true;
+		}
+		else{
+			$('#left').animate({'left':'-250px'},1000);
+			$('#right').animate({'left':'-=250px','width':'+=250px'},1000);
+			acordeon = false;
+		}
+	
+	});
+});
+$(document).ready(function(){
+	$(window).resize(function(){
+		if (acordeon){
+			$('#right').css('width',$(window).width()-300);
+		}
+		else{
+			$('#right').css('width',$(window).width()-50);
+		}
+	});
+
+});
+
+</script>
+<div id='header'>
+	<div id='slider'>
+		<ul id='header_list'>
+			<li class='header_item'><p>Autonome auto</p></li>
+			<li class='header_item'><p>Webserver</p></li>
+			<li class='header_item'><p>PID-controller</p></li>
+			<li class='header_item'><p>Lijndetectie</p></li>
+			<li class='header_item'><p>Autonome auto</p></li>
+		</ul>
+	<div id='slider'>
+</div>
+	<div id='left'>
+		<div id='sidebar'>
+			<ul>
+				<li>Rij zelf</li>
+				<li>Over ons</li>
+			</ul>
+		</div>
+		<div id='acordeon_click'>
+		</div>
+	</div>
+	<div id ='right'>
+		<div id='main'>
+			<h1> Main header </h1>
+			<p> Main aaaaaaaaaaaaaaaaaaaa</p>
+		</div>
+		<div id='footer'>
+		<p> Some footer text.</p>
+		</div>
+	</div> 
+</body>
+</html>
