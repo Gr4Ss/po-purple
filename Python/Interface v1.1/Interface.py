@@ -43,7 +43,7 @@ class Interface:
         self.__rightengine.set_speed(speed)
         while speed !=0:
             distance1 = constant*self.__leftengine.get_count()*self.__perimeter*self.__gearratio
-            distance2 = constant*self.__leftengine.get_count()*self.__perimeter*self.__gearratio
+            distance2 = constant*self.__rightengine.get_count()*self.__perimeter*self.__gearratio
             speed = pid1.new_value(distance-distance1,0.1)
             speed_diff = pid2.new_value(distance1-distance2,0.1)
             self.__leftengine.set_speed(speed)
