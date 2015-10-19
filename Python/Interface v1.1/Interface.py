@@ -25,12 +25,12 @@ class Interface:
     
     def ride_time(self,run_time,speed):
         start_time = time.time()
-        self.__leftengine.setSpeed(speed)
-        self.__rightengine.setSpeed(speed)
-        while (time.time() - start_time < run_time()):
+        self.__leftengine.set_speed(speed)
+        self.__rightengine.set_speed(speed)
+        while (time.time() - start_time < run_time):
             time.sleep(0.1)
-        self.__leftengine.setSpeed(0)
-        self.__rightengine.setSpeed(0)
+        self.__leftengine.set_speed(0)
+        self.__rightengine.set_speed(0)
         
     def ride_distance(self,distance):
         constant = -1 if distance<0 else 1
@@ -39,14 +39,14 @@ class Interface:
         pid1 = PID.PID(5,1/20.,1/50.,0.01)
         pid2 = PID.PID(1,1/20.,1/50.,0.01)
         speed = pid1.new_value(distance,0.1)
-        self.__leftengine.setSpeed(speed)
-        self.__rightengine.setSpeed(speed)
+        self.__leftengine.set_speed(speed)
+        self.__rightengine.set_speed(speed)
         while speed !=0:
             distance1 = constant*self.__leftengine.get_count()*self.__perimeter*self.__gearratio
             distance2 = constant*self.__leftengine.get_count()*self.__perimeter*self.__gearratio
             speed = pid1.new_value(distance-distance1,0.1)
             speed_diff = pid2.new_value(distance1-distance2,0.1)
-            self.__leftengine.setSpeed(speed)
-            self.__rightengine.setSpeed(speed + speed_diff)
-        self.__leftengine.setSpeed(0)
-        self.__rightengine.setSpeed(0)
+            self.__leftengine.set_speed(speed)
+            self.__rightengine.set_speed(speed + speed_diff)
+        self.__leftengine.set_speed(0)
+        self.__rightengine.set_speed(0)
