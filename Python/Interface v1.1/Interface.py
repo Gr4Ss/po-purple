@@ -11,9 +11,9 @@ class Interface:
         self.__rightengine = Motor.Motor('B')
         self.__topengine = Motor.Motor('C')
         self.__engines = [Motor.Motor('A'),Motor.Motor('B')]
-        self.__gearratio = ?
-        self.__perimeter = 2*math.pi*?
-        self.__brickpi = BrickPiThread([self.__motorleft,self.__motorright])
+        self.__gearratio = 24./40.
+        self.__perimeter = 2*math.pi*2.5
+        self.__brickpi = BrickPiThread.BrickPiThread([self.__motorleft,self.__motorright],[])
         self.__brickpi.on()
         
     def set_engines_speed(self,speed):
