@@ -30,12 +30,18 @@ class Motor:
     
     ## Let's run the motor
     def run_motor(self):
-	exec('old_angle = BrickPi.Encoder['+self.__port+']')
-	print old_angle
+	result = BrickPiUpdateValues()
+	if not result:
+		exec('old_angle = BrickPi.Encoder[PORT_'+self.__port+']')
+	else:
+	    old_angle = 0
 	while (self.__speed !=0):
-	     exec('angle = BrickPi.Encoder['+self.__port+']')
-	     print angle
-	     self.__update_count(old_angle,angle)
+	     result = BrickPiUpdateValues()
+	     if not result:
+		     exec('angle = BrickPi.Encoder[PORT_'+self.__port+']')
+	     else:
+		angle = 0  
+	     self.update_count(old_angle,angle)
 	     old_angle = angle
              exec("BrickPi.MotorSpeed[PORT_" + self.__port + "] =" + str(self.__speed))
              BrickPiUpdateValues()
@@ -43,10 +49,7 @@ class Motor:
     # if angle < old_angle: value = (720-old_angle) + angle
     # else: value = angle - old_angle
     def update_count(self,old_angle,angle):
-        if angle < old_angle:
-            value = (720 - old_angle) + angle
-        else:
-            value = angle-old_angle
+        value = (angle-old_angle)/720.
         self.__count = value
     # A method returning the number of rotations of the motor since the last time
     # reset_count() is executed
@@ -59,8 +62,8 @@ class Motor:
     def on(self,value):
 	if abs(value)>255:
 	    value = 255 if (value>0) else -255
-	self.__speed = value
-	self.__thread = threading.Thread(target=self.__run_motor)
+	self.__speed = int(value)
+	self.__thread = threading.Thread(target=self.run_motor)
 	self.__thread.setDaemon('True')
 	self.__thread.start()
 
@@ -73,7 +76,7 @@ class Motor:
     def update_speed(self,speed):
 	if abs(speed) > 255:
 	    speed = 255 if (speed >0) else -255
-	self.__speed = speed
+	self.__speed = int(speed)
     ## TO DO: Example on
         ## https://github.com/DexterInd/BrickPi_Python/blob/master/Sensor_Examples/BrickPi.py
     def rotate_angle(self):

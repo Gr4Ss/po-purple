@@ -4,7 +4,7 @@ import math
 from BrickPi import *
 import time
 from PID import *
-sensor_type = {'touch':'TOUCH','uv_sensor':'ULTRASONIC_CONT'}
+
 class Car:
     def __init__(self,radius,gear_ratio):
         self.__motor1 = Motor('A')
@@ -12,8 +12,8 @@ class Car:
 	self.__perimeter = 2*math.pi*radius
 	self.__gear_ratio = gear_ratio
         self.__distance_sensor = DistanceSensor(17,4)
-	self.__touch_sensor = MindstormSensor(1,'TOUCH')
-	self.__distance_sensor2 = MindstormSensor(3,'ULTRASONIC_CONT')
+	#self.__touch_sensor = MindstormSensor(1,'TOUCH')
+	#self.__distance_sensor2 = MindstormSensor(3,'ULTRASONIC_CONT')
     def ride_forward(self,run_time):
         start = time.time()
 	self.__motor1.on(255)
@@ -30,10 +30,15 @@ class Car:
             time.sleep(0.1)
 	self.__motor1.off()
 	self.__motor2.off()
+    # function: stop()
+    # Make the car stop.
     def stop(self):
         t1 = self.__motor1.off()
         t2 = self.__motor2.off()
-    def rotate(self,run_time):
+    # function: rotate(angle)
+    # @argument angle: The angle over which the car must rotate
+    # A PID-controller make sure that the car over the given angle
+    def rotate(self,angle):
 	start = time.time()
 	self.__motor1.on(150)
 	self.__motor2.on(-150)
@@ -50,10 +55,11 @@ class Car:
 	self.__motor1.on(speed)
 	self.__motor2.on(speed)
 	while (speed != 0):
-	    distance1 = self.__motor1.get_count()*self.__perimeter*self__gear_ratio
-	    distance2 = self.__motor2.get_count()*self.__perimeter*self__gear_ratio
+	    distance1 = self.__motor1.get_count()*self.__perimeter*self.__gear_ratio
+	    distance2 = self.__motor2.get_count()*self.__perimeter*self.__gear_ratio
 	    speed = pid1.new_value(distance - distance1,0.01)
 	    speed_diff = pid2.new_value(distance1-distance2,0.01)
+	    print 'a' + str(self.__motor1.get_count())
 	    self.__motor1.update_speed(speed)
 	    self.__motor2.update_speed(speed + speed_diff)
 	self.__motor1.off()
@@ -78,4 +84,5 @@ class Car:
 	    print self.__touch_sensor.get_value()
 
     
-
+car = Car(2,1/3.)
+car.ride_distance(100)
