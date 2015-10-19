@@ -8,9 +8,8 @@ import PID
 class Interface:
     def __init__(self):
         self.__leftengine = Motor.Motor('A')
-        self.__rightengine = Motor.Motor('B')
+        self.__rightengine = Motor.Motor('D')
         self.__topengine = Motor.Motor('C')
-        self.__engines = [Motor.Motor('A'),Motor.Motor('B')]
         self.__gearratio = 24./40.
         self.__perimeter = 2*math.pi*2.5
         self.__brickpi = BrickPiThread.BrickPiThread([self.__motorleft,self.__motorright],[])
