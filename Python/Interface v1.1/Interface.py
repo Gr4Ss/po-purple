@@ -14,7 +14,8 @@ class Interface:
         self.__perimeter = 2*math.pi*2.5
         self.__brickpi = BrickPiThread.BrickPiThread([self.__motorleft,self.__motorright],[])
         self.__brickpi.on()
-        
+    def kill_thread(self):
+		self.__brickpi.off()
     def set_engines_speed(self,speed):
         if len(self.__engines) != len(speed):
             raise Error()

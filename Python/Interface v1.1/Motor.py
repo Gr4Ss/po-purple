@@ -13,7 +13,8 @@ class Motor:
         ## speed < 0 is running backward
         ## speed > 0 is running forward
         self.__speed = 0
-	exec('self.__start_angle = BrickPi.Encoder[PORT_'+self.__port+']')
+		BrickPiUpdateValues()
+		exec('self.__start_angle = BrickPi.Encoder[PORT_'+self.__port+']')
     ## Returning the running speed of this Motor
     ## speed = 0 is not running
     ## speed < 0 is running backward
