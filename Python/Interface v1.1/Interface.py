@@ -50,4 +50,3 @@ class Interface:
             self.__rightengine.set_speed(constant*(speed + speed_diff))
         self.__leftengine.set_speed(0)
         self.__rightengine.set_speed(0)
-
