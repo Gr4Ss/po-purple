@@ -13,7 +13,8 @@ class Motor:
         ## speed < 0 is running backward
         ## speed > 0 is running forward
         self.__speed = 0
-	exec('self.__start_angle = BrickPi.Encoder['+self.__port+']')
+		BrickPiUpdateValues()
+		exec('self.__start_angle = BrickPi.Encoder[PORT_'+self.__port+']')
     ## Returning the running speed of this Motor
     ## speed = 0 is not running
     ## speed < 0 is running backward
@@ -34,11 +35,11 @@ class Motor:
     # A method returning the number of rotations of the motor since the last time
     # reset_count() is executed
     def get_count(self):
-	exec('angle = BrickPi.Encoder['+self.__port+']')
+	exec('angle = BrickPi.Encoder[PORT_'+self.__port+']')
 	return (angle-self.__start_angle)/720.
     # A method to reset the counter
     def reset_count(self):
-	exec('self.__start_angle = BrickPi.Encoder['+self.__port+']')
+	exec('self.__start_angle = BrickPi.Encoder[PORT_'+self.__port+']')
 	
 
 
