@@ -14,7 +14,7 @@ class PID:
     # If the error is less then the precision 0 is returned
     # Else the new value is calculated
     def new_value(self,error,dt):
-	if error < self.__precision:
+	if abs(error) < self.__precision:
 	     return 0 
 	self.__integral += error *dt
 	integral = self.__integral

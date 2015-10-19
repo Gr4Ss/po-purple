@@ -38,15 +38,16 @@ class Interface:
         self.__rightengine.reset_count()
         pid1 = PID.PID(5,1/20.,1/50.,0.01)
         pid2 = PID.PID(1,1/20.,1/50.,0.01)
-        speed = pid1.new_value(distance,0.1)
-        self.__leftengine.set_speed(speed)
-        self.__rightengine.set_speed(speed)
+        speed = pid1.new_value(constant*distance,0.1)
+        self.__leftengine.set_speed(constant*speed)
+        self.__rightengine.set_speed(constant*speed)
         while speed !=0:
             distance1 = constant*self.__leftengine.get_count()*self.__perimeter*self.__gearratio
             distance2 = constant*self.__rightengine.get_count()*self.__perimeter*self.__gearratio
-            speed = pid1.new_value(distance-distance1,0.1)
-            speed_diff = pid2.new_value(distance1-distance2,0.1)
-            self.__leftengine.set_speed(speed)
-            self.__rightengine.set_speed(speed + speed_diff)
+            speed = pid1.new_value(constant*(distance-distance1),0.1)
+            speed_diff = pid2.new_value(constant*(distance1-distance2),0.1)
+            self.__leftengine.set_speed(constant*speed)
+            self.__rightengine.set_speed(constant*(speed + speed_diff))
         self.__leftengine.set_speed(0)
-        self.__rightengine.set_speed(-1)
+        self.__rightengine.set_speed(0)
+
