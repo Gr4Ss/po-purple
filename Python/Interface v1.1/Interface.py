@@ -12,10 +12,10 @@ class Interface:
         self.__topengine = Motor.Motor('C')
         self.__gearratio = 24./40.
         self.__perimeter = 2*math.pi*2.5
-        self.__brickpi = BrickPiThread.BrickPiThread([self.__leftengine,self.__rightright],[])
+        self.__brickpi = BrickPiThread.BrickPiThread([self.__leftengine,self.__rightengine],[])
         self.__brickpi.on()
     def kill_thread(self):
-	    self.__brickpi.off()
+        self.__brickpi.off()
     def set_engines_speed(self,speed):
         if len(self.__engines) != len(speed):
             raise Error()
@@ -50,4 +50,3 @@ class Interface:
             self.__rightengine.set_speed(constant*(speed + speed_diff))
         self.__leftengine.set_speed(0)
         self.__rightengine.set_speed(0)
-
