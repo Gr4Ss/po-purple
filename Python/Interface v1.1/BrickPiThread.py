@@ -16,7 +16,7 @@ class BrickPiThread:
         self.__going = False
         self.__thread = None
     def thread(self):
-	    k = 0
+	k = 0
         while self.__going:
             for i in self.__engines:
                 i.update_value()
