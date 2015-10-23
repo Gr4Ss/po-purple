@@ -22,7 +22,6 @@ while True:
                 command = conn.recv(data[1])
                 command = pickle.loads(command)
                 data[1] = os.system(command)
-                print(data[1])
                 if data[0] != None:
                     data = pickle.dumps(data)
                     conn.send(pickle.dumps(sys.getsizeof(data)))
