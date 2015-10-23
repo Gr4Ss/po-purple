@@ -11,8 +11,8 @@ while True:
     print 'New connection from ', addr
     while True:
         try:
-            rec = conn.recv(1024)
-            data = pickle.loads(rec)
+            data = conn.recv(1024)
+            data = pickle.loads(data)
             if data == 'END':
                 print "Close"
                 conn.send("**END**")
@@ -20,7 +20,9 @@ while True:
                 break
             else:
                 command = conn.recv(data[1])
+                command = pickle.loads(command)
                 data[1] = os.system(command)
+                print(data[1])
                 if data[0] != None:
                     data = pickle.dumps(data)
                     conn.send(pickle.dumps(sys.getsizeof(data)))
