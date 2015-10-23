@@ -1,13 +1,17 @@
 import sys, os, socket, Queue, threading, select
 import cPickle as pickle
 
-global sendQueue = Queue.Queue
-global resultList = [Queue.Queue for i in range(maxMsgId)]
+
+global resultList
+global sendQueue
 ## global bool Ready
-takenNumbersList = [False for i in range(maxMsgId)]
 maxMsgId = 32
-currentMsgId = int 0
+currentMsgId = int(0)
+sendQueue = Queue.Queue
+resultList = [Queue.Queue for i in range(maxMsgId)]
+takenNumbersList = [False for i in range(maxMsgId)]
 lock = threading.Lock()
+
 
 if __name__ == '__main__':
     while True:
@@ -45,11 +49,11 @@ def doSomething(msg, block, noResult= False):
         return getResult(msgId)
     return msgId
 
-def drive(argument_1, argument_2, block = True)
+def drive(argument_1, argument_2, block = True):
     msg = "Drive" + " " + str(argument_1) + " " + str(argument_2)
     return doSomething(msg, block)
 
-def sendCommand(socket.socket s):
+def sendCommand(s):
     while True:
         data = sendQueue.get()
         try:
@@ -60,7 +64,7 @@ def sendCommand(socket.socket s):
         except Exception:
             Queue.Empty
 
-def recieveResults(socket.socket s):
+def recieveResults(s):
     while True:
         result = s.recv(1024)
         if result == "**END**":
