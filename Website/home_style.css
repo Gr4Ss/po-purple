@@ -21,6 +21,7 @@ html,body {
 	width:1000%;
 	height:100%;
 	-webkit-padding-start: 0px;
+	-moz-padding-start: 0px;
 }
 .header_item{	
 	background-color:red;
