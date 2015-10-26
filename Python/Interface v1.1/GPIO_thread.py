@@ -11,10 +11,11 @@ class GPIO_Thread:
 	self.__thread = threading.Thread(target=self.thread)
 	self.__thread.setDaemon('True')
 	self.__thread.start()
-   def off(self):
+    def off(self):
 	self.__going = False
+	self.__join()
 	self.__thread = None
-   def thread(self):
+    def thread(self):
 	while self.__going:
 	    for i in self.__sensors:
 		i.update_value()

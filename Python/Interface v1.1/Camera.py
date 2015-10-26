@@ -8,13 +8,15 @@ import threading
 # A class concerning the camera of the raspberry pi.
 ##
 class Camera:
-    # @post The camera is set to the camera of the pi
-    # @post The camera is not yet going
-    # @post There is yet no thread
+    # The camera is set to the camera of the pi
+    # If an exception occur then an error message is printed
     def __init__(self):
-        self.__camera = picamera.PiCamera()
+        try:
+            self.__camera = picamera.PiCamera()
+        except:
+            print "Error couldn't find Camera"
 
-    # While self.__going is True, each global_time a picture (saved as picture.jpg) is taken.
+    # A picture is taken and saved at picture.jpg
     def take_picture(self):
         self.__camera.capture('picture.jpg')
    
