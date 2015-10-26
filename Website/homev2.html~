@@ -38,8 +38,11 @@
     <div class="container">
 
       <div class="starter-template">
-        <h1>Bootstrap starter template</h1>
-        <p class="lead">Use this document as a way to quickly start any new project.<br> All you get is this text and a mostly barebones HTML document.</p>
+        <p> <button type="button" class="btn btn-default btn-lg btn-block">Drive straight</button> 
+            <button type="button" class="btn btn-default">Circle</button> 
+            <button type="button" class="btn btn-default">Follow the line</button> 
+            <button type="button" class="btn btn-default">Square</button> 
+        </p>
       </div>
 
     </div>
