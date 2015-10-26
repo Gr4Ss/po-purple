@@ -1,37 +1,32 @@
 import sys, os, socket, Queue, threading, select
 import cPickle as pickle
 
-global sendQueue = Queue.Queue
-global resultList = [Queue.Queue for i in range(maxMsgId)]
+
+global resultList
+global sendQueue
 ## global bool Ready
-takenNumbersList = [False for i in range(maxMsgId)]
+currentMsgId = 0
 maxMsgId = 32
-currentMsgId = int 0
+sendQueue = Queue.Queue()
+resultList = [Queue.Queue() for i in range(maxMsgId)]
+takenNumbersList = [False for i in range(maxMsgId)]
 lock = threading.Lock()
 
-if __name__ == '__main__':
-    while True:
-        s = socket.socket(socket.AF_INET, socket.SOCK_STREAM)
-        s.connect(('192.168.137.98', 5000))
-        client_sock,addr = listen_sock.accept()
-        recv_thread = threading.Thread(target=recieveResults,args=[s],daemon=True)
-        send_thread = threading.Thread(target=sendCommand,args=[s],daemon=True)
-        recv_thread.start()
-        send_thread.start()
 
 def getMsgId():
     with lock:
-        currentMsgId = currentMsgId + 1
+        global currentMsgId
+        currentMsgId = (currentMsgId + 1) % maxMsgId
         start = currentMsgId
-        while takenNumberList[currentMsgId]:
-            currentMsgId = (currentMsgId + 1)%maxMsgId
+        while takenNumbersList[currentMsgId]:
+            currentMsgId = (currentMsgId + 1) % maxMsgId
             if currentMsgId == start:
                 raise ValueError('resultList overflow!')
-        takenNumberList[currentMsgId] = True
+        takenNumbersList[currentMsgId] = True
         return currentMsgId
 
 def getResult(msgId):
-    result = resultList[msgId].get()
+    result = resultList[msgId].get(True)
     takenNumbersList[msgId] = False
     return result
 
@@ -45,11 +40,11 @@ def doSomething(msg, block, noResult= False):
         return getResult(msgId)
     return msgId
 
-def drive(argument_1, argument_2, block = True)
+def drive(argument_1, argument_2, block = True):
     msg = "Drive" + " " + str(argument_1) + " " + str(argument_2)
     return doSomething(msg, block)
 
-def sendCommand(socket.socket s):
+def sendCommand(s):
     while True:
         data = sendQueue.get()
         try:
@@ -60,7 +55,7 @@ def sendCommand(socket.socket s):
         except Exception:
             Queue.Empty
 
-def recieveResults(socket.socket s):
+def recieveResults(s):
     while True:
         result = s.recv(1024)
         if result == "**END**":
@@ -71,3 +66,12 @@ def recieveResults(socket.socket s):
             result = s.recv(result)
             result = pickle.loads(result)
             resultList[result[0]].put(result[1])
+
+if __name__ == '__main__':
+    s = socket.socket(socket.AF_INET, socket.SOCK_STREAM)
+    s.connect(('localhost', 5000))
+    #client_sock,addr = s.accept()
+    recv_thread = threading.Thread(target=recieveResults,args=[s])
+    send_thread = threading.Thread(target=sendCommand,args=[s])
+    recv_thread.start()
+    send_thread.start()
