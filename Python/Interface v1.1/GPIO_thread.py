@@ -13,7 +13,7 @@ class GPIO_Thread:
 	self.__thread.start()
     def off(self):
 	self.__going = False
-	self.__join()
+	self.__thread.join()
 	self.__thread = None
     def thread(self):
 	while self.__going:
