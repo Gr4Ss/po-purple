@@ -20,16 +20,19 @@ html,body {
 	left:0px;
 	width:1000%;
 	height:100%;
-	
+	-webkit-padding-start: 0px;
+	-moz-padding-start: 0px;
 }
-.header_item{
-	display:inline-block;
-	
+.header_item{	
 	background-color:red;
 	width:10%;
 	height:100%;
 	text-align:center;
 	font-size:50px;
+  margin-left: 0px;
+  margin-right: 0px;
+  display: block;
+  float: left;
 }
 #left{
 	position:absolute;
