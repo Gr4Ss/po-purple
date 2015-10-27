@@ -17,8 +17,8 @@ class Remote_control:
         self.__rightengine = Motor('D')
 	self.__distanceLego = MindstormSensor('1','ULTRASONIC_CONT')
         self.__brickpi = BrickPi_Thread([self.__leftengine,self.__rightengine],[self.__distanceLego])
-        self.__gearratio = 24./40.
-        self.__perimeter = 2*math.pi*2.5
+        self.__gearratio = 1./1.
+        self.__perimeter = 2*math.pi*2.758
         self.__commands = ['F','S','L','R','B','V','E']
     def going(self):
 	return self.__input_going
@@ -76,7 +76,7 @@ class Remote_control:
             self.__command_thread.join()
             self.__command_thread = None
             
-    def forward(self):
+    def backward(self):
         pid = PID(5.,1/20.,1/50.,1.)
         self.__leftengine.set_speed(-240)
         self.__rightengine.set_speed(-240)
@@ -89,7 +89,7 @@ class Remote_control:
             self.__rightengine.set_speed(-240 - speeddif)
             time.sleep(0.1)
 
-    def backward(self):
+    def forward(self):
         pid = PID(5.,1/20.,1/50.,1.)
         self.__leftengine.set_speed(240)
         self.__rightengine.set_speed(240)
