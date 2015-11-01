@@ -19,10 +19,19 @@ class Interface:
         self.__brickpi = BrickPi_Thread([self.__leftengine,self.__rightengine],[])
         self.__gpio = GPIO_Thread([self.__distancePi])
         self.__brickpi.on()
-
-    def kill_thread(self):
+        self.__gpio.on()
+        
+    def get_sensor_value(self):
+        result = dict()
+        result['Distancesensor1'] = self.__distancePi.get_value()
+        result['Distancesensor2'] = self.__distanceLego.get_value()
+        result['Angle top angle'] = (self.__topengine.get_count()%1) *2*math.pi
+        return result
+    
+    def kill_threads(self):
         self.__brickpi.off()
-
+        self.__gpio.off()
+        
     def set_engines_speed(self,speed):
         if len(self.__engines) != len(speed):
             raise Error()
@@ -55,25 +64,26 @@ class Interface:
             lspeed,rspeed = self.correct_speed(speed,speed_diff)
             self.__leftengine.set_speed(lspeed)
             self.__rightengine.set_speed(rspeed)
-	    time.sleep(0.1)
+            time.sleep(0.1)
         self.__leftengine.set_speed(0)
         self.__rightengine.set_speed(0)
-        
-     def correct_speed(self,speed,speed_diff):
-	if speed >255:
-	    if speed_diff >0:
-		return [255-abs(speed_diff),255]
-	    else:
-		return [255,255 - abs(speed_diff)]
-	elif speed < -255:
-	    if speed_diff > 0:
-		return [-255,-255+abs(speed_diff)]
-	    else:
-		return [-255+abs(speed_diff),-255]
-	if abs(speed) < 120 and abs(speed) >5:
-	    sign = -1 if speed < 0 else 1 
-	    return [sign*120,sign*120+speed_diff]
-	return [speed,speed+speed_diff]
+            
+    def correct_speed(self,speed,speed_diff):
+        if speed >255:
+            if speed_diff >0:
+                return [255-abs(speed_diff),255]
+            else:
+                return [255,255 - abs(speed_diff)]
+        elif speed < -255:
+            if speed_diff > 0:
+                return [-255,-255+abs(speed_diff)]
+            else:
+                return [-255+abs(speed_diff),-255]
+        if abs(speed) < 120 and abs(speed) >5:
+            sign = -1 if speed < 0 else 1 
+            return [sign*120,sign*120+speed_diff]
+        return [speed,speed+speed_diff]
+    
     def ride_circ2(self,radius):
 	distance_in = math.pi*2*radius
 	distance_out = math.pi*2*(radius+self.__widthcar)
@@ -88,12 +98,46 @@ class Interface:
             distance2 = self.__rightengine.get_count()*self.__perimeter*self.__gearratio
             speed1 = pid1.new_value(distance_in-distance1,0.1)
             speed2 = pid2.new_value(distance_out-distance2,0.1) 
-            #lspeed,rspeed = self.correct_speed(speed,speed_diff)
-            self.__leftengine.set_speed(speed1)
-            self.__rightengine.set_speed(speed2)
+            lspeed,rspeed = (speed1/speed2)*255 , 255
+            self.__leftengine.set_speed(lspeed)
+            self.__rightengine.set_speed(rspeed)
             time.sleep(0.1)
         self.__leftengine.set_speed(0)
         self.__rightengine.set_speed(0)
+        
+    def rotate(self,degree):
+        if degree > 0:
+            inner_engine = self.__right_engine
+            outer_engine = self.__left_engine
+        else:
+            inner_engine = self.__left_engine
+            outer_engine = self.__right_engine
+        distance = self.__width/2. * abs(degree)
+        pid1 = PID.PID(10.,1./2.,1/5.,1.)
+	pid2 = PID.PID(10.,1./2.,1/5.,1.)
+        speed1 = pid1.new_value(distance,0.1)
+        speed2 = pid2.new_value(-distance,0.1)
+        outer_engine.set_speed(speed1)
+        inner_engine.set_speed(speed2)
+        while not (speed1 == 0 and speed2 == 0):
+            distance1 = outer_engine.get_count()*self.__perimeter*self.__gearratio
+            distance2 = inner_engine.get_count()*self.__perimeter*self.__gearratio
+            speed1 = pid1.new_value(distance - distance1,0.1)
+            speed2 = pid2.new_value(-distance - distance2,0.1)
+            outer_engine.set_speed(speed1)
+            inner_engine.set_speed(speed2)
+            time.sleep(0.1)
+            
+    def ride_square(self):
+        ride_distance(100)
+        rotate(math.pi/2.)
+        ride_distance(100)
+        rotate(math.pi/2.)
+        ride_distance(100)
+        rotate(math.pi/2.)
+        ride_distance(100)
+        rotate(math.pi/2.)
+        
     def ride_circ(self,radius):
         if abs(radius) <20:
             raise Exception
@@ -120,4 +164,4 @@ class Interface:
 	    time.sleep(0.1)
         inner_engine.set_speed(0)
         outer_engine.set_speed(0)
-        
+    

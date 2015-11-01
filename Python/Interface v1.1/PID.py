@@ -11,7 +11,7 @@ class PID:
         self.__precision = precision
         self.__integral = 0
         self.__error = 0
-    # If the error is less then the precision 0 is returned
+    # If the absolute vaule of the error is less then the precision 0 is returned
     # Else the new value is calculated
     def new_value(self,error,dt):
         if abs(error) < self.__precision:
