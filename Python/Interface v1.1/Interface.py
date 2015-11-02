@@ -164,4 +164,36 @@ class Interface:
 	    time.sleep(0.1)
         inner_engine.set_speed(0)
         outer_engine.set_speed(0)
+        
+     def ride_circ3(self,radius):
+        if abs(radius) <20:
+            raise Exception
+        pid1 = PID.PID(10.,1/20.,1/50.,1.)
+        pid2 = PID.PID(10.,1/20.,1/50.,1.)
+        if radius>0:
+            inner_engine = self.__right_engine
+            outer_engine = self.__left_engine
+        else:
+            inner_engine = self.__left_engine
+            outer_engine = self.__right_engine
+        self.__inner_engine.reset_count()
+        self.__outer_engine.reset_count()
+        angle_per_loop = 1./(float(radius))
+        angle = angle_per_loop
+        speed1 = pid1.new_value(angle*(2*math.pi*abs(radius)-0,0.1))
+        speed2 = pid2.new_value(angle*(2*math.pi*(abs(radius)+ 0))-distance2,0.1)
+        inner_engine.set_speed(speed1)
+        outer_engine.set_speed(speed2)
+        while not (speed1==0 and speed2==0):
+            distance1 = inner_engine.get_count()*self.__perimeter*self.__gearratio
+            distance2 = outer_engine.get_count()*self.__perimeter*self.__gearratio
+            speed1 = pid1.new_value(angle*(2*math.pi*abs(radius)-distance1,0.1))
+            speed2 = pid2.new_value(angle*(2*math.pi*(abs(radius)+ self.__widthcar))-distance2,0.1)
+            inner_engine.set_speed(speed1)
+            outer_engine.set_speed(speed2)
+            if angle < 2*math.pi:
+                angle += angle_per_loop
+	    time.sleep(0.1)
+        inner_engine.set_speed(0)
+        outer_engine.set_speed(0)
     
