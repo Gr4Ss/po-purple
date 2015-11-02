@@ -39,119 +39,142 @@
 		<div class="starter-template">
 			<div class="panel-group" id="accordion" role="tablist" aria-multiselectable="true">
 			
-			 <div class="panel panel-default">
-				<div class="panel-heading" role="tab" id="headingOne">
-					<h4 class="panel-title">
-						<a role="button" data-toggle="collapse" data-parent="#accordion" href="#collapseOne" aria-expanded="true" aria-controls="collapseOne">
-						Drive straight
-						</a>
-					</h4>
-				</div>
-				<div id="collapseOne" class="panel-collapse collapse in" role="tabpanel" aria-labelledby="headingOne">
-					<div class="panel-body">
-						<div class="form1">
-							<form class="form-horizontal">
-								<div class="form-group">
-									<label for="distance">Distance</label>
-									<input type="text" class="form-control" id="distance" placeholder="in cm">
-								</div>
-								<button type="submit" class="btn btn-default btn-lg btn-block">Drive straight</button> 
-							</form>
+				<div class="panel panel-default">
+					<div class="panel-heading" role="tab" id="headingOne">
+						<h4 class="panel-title">
+							<a role="button" data-toggle="collapse" data-parent="#accordion" href="#collapseOne" aria-expanded="true" aria-controls="collapseOne">
+							Drive straight
+							</a>
+						</h4>
+					</div>
+					<div id="collapseOne" class="panel-collapse collapse in" role="tabpanel" aria-labelledby="headingOne">
+						<div class="panel-body">
+							<p>
+								The robot uses 2 PID-controllers to drive a straight line.
+								The first PID-controller has as input the distance yet to be driven and has as output a speed for both engines. 
+								The input of the second PID-controller is supplied with the distance difference between the 
+								left and the right wheel, and present at it's output the speed differce between both engines. 
+							</p>
+							<div class="form1">
+								<form class="form-horizontal">
+									<div class="form-group">
+										<label for="distance">Distance</label>
+										<input type="text" class="form-control" id="distance" placeholder="in cm">
+									</div>
+									<button type="submit" class="btn btn-default btn-lg btn-block">Drive straight</button> 
+								</form>
+							</div>
 						</div>
 					</div>
 				</div>
-			</div>
-			
-			<div class="panel panel-default">
-				<div class="panel-heading" role="tab" id="headingTwo">
-					<h4 class="panel-title">
-						<a class="collapsed" role="button" data-toggle="collapse" data-parent="#accordion" href="#collapseTwo" aria-expanded="false" aria-controls="collapseTwo">
-						Drive Circle
-						</a>
-					</h4>
-				</div>
-				<div id="collapseTwo" class="panel-collapse collapse" role="tabpanel" aria-labelledby="headingTwo">
-					<div class="panel-body">
-						<div class="form2">
-							<form class="form-horizontal">
-								<div class="form-group">
-									<label for="radius">Radius</label>
-									<input type="text" class="form-control" id="radius" placeholder="in cm">
-								</div>
-								<button type="submit" class="btn btn-default btn-lg btn-block">Drive Circle</button> 
-							</form>
-						</div>
-					</div>
-				</div>
-			</div>	
-			
-			<div class="panel panel-default">
-				<div class="panel-heading" role="tab" id="headingThree">
-					<h4 class="panel-title">
-						<a class="collapsed" role="button" data-toggle="collapse" data-parent="#accordion" href="#collapseThree" aria-expanded="false" aria-controls="collapseThree">
-						Drive Square
-						</a>
-					</h4>
-				</div>
-				<div id="collapseThree" class="panel-collapse collapse" role="tabpanel" aria-labelledby="headingThree">
-					<div class="panel-body">
-						<div class="form3">
-							<form class="form-horizontal">
-								<div class="form-group">
-									<label for="side">Side Length</label>
-									<input type="text" class="form-control" id="side" placeholder="in cm">
-								</div>
-								<button type="submit" class="btn btn-default btn-lg btn-block">Drive Square</button> 
-							</form>
-						</div>
-					</div>
-				</div>
-			</div>		
 				
-			<div class="panel panel-default">
-				<div class="panel-heading" role="tab" id="headingFour">
-					<h4 class="panel-title">
-						<a class="collapsed" role="button" data-toggle="collapse" data-parent="#accordion" href="#collapseFour" aria-expanded="false" aria-controls="collapseFour">
-						Follow the line
-						</a>
-					</h4>
-				</div>
-				<div id="collapseFour" class="panel-collapse collapse" role="tabpanel" aria-labelledby="headingFour">
-					<div class="panel-body">
-						<div class="form4">
-							<form class="form-horizontal">
-								<button type="submit" class="btn btn-default btn-lg btn-block">Follow the line</button> 
-							</form>
+				<div class="panel panel-default">
+					<div class="panel-heading" role="tab" id="headingTwo">
+						<h4 class="panel-title">
+							<a class="collapsed" role="button" data-toggle="collapse" data-parent="#accordion" href="#collapseTwo" aria-expanded="false" aria-controls="collapseTwo">
+							Drive Circle
+							</a>
+						</h4>
+					</div>
+					<div id="collapseTwo" class="panel-collapse collapse" role="tabpanel" aria-labelledby="headingTwo">
+						<div class="panel-body">
+							<p>
+								<strong>Note: </strong> The given radius is the radius of the circle driven by the centermost wheel.
+							</p>
+							<div class="form2">
+								<form class="form-horizontal">
+									<div class="form-group">
+										<label for="radius">Radius</label>
+										<input type="text" class="form-control" id="radius" placeholder="in cm">
+									</div>
+									<button type="submit" class="btn btn-default btn-lg btn-block">Drive Circle</button> 
+								</form>
+							</div>
+						</div>
+					</div>
+				</div>	
+				
+				<div class="panel panel-default">
+					<div class="panel-heading" role="tab" id="headingThree">
+						<h4 class="panel-title">
+							<a class="collapsed" role="button" data-toggle="collapse" data-parent="#accordion" href="#collapseThree" aria-expanded="false" aria-controls="collapseThree">
+							Drive Square
+							</a>
+						</h4>
+					</div>
+					<div id="collapseThree" class="panel-collapse collapse" role="tabpanel" aria-labelledby="headingThree">
+						<div class="panel-body">
+							<p> 
+								To drive a square, the robot will first drive the given length. Then it will rotate and drive the same distance again, ...
+								</br>
+								</br>
+								<strong>Note:</strong> The robot will end its movement in the same position as he started it, i.e. after the last straight he will rotate again.
+							</p>
+							<div class="form3">
+								<form class="form-horizontal">
+									<div class="form-group">
+										<label for="side">Side Length</label>
+										<input type="text" class="form-control" id="side" placeholder="in cm">
+									</div>
+									<button type="submit" class="btn btn-default btn-lg btn-block">Drive Square</button> 
+								</form>
+							</div>
+						</div>
+					</div>
+				</div>		
+					
+				<div class="panel panel-default">
+					<div class="panel-heading" role="tab" id="headingFour">
+						<h4 class="panel-title">
+							<a class="collapsed" role="button" data-toggle="collapse" data-parent="#accordion" href="#collapseFour" aria-expanded="false" aria-controls="collapseFour">
+							Follow the line
+							</a>
+						</h4>
+					</div>
+					<div id="collapseFour" class="panel-collapse collapse" role="tabpanel" aria-labelledby="headingFour">
+						<div class="panel-body">
+							<p> <strong>Note:</strong> Coming soon </p>
+							<div class="form4">
+								<form class="form-horizontal">
+									<button type="submit" class="btn btn-default btn-lg btn-block">Follow the line</button> 
+								</form>
+							</div>
 						</div>
 					</div>
 				</div>
-			</div>
-			<div class="panel panel-default">
-				<div class="panel-heading" role="tab" id="headingFive">
-					<h4 class="panel-title">
-						<a class="collapsed" role="button" data-toggle="collapse" data-parent="#accordion" href="#collapseFive" aria-expanded="false" aria-controls="collapseFive">
-						Send
-						</a>
-					</h4>
-				</div>
-				<div id="collapseFive" class="panel-collapse collapse" role="tabpanel" aria-labelledby="headingFive">
-					<div class="panel-body">
-						<div class="form5">
-							<form class="form-horizontal">
-								<p>
-									<textarea class="form-control" rows="3" placeholder="Send list of commands"></textarea>
-								</p>
-								<p>
-									<button type="submit" class="btn btn-default btn-lg btn-block">Send</button>
-								</p>
-							</form>
+				<div class="panel panel-default">
+					<div class="panel-heading" role="tab" id="headingFive">
+						<h4 class="panel-title">
+							<a class="collapsed" role="button" data-toggle="collapse" data-parent="#accordion" href="#collapseFive" aria-expanded="false" aria-controls="collapseFive">
+							Send commands
+							</a>
+						</h4>
+					</div>
+					<div id="collapseFive" class="panel-collapse collapse" role="tabpanel" aria-labelledby="headingFive">
+						<div class="panel-body">
+							<div class="form5">
+								<p> <strong>Note:</strong> Coming soon </p>
+								<form class="form-horizontal">
+									<p>
+										<textarea class="form-control" rows="3" placeholder="Send list of commands"></textarea>
+									</p>
+									<p>
+										<button type="submit" class="btn btn-default btn-lg btn-block">Send</button>
+									</p>
+								</form>
+							</div>
 						</div>
 					</div>
 				</div>
+				
 			</div>
-			
 		</div>
-    </div>
+	</div>
+	<div class='container'id='about'>
+		<div class="starter-template">
+			<h1> About us </h1>
+			<iframe width="560" height="315" src="https://www.youtube.com/embed/cJunCsrhJjg?rel=0&amp;showinfo=0" frameborder="0" allowfullscreen></iframe>
+		</div>
 	</div>
     <script src="https://ajax.googleapis.com/ajax/libs/jquery/1.11.3/jquery.min.js"></script>
     <script src="bootstrap-3.3.5-dist/js/bootstrap.min.js"></script>
