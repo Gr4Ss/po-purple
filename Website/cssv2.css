@@ -24,6 +24,7 @@ body {
 .form1{
    padding-bottom: 20px;
    border-bottom: 1px solid black;
+   text-align: center;
 }
 
 .form2 {
@@ -43,4 +44,8 @@ body {
 
 .form5 {
    padding-bottom: 20px;
+}
+
+input {
+   text-align: center;
 }
