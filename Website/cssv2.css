@@ -21,31 +21,6 @@ body {
    text-align: center; 
 }
 
-.form1{
-   padding-bottom: 20px;
-   border-bottom: 1px solid black;
-   text-align: center;
-}
-
-.form2 {
-   padding-bottom: 20px;
-   border-bottom: 1px solid black;
-}
-
-.form3 {
-   padding-bottom: 20px;
-   border-bottom: 1px solid black;
-}
-
-.form4 {
-   padding-bottom: 20px;
-   border-bottom: 1px solid black;
-}
-
-.form5 {
-   padding-bottom: 20px;
-}
-
 input {
    text-align: center;
 }
