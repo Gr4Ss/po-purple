@@ -5,12 +5,15 @@ class PID:
     # @param ki: the value of the integral action
     # @param precision: Stop the PID controller when a the error is less then the precission
     def __init__(self,kp,kd,ki,precision):
-        self.__kp = kp
-        self.__kd = kd
-        self.__ki = ki
-        self.__precision = precision
-        self.__integral = 0
-        self.__error = 0
+        try:
+            self.__kp = float(kp)
+            self.__kd = float(kd)
+            self.__ki = float(ki)
+            self.__precision = float(precision)
+            self.__integral = 0
+            self.__error = 0
+        except:
+            raise Error()
     # If the absolute vaule of the error is less then the precision 0 is returned
     # Else the new value is calculated
     def new_value(self,error,dt):

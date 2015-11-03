@@ -1,26 +1,31 @@
 # import libary for controlling the brickpi ports
 from BrickPi import *
+# Setup the brickpi after loading the module
+BrickPiSetup()
+# time module for timing
 import time
 # import libary for controlling the GPI0 pin
 import RPi.GPIO as GPIO
-# Setup the brickpi after loading the module
-BrickPiSetup()
+
 
 class Sensor:
-    # self.__value a FIFO, containing the last nb_values
     def __init__(self,nb_values):
-        self.__value = []
-	self.__nb_values = nb_values
-    # A method that calculate a new sensor and add it afterwards to the values
+        # self.__value a FIFO, containing the last nb_values
+        self.__values = []
+        # self.__nb_values indicating how many values must be hold
+        self.__nb_values = nb_values
+	
+    # A method that calculate a new sensor and add it afterwards to the self.values
     def update_value(self):
         pass
     # A method to add a given value to the self.__value FIFO
     # if len(self.__value) < self.__nb_values then the value is just added to self.__value
     # Else the len(self.__value) - self.__nb_values + 1 first values will be deleted.
     def add_value(self,value):
-	while (len(self.__value) >= self.__nb_values):
-	     self.__value.pop(0)
-	self.__value.append(value)
+        while (len(self.__values) >= self.__nb_values):
+	     self.__values.pop(0)
+	self.__values.append(value)
+	
     # Return the median of the not None values in self.__value	
     def get_value(self):
 	try:
@@ -77,10 +82,11 @@ class MindstormSensor(Sensor):
     # port is the port of the brickpi to which the sensor is connected
     # sensor_type is the sensor type.
     def __init__(self,port,sensor_type):
-	Sensor.__init__(self,3)
+	Sensor.__init__(self,5)
 	self.__port = port
 	exec('BrickPi.SensorType[PORT_'+str(self.__port)+'] = TYPE_SENSOR_'+ sensor_type)
 	BrickPiSetupSensors()
+	
     def update_value(self):
 	exec('value = BrickPi.Sensor[PORT_'+ str(self.__port) +']')
 	self.add_value(value)

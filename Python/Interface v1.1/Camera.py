@@ -1,7 +1,4 @@
 import picamera
-import time
-import threading
-
 
 
 ## class Camera
