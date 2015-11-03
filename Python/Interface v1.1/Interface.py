@@ -85,6 +85,8 @@ class Interface:
         return [speed,speed+speed_diff]
     
     def ride_circ2(self,radius):
+        self.__leftengine.reset_count()
+        self.__rightengine.reset_count()
 	distance_in = math.pi*2*radius
 	distance_out = math.pi*2*(radius+self.__widthcar)
 	pid1 = PID.PID(10.,1./2.,1/5.,1.)
@@ -106,6 +108,8 @@ class Interface:
         self.__rightengine.set_speed(0)
         
     def rotate(self,degree):
+        self.__leftengine.reset_count()
+        self.__rightengine.reset_count()
         if degree > 0:
             inner_engine = self.__right_engine
             outer_engine = self.__left_engine
