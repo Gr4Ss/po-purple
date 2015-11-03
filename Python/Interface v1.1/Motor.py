@@ -40,7 +40,8 @@ class Motor:
 	return (angle-self.__start_angle)/720.
     # A method to reset the counter
     def reset_count(self):
-	exec('self.__start_angle = BrickPi.Encoder[PORT_'+self.__port+']')
+	exec('angle = BrickPi.Encoder[PORT_'+self.__port+']')
+	self.__start_angle = angle
 	
 
 
