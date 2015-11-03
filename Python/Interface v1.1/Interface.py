@@ -11,11 +11,11 @@ class Interface:
         self.__leftengine = Motor.Motor('A')
         self.__rightengine = Motor.Motor('D')
         self.__topengine = Motor.Motor('C')
-        self.__widthcar = 11.
+        self.__widthcar = 2.6 + 11.1
         self.__distanceLego = MindstormSensor('1','ULTRASONIC_CONT')
         self.__distancePi = DistanceSensor(17,4)
         self.__gearratio = 1./1.
-        self.__perimeter = 2*math.pi*2.758
+        self.__perimeter = math.pi*5.59
         self.__brickpi = BrickPi_Thread([self.__leftengine,self.__rightengine],[])
         self.__gpio = GPIO_Thread([self.__distancePi])
         self.__brickpi.on()
@@ -57,8 +57,8 @@ class Interface:
         self.__leftengine.set_speed(speed)
         self.__rightengine.set_speed(speed)
         while speed !=0:
-            distance1 = constant*self.__leftengine.get_count()*self.__perimeter*self.__gearratio
-            distance2 = constant*self.__rightengine.get_count()*self.__perimeter*self.__gearratio
+            distance1 = self.__leftengine.get_count()*self.__perimeter*self.__gearratio
+            distance2 = self.__rightengine.get_count()*self.__perimeter*self.__gearratio
             speed = pid1.new_value(distance-distance1,0.01)
             speed_diff = pid2.new_value(distance1-distance2,0.01)
             lspeed,rspeed = self.correct_speed(speed,speed_diff)
@@ -111,12 +111,12 @@ class Interface:
         self.__leftengine.reset_count()
         self.__rightengine.reset_count()
         if degree > 0:
-            inner_engine = self.__right_engine
-            outer_engine = self.__left_engine
+            inner_engine = self.__rightengine
+            outer_engine = self.__leftengine
         else:
-            inner_engine = self.__left_engine
-            outer_engine = self.__right_engine
-        distance = self.__width/2. * abs(degree)
+            inner_engine = self.__leftengine
+            outer_engine = self.__rightengine
+        distance = self.__widthcar/2. * abs(degree)
         pid1 = PID.PID(10.,1./2.,1/5.,1.)
 	pid2 = PID.PID(10.,1./2.,1/5.,1.)
         speed1 = pid1.new_value(distance,0.1)
@@ -133,14 +133,14 @@ class Interface:
             time.sleep(0.1)
             
     def ride_square(self):
-        ride_distance(100)
-        rotate(math.pi/2.)
-        ride_distance(100)
-        rotate(math.pi/2.)
-        ride_distance(100)
-        rotate(math.pi/2.)
-        ride_distance(100)
-        rotate(math.pi/2.)
+        self.ride_distance(100)
+        self.rotate(math.pi/2.)
+        self.ride_distance(100)
+        self.rotate(math.pi/2.)
+        self.ride_distance(100)
+        self.rotate(math.pi/2.)
+        self.ride_distance(100)
+        self.rotate(math.pi/2.)
         
     def ride_circ(self,radius):
         if abs(radius) <20:
@@ -148,19 +148,19 @@ class Interface:
         pid1 = PID.PID(10.,1/20.,1/50.,1.)
         pid2 = PID.PID(10.,1/20.,1/50.,1.)
         if radius>0:
-            inner_engine = self.__right_engine
-            outer_engine = self.__left_engine
+            inner_engine = self.__rightengine
+            outer_engine = self.__leftengine
         else:
-            inner_engine = self.__left_engine
-            outer_engine = self.__right_engine
-        self.__inner_engine.reset_count()
-        self.__outer_engine.reset_count()
+            inner_engine = self.__leftengine
+            outer_engine = self.__rightengine
+        inner_engine.reset_count()
+        outer_engine.reset_count()
         angle_per_loop = 1./(float(radius))
         angle = 0.
         while angle < 2*math.pi:
             distance1 = inner_engine.get_count()*self.__perimeter*self.__gearratio
             distance2 = outer_engine.get_count()*self.__perimeter*self.__gearratio
-            speed1 = pid1.new_value(angle*(2*math.pi*abs(radius)-distance1,0.1))
+            speed1 = pid1.new_value(angle*(2*math.pi*abs(radius))-distance1,0.1)
             speed2 = pid2.new_value(angle*(2*math.pi*(abs(radius)+ self.__widthcar))-distance2,0.1)
             inner_engine.set_speed(speed1)
             outer_engine.set_speed(speed2)
@@ -175,23 +175,23 @@ class Interface:
         pid1 = PID.PID(10.,1/20.,1/50.,1.)
         pid2 = PID.PID(10.,1/20.,1/50.,1.)
         if radius>0:
-            inner_engine = self.__right_engine
-            outer_engine = self.__left_engine
+            inner_engine = self.__rightengine
+            outer_engine = self.__leftengine
         else:
-            inner_engine = self.__left_engine
-            outer_engine = self.__right_engine
-        self.__inner_engine.reset_count()
-        self.__outer_engine.reset_count()
+            inner_engine = self.__leftengine
+            outer_engine = self.__rightengine
+        inner_engine.reset_count()
+        outer_engine.reset_count()
         angle_per_loop = 1./(float(radius))
         angle = angle_per_loop
-        speed1 = pid1.new_value(angle*(2*math.pi*abs(radius)-0,0.1))
+        speed1 = pid1.new_value(angle*(2*math.pi*abs(radius))-0,0.1)
         speed2 = pid2.new_value(angle*(2*math.pi*(abs(radius)+ 0))-distance2,0.1)
         inner_engine.set_speed(speed1)
         outer_engine.set_speed(speed2)
         while not (speed1==0 and speed2==0):
             distance1 = inner_engine.get_count()*self.__perimeter*self.__gearratio
             distance2 = outer_engine.get_count()*self.__perimeter*self.__gearratio
-            speed1 = pid1.new_value(angle*(2*math.pi*abs(radius)-distance1,0.1))
+            speed1 = pid1.new_value(angle*(2*math.pi*abs(radius))-distance1,0.1)
             speed2 = pid2.new_value(angle*(2*math.pi*(abs(radius)+ self.__widthcar))-distance2,0.1)
             inner_engine.set_speed(speed1)
             outer_engine.set_speed(speed2)
