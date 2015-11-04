@@ -25,6 +25,8 @@ class BrickPi_Thread:
             self.__thread = threading.Thread(target=self.thread)
             self.__thread.setDaemon('True')
             self.__thread.start()
+        else:
+            print 'First turn the ongoing thread off'
     # Turn the thread back off
     # If there is a thread it is no longer going
     def off(self):
@@ -32,6 +34,8 @@ class BrickPi_Thread:
             self.__going = False
             self.__thread.join()
             self.__thread = None
+        else:
+            print 'No thread to turn off'
     # The actual thread that will run
     def thread(self):
         # A bookkeeping value

@@ -1,7 +1,4 @@
 import picamera
-import time
-import threading
-
 
 
 ## class Camera
@@ -17,6 +14,7 @@ class Camera:
             print "Error couldn't find Camera"
 
     # A picture is taken and saved at picture.jpg
-    def take_picture(self):
+    def take_picture(self, res1=720, res2=480):
+        self.__camera.resolution = (res1, res2)
         self.__camera.capture('picture.jpg')
    
