@@ -244,7 +244,7 @@ class Interface:
         if abs(outspeed) > abs(inspeed):
             routspeed = sign(outspeed) * min(255,abs(outspeed))
             routspeed = sign(outspeed) * max(MINIMUM_SPEED*1.1,abs(outspeed))
-            rinspeed = sign(outspeed) * abs(max(abs(inspeed),5)/outspeed) * routspeed
+            rinspeed = sign(outspeed) * abs(max(inspeed,5)/outspeed) * routspeed
 	    return rinspeed,routspeed
 	return inspeed,outspeed
         

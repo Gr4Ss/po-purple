@@ -51,15 +51,15 @@ class Remote_control:
 		    self.stop_command_thread()
                 self.off()
     def on(self):
+
             self.__brickpi.on()
             self.__input_going = True
 	    self.__input_thread = threading.Thread(target=self.input_handler)
 	    self.__input_thread.setDaemon('True')
 	    self.__input_thread.start()
-
     def off(self):
-		self.__brickpi.off()
 		self.__input_going = False
+		self.__brickpi.off()
 		self.__input_thread.join()
 		self.__input_thread = None
 
