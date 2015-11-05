@@ -194,7 +194,7 @@ class Interface:
         if sides <3:
             raise Error()
         
-        angle = math.pi - (math.pi * (sides-2)/sides)
+        angle = (math.pi * (sides-2)/sides)
         if DEBUG:
             print 'Angle: ', angle
         while sides >0:
