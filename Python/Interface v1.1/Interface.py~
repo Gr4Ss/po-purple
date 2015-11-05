@@ -194,7 +194,7 @@ class Interface:
         if sides <3:
             raise Error()
         
-        angle = (math.pi * (sides-2)/sides)
+        angle = math.pi - (math.pi * (sides-2)/sides)
         if DEBUG:
             print 'Angle: ', angle
         while sides >0:
@@ -277,11 +277,11 @@ class Interface:
             if DEBUG:
                 print 'Speed: ',speed1,speed2
             ## Wat volgt is misschien nuttig
-            ## ispeed, ospeed = self.correct_speed2(speed1,speed2)
+            ispeed, ospeed = self.correct_speed2(speed1,speed2)
             ## if DEBUG:
-            ##  print 'Corrected speed: ', lspeed, rspeed
-            inner_engine.set_speed(speed1)
-            outer_engine.set_speed(speed2)
+            ##  print 'Corrected speed: ', ispeed, ospeed
+            inner_engine.set_speed(ispeed)
+            outer_engine.set_speed(ospeed)
             if angle < 2*math.pi:
                 angle += angle_per_loop
 	    time.sleep(0.1)

@@ -244,7 +244,7 @@ class Interface:
         if abs(outspeed) > abs(inspeed):
             routspeed = sign(outspeed) * min(255,abs(outspeed))
             routspeed = sign(outspeed) * max(MINIMUM_SPEED*1.1,abs(outspeed))
-            rinspeed = sign(outspeed) * abs(max(inspeed,5)/outspeed) * routspeed
+            rinspeed = sign(outspeed) * abs(max(abs(inspeed),5)/outspeed) * routspeed
 	    return rinspeed,routspeed
 	return inspeed,outspeed
         
@@ -277,11 +277,11 @@ class Interface:
             if DEBUG:
                 print 'Speed: ',speed1,speed2
             ## Wat volgt is misschien nuttig
-            ## ispeed, ospeed = self.correct_speed2(speed1,speed2)
+            ispeed, ospeed = self.correct_speed2(speed1,speed2)
             ## if DEBUG:
-            ##  print 'Corrected speed: ', lspeed, rspeed
-            inner_engine.set_speed(speed1)
-            outer_engine.set_speed(speed2)
+            ##  print 'Corrected speed: ', ispeed, ospeed
+            inner_engine.set_speed(ispeed)
+            outer_engine.set_speed(ospeed)
             if angle < 2*math.pi:
                 angle += angle_per_loop
 	    time.sleep(0.1)
