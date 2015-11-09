@@ -13,7 +13,7 @@
     <link rel="stylesheet" href="cssv2.css">
 </head>
 
-<body>
+<body data-spy="scroll" data-target=".navbar" data-offset="50">
     <nav class="navbar navbar-inverse navbar-fixed-top">
       <div class="container">
         <div class="navbar-header">
@@ -27,15 +27,15 @@
         </div>
         <div id="navbar" class="collapse navbar-collapse">
           <ul class="nav navbar-nav">
-            <li class="active"><a href="#">Home</a></li>
+            <li class="active"><a href="#home">Home</a></li>
+	    <li><a href="#videostream">Videostream</a></li>
             <li><a href="#about">About</a></li>
-            <li><a href="#contact">Contact</a></li>
           </ul>
         </div><!--/.nav-collapse -->
       </div>
     </nav>
 
-    <div class="container">
+    <div class="container" id='home'>
 		<div class="starter-template">
 			<div class="panel-group" id="accordion" role="tablist" aria-multiselectable="true">
 			
@@ -166,10 +166,44 @@
 						</div>
 					</div>
 				</div>
+
+				<div class="panel panel-default">
+					<div class="panel-heading" role="tab" id="headingSix">
+						<h4 class="panel-title">
+							<a class="collapsed" role="button" data-toggle="collapse" data-parent="#accordion" href="#collapseSix" aria-expanded="false" aria-controls="collapseSix">
+							Manual driving
+							</a>
+						</h4>
+					</div>
+					<div id="collapseSix" class="panel-collapse collapse" role="tabpanel" aria-labelledby="headingSix">
+						<div class="panel-body">
+							<p>
+								<strong>Note: </strong> The given radius is the radius of the circle driven by the centermost wheel.
+							</p>
+							<div class="form6">
+								<form class="form-horizontal">
+									<div class="form-group">
+										<label for="radius">Radius</label>
+										<input type="text"  id="radius" placeholder="in cm">
+									</div>
+									<button type="submit" class="btn btn-default btn-lg btn-block">Drive Circle</button> 
+								</form>
+							</div>
+						</div>
+					</div>
+				</div>	
 				
 			</div>
 		</div>
 	</div>
+
+	<div class='container' id='videostream'>
+		<div class="starter-template">
+			<h1> Videostream </h1>
+			<iframe src="https://www.youtube.com/embed/6_b7RDuLwcI" frameborder="0" allowfullscreen id='videolol'></iframe>
+		</div>
+	</div>
+
 	<div class='container'id='about'>
 		<div class="starter-template">
 			<h1> About us </h1>
@@ -209,8 +243,63 @@
 			</div>
 		</div>
 	</div>
+
+	
     <script src="https://ajax.googleapis.com/ajax/libs/jquery/1.11.3/jquery.min.js"></script>
     <script src="bootstrap-3.3.5-dist/js/bootstrap.min.js"></script>
+    <script>
+	$('a').click(function(){
+    	$('html, body').animate({
+        	scrollTop: $( $.attr(this, 'href') ).offset().top
+    	}, 500);
+    	return false;
+	});
+    </script>
+
+    <script>
+    // By Chris Coyier & tweaked by Mathias Bynens
+	console.log('executing');
+	$(function() {
+
+	// Find all YouTube videos
+	var $allVideos = $("iframe[src^='http://www.youtube.com']"),
+
+	    // The element that is fluid width
+	    $fluidEl = $("body");
+
+	// Figure out and save aspect ratio for each video
+	$allVideos.each(function() {
+
+		$(this)
+			.data('aspectRatio', this.height / this.width)
+			
+			// and remove the hard coded width/height
+			.removeAttr('height')
+			.removeAttr('width');
+
+	});
+
+	// When the window is resized
+	// (You'll probably want to debounce this)
+	$(window).resize(function() {
+
+		var newWidth = $fluidEl.width();
+		
+		// Resize all videos according to their own aspect ratio
+		$allVideos.each(function() {
+
+			var $el = $(this);
+			$el
+				.width(newWidth)
+				.height(newWidth * $el.data('aspectRatio'));
+
+		});
+
+	// Kick off one resize to fix all videos on page load
+	}).resize();
+
+});
+    </script>
 </body>
 </html>
 
