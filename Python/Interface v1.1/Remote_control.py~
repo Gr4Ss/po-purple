@@ -22,13 +22,13 @@ class Remote_control:
         self.__commands = ['F','S','L','R','B','V','E']
     def going(self):
 	return self.__input_going
-    def is_legal_input(self,inpt):
+    def is_legal_input(inpt):
         return inpt in self.__commands
 
     def input_handler(self):
         while self.__input_going:
             inp = raw_input('Enter next command: ')
-            if not self.is_legal_input(inp):
+            if not is_legal_input(inp):
                 print 'Not a valid commad'
             if inp == 'F':
                 if self.__command_going:
