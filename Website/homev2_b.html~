@@ -85,7 +85,7 @@
 								<form class="form-horizontal">
 									<div class="form-group">
 										<label for="radius">Radius</label>
-										<input type="text"  id="radius" placeholder="in cm">
+										<input type="text"  id="radius" placeholder="in cm" name="circ">
 									</div>
 									<button type="submit" class="btn btn-default btn-lg btn-block">Drive Circle</button> 
 								</form>
@@ -114,7 +114,7 @@
 								<form class="form-horizontal">
 									<div class="form-group">
 										<label for="side">Side Length</label>
-										<input type="text"  id="side" placeholder="in cm">
+										<input type="text"  id="side" placeholder="in cm" name="square">
 									</div>
 									<button type="submit" class="btn btn-default btn-lg btn-block">Drive Square</button> 
 								</form>
@@ -200,7 +200,8 @@
 	<div class='container' id='videostream'>
 		<div class="starter-template">
 			<h1> Videostream </h1>
-			<iframe src="https://www.youtube.com/embed/6_b7RDuLwcI" frameborder="0" allowfullscreen id='videolol'></iframe>
+			<video src="192.168.137.156:7001//">
+			</video>
 		</div>
 	</div>
 
