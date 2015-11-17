@@ -22,11 +22,11 @@ class Interface:
     def __init__(self):
         # Storing the engines of this car
         self.__leftengine = Engine('A')
-        self.__rightengine = Engine('D')
+        self.__rightengine = Engine('B')
         self.__topengine = Engine('C')
         self.__engines = [self.__leftengine,self.__rightengine,self.__topengine]
         # Storing the distance between the centers of the cars
-        self.__widthcar = 2.6 + 11.1
+        self.__widthcar = 2.6 + 11.1 - .2
         # Storing the Lego MINDSTORM distance sensor
         self.__distanceLego = MindstormSensor('1','ULTRASONIC_CONT')
         # Storing the GPIO distance sensor
@@ -34,7 +34,7 @@ class Interface:
         # Storing the current gearration
         self.__gearratio = 1./1.
         # Storing the perimeter of the wheels (2*pi*r)
-        self.__perimeter = 2*math.pi*2.759
+        self.__perimeter = 2*math.pi*2.758
         # Storing a reference to a brickpi thread
         self.__brickpi = BrickPi_Thread(self.__engines,[self.__distanceLego])
         # Storing a reference to a gpio thread
@@ -80,7 +80,7 @@ class Interface:
         self.__leftengine.reset_count()
         self.__rightengine.reset_count()
         pid1 = PID.PID(5.,1/20.,1/50.,.5)
-        pid2 = PID.PID(10.,1/2.,1/5.,.5)
+        pid2 = PID.PID(20.,1/2.,1/5.,.5)
         speed = MINIMUM_SPEED
         if DEBUG:
             print speed
@@ -164,8 +164,8 @@ class Interface:
             outer_engine = self.__rightengine
         # Calculate the distance to be driven
         distance = self.__widthcar/2. * abs(degree)
-        pid1 = PID.PID(50.,1./2.,1/1.,.5)
-	pid2 = PID.PID(50.,1./2.,1/1.,.5)
+        pid1 = PID.PID(10.,1./2.,10/2.,.6)
+	pid2 = PID.PID(10.,1./2.,10/2.,.6)
         speed1 = pid1.new_value(distance,0.1)
         speed2 = pid2.new_value(-distance,0.1)
         if DEBUG:
@@ -185,7 +185,7 @@ class Interface:
             inner_engine.set_speed(speed2)
             time.sleep(0.1)
             
-    def ride_polyglot(self,sides,distance):
+    def ride_polygon(self,sides,distance):
         try:
             sides = float(sides)
         except:
@@ -194,12 +194,14 @@ class Interface:
         if sides <3:
             raise Error()
         
-        angle = math.pi - (math.pi * (sides-2)/sides)
+        angle = math.pi - (math.pi * (sides-2)/sides) + 0.2
         if DEBUG:
             print 'Angle: ', angle
-        while sides >0:
+        while sides > 0:
             self.ride_distance(distance)
+	    time.sleep(0.1)
             self.rotate(angle)
+	    time.sleep(0.1)
             sides -= 1
             if DEBUG:
                 print 'Sides: ', sides
@@ -264,7 +266,7 @@ class Interface:
         angle_per_loop = 1.5/(float(radius))
         angle = angle_per_loop
         speed1 = pid1.new_value(angle*(2*math.pi*abs(radius))-0,0.1)
-        speed2 = pid2.new_value(angle*(2*math.pi*(abs(radius)+ 0))-distance2,0.1)
+        speed2 = pid2.new_value(angle*(2*math.pi*(abs(radius)+ 0))-0,0.1)
         inner_engine.set_speed(speed1)
         outer_engine.set_speed(speed2)
         while not (speed1==0 and speed2==0):
@@ -279,12 +281,13 @@ class Interface:
             ## Wat volgt is misschien nuttig
             ispeed, ospeed = self.correct_speed2(speed1,speed2)
             ## if DEBUG:
-            ##  print 'Corrected speed: ', ispeed, ospeed
+            print 'Corrected speed: ', ispeed, ospeed
             inner_engine.set_speed(ispeed)
             outer_engine.set_speed(ospeed)
-            if angle < 2*math.pi:
+            if angle <= 2*math.pi + 0.3:
                 angle += angle_per_loop
 	    time.sleep(0.1)
         inner_engine.set_speed(0)
         outer_engine.set_speed(0)
     
+

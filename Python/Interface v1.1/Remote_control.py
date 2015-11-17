@@ -1,5 +1,5 @@
 import threading
-from Motor import *
+from Engine import *
 from Sensor import *
 from BrickPi_thread import *
 from PID import *
@@ -13,8 +13,8 @@ class Remote_control:
         self.__input_thread = None
         self.__command_thread = None
         self.__command_going = False
-        self.__leftengine = Motor('A')
-        self.__rightengine = Motor('D')
+        self.__leftengine = Engine('A')
+        self.__rightengine = Engine('B')
 	self.__distanceLego = MindstormSensor('1','ULTRASONIC_CONT')
         self.__brickpi = BrickPi_Thread([self.__leftengine,self.__rightengine],[self.__distanceLego])
         self.__gearratio = 1./1.
@@ -51,9 +51,8 @@ class Remote_control:
 		    self.stop_command_thread()
                 self.off()
     def on(self):
-
-            self.__brickpi.on()
-            self.__input_going = True
+        self.__brickpi.on()
+        self.__input_going = True
 	    self.__input_thread = threading.Thread(target=self.input_handler)
 	    self.__input_thread.setDaemon('True')
 	    self.__input_thread.start()
@@ -76,7 +75,7 @@ class Remote_control:
             self.__command_going = False
             self.__command_thread.join()
             self.__command_thread = None
-            
+
     def backward(self):
         pid = PID(5.,1/20.,1/50.,1.)
         self.__leftengine.set_speed(-240)
@@ -110,9 +109,8 @@ class Remote_control:
     def values(self):
 	print self.__distanceLego.getValue()
 
-if __name__ == '__main__': 
+if __name__ == '__main__':
 	remote_control = Remote_control()
 	remote_control.on()
 	while remote_control.going():
 		time.sleep(0.1)
-
