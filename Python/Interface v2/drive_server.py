@@ -136,7 +136,7 @@ while True:
             elif has_lock(message[1]):
                 return_message = 'LOCK_ALREAY'
             else:
-                value = 'LOCK_FALSE'
+                return_message = 'LOCK_FALSE'
         elif message[0] == 'UNLOCK':
             unlock_aquired = free_lock(message[1])
             if unlock_aquired:
@@ -165,9 +165,9 @@ while True:
             if TESTING_MODE:
                 return_message = str(time.time())
             else:
-                return_message = controller.get_data()
+                return_message = str(controller.get_data())
         elif message[0] == 'STRAIGHT':
-            distance = message[1]
+            distance = int(message[1])
             id_ = message[2]
             if not has_lock(id_):
                 return_message = 'NO_LOCK'
@@ -181,7 +181,7 @@ while True:
                 else:
                     return_message = 'SUCCESS'
         elif message[0] == 'CIRC':
-            radius = message[1]
+            radius = int(message[1])
             id_ = message[2]
             if not has_lock(id_):
                 return_message = 'NO_LOCK'
@@ -195,7 +195,7 @@ while True:
                 else:
                     return_message = 'SUCCESS'
         elif message[0] == 'SQUARE':
-            side = message[1]
+            side = int(message[1])
             id_ = message[2]
             if not has_lock(id_):
                 return_message = 'NO_LOCK'
@@ -208,10 +208,6 @@ while True:
                         return_message = 'FAILURE'
                 else:
                     return_message = 'SUCCESS'
-
-
-
-
     else:
         return_message = 'ILLEGAL_MESSAGE'
 

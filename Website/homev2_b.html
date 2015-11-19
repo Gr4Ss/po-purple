@@ -28,7 +28,7 @@
         <div id="navbar" class="collapse navbar-collapse">
           <ul class="nav navbar-nav">
             <li class="active"><a href="#home">Home</a></li>
-	    <li><a href="#videostream">Videostream</a></li>
+	           <li><a href="#videostream">Videostream</a></li>
             <li><a href="#about">About</a></li>
           </ul>
         </div><!--/.nav-collapse -->
@@ -37,8 +37,17 @@
 
     <div class="container" id='home'>
 		<div class="starter-template">
+<!--  ################# HEADER - BODY ##################### -->
+      <div class="jumbotron">
+        <h1>Get lock!</h1>
+        <form>
+          <input type = "submit" value = "Lock" name ='lock'>
+          <input type = "submit" value = "Unlock" name = 'unlock'>
+        </form>
+      <p><a class="btn btn-primary btn-lg" href="#" role="button">Learn more</a></p>
+      </div>
 			<div class="panel-group" id="accordion" role="tablist" aria-multiselectable="true">
-			
+
 				<div class="panel panel-default">
 					<div class="panel-heading" role="tab" id="headingOne">
 						<h4 class="panel-title">
@@ -51,9 +60,9 @@
 						<div class="panel-body">
 							<p>
 								The robot uses 2 PID-controllers to drive a straight line.
-								The first PID-controller has as input the distance yet to be driven and has as output a speed for both engines. 
-								The input of the second PID-controller is supplied with the distance difference between the 
-								left and the right wheel, and present at it's output the speed differce between both engines. 
+								The first PID-controller has as input the distance yet to be driven and has as output a speed for both engines.
+								The input of the second PID-controller is supplied with the distance difference between the
+								left and the right wheel, and present at it's output the speed differce between both engines.
 							</p>
 							<div class="form1">
 								<form class="form-horizontal">
@@ -61,13 +70,13 @@
 										<label for="distance">Distance</label>
 										<input type="text"  id="distance"  placeholder="in cm" name='straight'>
 									</div>
-									<button type="submit" class="btn btn-default btn-lg btn-block">Drive straight</button> 
+									<button type="submit" class="btn btn-default btn-lg btn-block">Drive straight</button>
 								</form>
 							</div>
 						</div>
 					</div>
 				</div>
-				
+
 				<div class="panel panel-default">
 					<div class="panel-heading" role="tab" id="headingTwo">
 						<h4 class="panel-title">
@@ -87,13 +96,13 @@
 										<label for="radius">Radius</label>
 										<input type="text"  id="radius" placeholder="in cm" name="circ">
 									</div>
-									<button type="submit" class="btn btn-default btn-lg btn-block">Drive Circle</button> 
+									<button type="submit" class="btn btn-default btn-lg btn-block">Drive Circle</button>
 								</form>
 							</div>
 						</div>
 					</div>
-				</div>	
-				
+				</div>
+
 				<div class="panel panel-default">
 					<div class="panel-heading" role="tab" id="headingThree">
 						<h4 class="panel-title">
@@ -104,7 +113,7 @@
 					</div>
 					<div id="collapseThree" class="panel-collapse collapse" role="tabpanel" aria-labelledby="headingThree">
 						<div class="panel-body">
-							<p> 
+							<p>
 								To drive a square, the robot will first drive the given length. Then it will rotate and drive the same distance again, ...
 								</br>
 								</br>
@@ -116,13 +125,13 @@
 										<label for="side">Side Length</label>
 										<input type="text"  id="side" placeholder="in cm" name="square">
 									</div>
-									<button type="submit" class="btn btn-default btn-lg btn-block">Drive Square</button> 
+									<button type="submit" class="btn btn-default btn-lg btn-block">Drive Square</button>
 								</form>
 							</div>
 						</div>
 					</div>
-				</div>		
-					
+				</div>
+
 				<div class="panel panel-default">
 					<div class="panel-heading" role="tab" id="headingFour">
 						<h4 class="panel-title">
@@ -136,7 +145,7 @@
 							<p> <strong>Note:</strong> Coming soon </p>
 							<div class="form4">
 								<form class="form-horizontal">
-									<button type="submit" class="btn btn-default btn-lg btn-block">Follow the line</button> 
+									<button type="submit" class="btn btn-default btn-lg btn-block">Follow the line</button>
 								</form>
 							</div>
 						</div>
@@ -186,13 +195,29 @@
 										<label for="radius">Radius</label>
 										<input type="text"  id="radius" placeholder="in cm">
 									</div>
-									<button type="submit" class="btn btn-default btn-lg btn-block">Drive Circle</button> 
+									<button type="submit" class="btn btn-default btn-lg btn-block">Drive Circle</button>
 								</form>
 							</div>
 						</div>
 					</div>
-				</div>	
-				
+				</div>
+        <div class="panel panel-default">
+					<div class="panel-heading" role="tab" id="headingSeven">
+						<h4 class="panel-title">
+							<a class="collapsed" role="button" data-toggle="collapse" data-parent="#accordion" href="#collapseFour" aria-expanded="false" aria-controls="collapseSeven">
+							Get data
+							</a>
+						</h4>
+					</div>
+					<div id="collapseSeven" class="panel-collapse collapse" role="tabpanel" aria-labelledby="headingSeven">
+						<div class="panel-body">
+							<div id ='data_display'></div>
+
+							</div>
+						</div>
+					</div>
+				</div>
+
 			</div>
 		</div>
 	</div>
@@ -251,7 +276,7 @@
 		</div>
 	</div>
 
-	
+
     <script src="https://ajax.googleapis.com/ajax/libs/jquery/1.11.3/jquery.min.js"></script>
     <script src="bootstrap-3.3.5-dist/js/bootstrap.min.js"></script>
     <script>
@@ -279,7 +304,7 @@
 
 		$(this)
 			.data('aspectRatio', this.height / this.width)
-			
+
 			// and remove the hard coded width/height
 			.removeAttr('height')
 			.removeAttr('width');
@@ -291,7 +316,7 @@
 	$(window).resize(function() {
 
 		var newWidth = $fluidEl.width();
-		
+
 		// Resize all videos according to their own aspect ratio
 		$allVideos.each(function() {
 
@@ -307,7 +332,13 @@
 
 });
     </script>
+    <script>
+    function load_data(){
+      $('#data_display').load("get_data_client.py");
+    };
+
+    setInterval(function(){load_data();
+                          console.log('get_data');},1000);
+    </script>
 </body>
 </html>
-
-
