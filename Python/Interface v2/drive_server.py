@@ -54,8 +54,8 @@ def parse_message(message):
             return False
         else:
             constraint = commands.get(key,0).get('constraint',False)
-            to_be_checked = split_message[1]
             if constraint != False:
+                to_be_checked = int(split_message[1])
                 temp = constraint(to_be_checked)
                 if temp:
                     return split_message
@@ -118,23 +118,24 @@ def has_lock(id_):
         return False
 # A method to check whether or not a lock is expired
 def lock_expired():
-    global SUPERLOCK,LOCK_TIME, LOCK_MAX_TIME
-    return (not SUPERLOCK) and (time.time() - LOCK_TIME >= LOCK_MAX_TIME)
+    global SUPERLOCK,LOCK,LOCK_TIME, LOCK_MAX_TIME
+    return (not SUPERLOCK) and LOCK and (time.time() - LOCK_TIME >= LOCK_MAX_TIME)
 
 while True:
+    global LOCK_ID
     message = socket.recv()
     print "Received request: ", message
     message = parse_message(message)
     return_message = ''
     if (message!= False):
-        if lock_expired:
+        if lock_expired():
             free_lock(LOCK_ID)
         if message[0] == 'LOCK':
             lock_acquired = get_lock(message[1])
             if lock_acquired:
                 return_message = 'LOCK_TRUE'
             elif has_lock(message[1]):
-                return_message = 'LOCK_ALREAY'
+                return_message = 'LOCK_ALREADY'
             else:
                 return_message = 'LOCK_FALSE'
         elif message[0] == 'UNLOCK':
@@ -175,11 +176,11 @@ while True:
                 if not TESTING_MODE:
                     try:
                         controller.start_command('drive_distance',(distance))
-                        return_message = 'SUCCESS'
+                        return_message = 'SUCCES'
                     except:
                         return_message = 'FAILURE'
                 else:
-                    return_message = 'SUCCESS'
+                    return_message = 'SUCCES'
         elif message[0] == 'CIRC':
             radius = int(message[1])
             id_ = message[2]
@@ -189,11 +190,11 @@ while True:
                 if not TESTING_MODE:
                     try:
                         controller.start_command('drive_circ',(radius))
-                        return_message = 'SUCCESS'
+                        return_message = 'SUCCES'
                     except:
                         return_message = 'FAILURE'
                 else:
-                    return_message = 'SUCCESS'
+                    return_message = 'SUCCES'
         elif message[0] == 'SQUARE':
             side = int(message[1])
             id_ = message[2]
@@ -203,11 +204,11 @@ while True:
                 if not TESTING_MODE:
                     try:
                         controller.start_command('drive_square',(side))
-                        return_message = 'SUCCESS'
+                        return_message = 'SUCCES'
                     except:
                         return_message = 'FAILURE'
                 else:
-                    return_message = 'SUCCESS'
+                    return_message = 'SUCCES'
     else:
         return_message = 'ILLEGAL_MESSAGE'
 

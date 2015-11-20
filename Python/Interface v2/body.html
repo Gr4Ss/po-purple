@@ -1,3 +1,11 @@
+<div class="jumbotron">
+  <h1>Get lock!</h1>
+  <form>
+    <input type = "submit" value = "Lock" name ='lock'>
+    <input type = "submit" value = "Unlock" name = 'unlock'>
+  </form>
+<p><a class="btn btn-primary btn-lg" href="#" role="button">Learn more</a></p>
+</div>
 <div class="panel-group" id="accordion" role="tablist" aria-multiselectable="true">
 
   <div class="panel panel-default">
@@ -286,7 +294,7 @@ $el
 </script>
 <script>
 function load_data(){
-$('#data_display').load("get_data_client.py");
+$('#data_display').load("get_data.py");
 };
 
 setInterval(function(){load_data();

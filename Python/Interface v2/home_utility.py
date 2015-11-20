@@ -18,7 +18,7 @@ def create_hash(length):
 
 def response_parser(response):
     result = '<h1> PIETER = LOSER </h1>'
-    if response = 'ILLEGAL_MESSAGE':
+    if response == 'ILLEGAL_MESSAGE':
         html_file = open('illegal_message.html')
         result = html_file.read()
         html_file.close()
@@ -31,7 +31,11 @@ def response_parser(response):
         html_file = open('gotnolock.html')
         result = html_file.read()
         html_file.close()
-    elif response == 'NO_LOCK':
+    elif response == 'UNLOCK_TRUE':
+        html_file = open('unlock.html')
+        result = html_file.read()
+        html_file.close()
+    elif response == 'NO_LOCK' or response == 'UNLOCK_FALSE':
         html_file = open('nolock.html')
         result = html_file.read()
         html_file.close()

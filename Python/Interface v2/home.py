@@ -11,7 +11,8 @@ cgitb.enable()
 # Storing the port to communicate with the drive server
 PORT = '5060'
 # Storing the IP of the website host (the pi)
-IP = '192.168.137.156'
+#IP = '192.168.137.156'
+IP= 'localhost'
 
 # Setting up a socket to communicate with the driving server
 context = zmq.Context()
@@ -31,6 +32,7 @@ except (Cookie.CookieError, KeyError):
 
 print "Content-type: text/html"
 print cookie.output()
+print
 
 # printing the header part of the html
 header = open('header.html')
@@ -43,7 +45,7 @@ if (len(form)!= 0):
         if key == 'lock':
             command = 'LOCK_' + str(session_id)
             break
-        elif key = 'unlock':
+        elif key == 'unlock':
             command = 'UNLOCK_' + str(session_id)
             break
         elif key == 'straight':
@@ -55,10 +57,9 @@ if (len(form)!= 0):
         elif key == 'square':
             command = 'SQUARE_' + str(form['square'].value) + '_' + str(session_id)
             break
-
-        socket.send(command)
-        response = socket.recv()
-        print response_parser(response)
+    socket.send(command)
+    response = socket.recv()
+    print response_parser(response)
 
 # printing the rest of the body
 body = open('body.html')
