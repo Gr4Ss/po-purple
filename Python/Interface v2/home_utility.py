@@ -22,7 +22,7 @@ def response_parser(response):
         html_file = open('illegalmessage.html')
         result = html_file.read()
         html_file.close()
-    elif response == 'LOCK_TRUE' or response == 'LOCK_ALREAY':
+    elif response == 'LOCK_TRUE' or response == 'LOCK_ALREADY':
         html_file = open('lock.html')
         result = html_file.read()
         html_file.close()
