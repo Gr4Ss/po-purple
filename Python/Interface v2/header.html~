@@ -28,9 +28,9 @@
         </div>
         <div id="navbar" class="collapse navbar-collapse">
           <ul class="nav navbar-nav">
-            <li class="active"><a href="#home" class="smooth-nav">Home</a></li>
-	    <li><a href="#videostream" class="smooth-nav">Videostream</a></li>
-            <li><a href="#about" class="smooth-nav">About</a></li>
+            <li class="active"><a href="#home">Home</a></li>
+	           <li><a href="#videostream">Videostream</a></li>
+            <li><a href="#about">About</a></li>
           </ul>
         </div><!--/.nav-collapse -->
       </div>
