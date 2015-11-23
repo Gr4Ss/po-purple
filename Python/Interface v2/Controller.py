@@ -53,7 +53,10 @@ class Controller:
         if self.__command_going:
             self.stop_commmand()
         self.__command_going = True
-        exec('thread = threading.Thread(target=self.' + command +',args='+ str(arguments) +')')
+        if arguments != None:
+            exec('thread = threading.Thread(target=self.' + command +',args='+ str(arguments) +')')
+        else:
+            exec('thread = threading.Thread(target=self.' + command +')')
         self.__command_thread = thread
         self.__command_thread.setDaemon('True')
         self.__command_thread.start()
@@ -133,7 +136,7 @@ class Controller:
             time.sleep(0.01)
         self.__leftengine.set_speed(0)
         self.__rightengine.set_speed(0)
-        self.stop_commmand()
+
 
     def correct_speed(self,speed,speed_diff):
         # If the speed or speed + diff is bigger then 255 a correction must happen
@@ -193,7 +196,6 @@ class Controller:
             outer_engine.set_speed(speed1)
             inner_engine.set_speed(speed2)
             time.sleep(0.1)
-        self.stop_commmand()
 
     def ride_polygon(self,sides,distance):
         try:

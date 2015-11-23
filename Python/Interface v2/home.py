@@ -60,6 +60,11 @@ if (len(form)!= 0):
         elif key == 'square':
             command = 'SQUARE_' + str(form['square'].value) + '_' + str(session_id)
             break
+        elif key == 'forwardstart':
+            command = 'FORWARDSTART_' + str(session_id)
+            break
+        elif key == 'forwardstop':
+            command = 'FORWARDSTOP_' + str(session_id)
     socket.send(command)
     response = socket.recv()
     print response_parser(response)
