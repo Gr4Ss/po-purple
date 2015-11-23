@@ -8,7 +8,7 @@ if not TESTING_MODE:
 # Import the controller
     import Controller
 # create controller entity
-    controller = Controller()
+    controller = Controller.Controller()
 
 # The port to which this server will listen
 PORT = '5060'
@@ -123,6 +123,7 @@ def lock_expired():
 
 while True:
     global LOCK_ID
+
     message = socket.recv()
     print "Received request: ", message
     message = parse_message(message)
@@ -162,11 +163,11 @@ while True:
                 return_message = 'UNLOCK_TRUE'
             else:
                 return_message = 'UNLOCK_FALSE'
-        elif message[0] == 'DATA':
-            if TESTING_MODE:
-                return_message = str(time.time())
-            else:
-                return_message = str(controller.get_sensor_data())
+        #elif message[0] == 'DATA':
+        #    if TESTING_MODE:
+        #        return_message = str(time.time())
+        #    else:
+        #        return_message = str(controller.get_sensor_data())
         elif message[0] == 'STRAIGHT':
             distance = int(message[1])
             id_ = message[2]
@@ -175,7 +176,7 @@ while True:
             else:
                 if not TESTING_MODE:
                     try:
-                        controller.start_command('drive_distance',(distance))
+                        controller.start_command('ride_distance','(' + str(distance) + ',)')
                         return_message = 'SUCCES'
                     except:
                         return_message = 'FAILURE'
@@ -189,7 +190,7 @@ while True:
             else:
                 if not TESTING_MODE:
                     try:
-                        controller.start_command('drive_circ',(radius))
+                        controller.start_command('ride_circ','(' + str(radius) + ',)')
                         return_message = 'SUCCES'
                     except:
                         return_message = 'FAILURE'

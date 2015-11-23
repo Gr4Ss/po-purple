@@ -241,7 +241,7 @@
 
 
 <script src="https://ajax.googleapis.com/ajax/libs/jquery/1.11.3/jquery.min.js"></script>
-<script src="bootstrap-3.3.5-dist/js/bootstrap.min.js"></script>
+<script src="https://maxcdn.bootstrapcdn.com/bootstrap/3.3.5/js/bootstrap.min.js"></script>
 <script>
 $('.smooth-nav').click(function(){
 $('html, body').animate({
@@ -296,7 +296,7 @@ $el
 </script>
 <script>
 function load_data(){
-$('#data_display').load("get_data_client.py");
+$('#data_display').load("get_data.py");
 };
 
 setInterval(function(){load_data();
@@ -307,7 +307,6 @@ setInterval(function(){load_data();
 var app = angular.module('formStraight', []);
 app.controller('controllerStraight', function($scope) {
   $scope.result = function(){
-    console.log($scope.distance == '');
     if ($scope.distance != ''){
       distance = parseInt($scope.distance);
       return ((distance<20 || distance > 600)) ? 'Please enter a number between 20 and 600':'';

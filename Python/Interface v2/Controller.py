@@ -6,7 +6,7 @@ from Engine import *
 from BrickPi_thread import *
 from GPIO_thread import *
 from Sensor import *
-from PID import *
+import PID
 
 ## The minimum speed to move
 MINIMUM_SPEED = 110
@@ -29,7 +29,7 @@ class Controller:
         # Storing the distance between the centers of the cars
         self.__widthcar = 2.6 + 11.1 - .2
         # Storing the Lego MINDSTORM distance sensor
-        self.__distanceLego = MindstormSensor('1','ULTRASONIC_CONT')
+        self.__distanceLego = MindstormSensor('4','ULTRASONIC_CONT')
         # Storing the GPIO distance sensor
         self.__distancePi = DistanceSensor(17,4)
         # Storing the current gearration
@@ -40,10 +40,10 @@ class Controller:
         self.__brickpi = BrickPi_Thread(self.__engines,[self.__distanceLego])
         # Storing a reference to a gpio thread
         self.__gpio = GPIO_Thread([self.__distancePi])
-        # Turn the threads on
         self.__brickpi.on()
         self.__gpio.on()
-
+        self.__command_going = False
+        self.__command_thread = None
     ## Turn the thread back off
     def kill_threads(self):
         self.__brickpi.off()
@@ -53,7 +53,7 @@ class Controller:
         if self.__command_going:
             self.stop_commmand()
         self.__command_going = True
-        exec('thread = threading.Thread(target=self.' + command +',args='+ argument +')')
+        exec('thread = threading.Thread(target=self.' + command +',args='+ str(arguments) +')')
         self.__command_thread = thread
         self.__command_thread.setDaemon('True')
         self.__command_thread.start()
@@ -63,6 +63,7 @@ class Controller:
             self.__command_going = False
             self.__command_thread.join()
             self.__command_thread = None
+
     ## Return the values of the sensor in a dictionary with keys
     ## Distancesensor1 -> GPIO distance sensor
     ## Distancesensor2 -> Lego MINDSTORM distance sensor
@@ -132,6 +133,7 @@ class Controller:
             time.sleep(0.01)
         self.__leftengine.set_speed(0)
         self.__rightengine.set_speed(0)
+        self.stop_commmand()
 
     def correct_speed(self,speed,speed_diff):
         # If the speed or speed + diff is bigger then 255 a correction must happen
@@ -191,6 +193,7 @@ class Controller:
             outer_engine.set_speed(speed1)
             inner_engine.set_speed(speed2)
             time.sleep(0.1)
+        self.stop_commmand()
 
     def ride_polygon(self,sides,distance):
         try:
@@ -213,14 +216,15 @@ class Controller:
             if DEBUG:
                 print 'Sides: ', sides
 
+
     def correct_speed2(self,inspeed,outspeed):
         # Only usefull when outspeed bigger then inspeed
         if abs(outspeed) > abs(inspeed):
             routspeed = sign(outspeed) * min(255,abs(outspeed))
             routspeed = sign(outspeed) * max(MINIMUM_SPEED*1.1,abs(outspeed))
             rinspeed = sign(outspeed) * abs(max(abs(inspeed),5)/outspeed) * routspeed
-	           return rinspeed,routspeed
-	    return inspeed,outspeed
+	        return rinspeed,routspeed
+        return inspeed,outspeed
 
     def ride_circ(self,radius):
         if abs(radius) <20:
@@ -252,8 +256,8 @@ class Controller:
                 print 'Speed: ',speed1,speed2
             ## Wat volgt is misschien nuttig
             ispeed, ospeed = self.correct_speed2(speed1,speed2)
-            ## if DEBUG:
-            print 'Corrected speed: ', ispeed, ospeed
+            if DEBUG:
+                print 'Corrected speed: ', ispeed, ospeed
             inner_engine.set_speed(ispeed)
             outer_engine.set_speed(ospeed)
             if angle <= 2*math.pi + 0.3:
