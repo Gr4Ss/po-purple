@@ -22,6 +22,7 @@ if([32, 37, 38, 39, 40].indexOf(e.keyCode) > -1) {
               moveUp = 0;
               $(".driveForward").css("background-color", "white");
               $(".driveForward").css("color", "black");
+              $.post("home.py",'forwardstop');
               break;
             case 39:
               moveRight = 0;
@@ -48,6 +49,7 @@ if([32, 37, 38, 39, 40].indexOf(e.keyCode) > -1) {
               moveUp = 1;
               $(".driveForward").css("background-color", "green");
               $(".driveForward").css("color", "white");
+              $.post("home.py",'forwardstart');
               break;
             case 39:
               moveRight = 1;

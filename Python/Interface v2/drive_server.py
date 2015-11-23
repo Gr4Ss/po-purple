@@ -1,6 +1,7 @@
 import zmq
 import time
 import constraints as c
+import threading
 
 TESTING_MODE = True
 
@@ -37,7 +38,7 @@ commands = {'LOCK':{'nb_of_arguments':1},'UNLOCK':{'nb_of_arguments':1},
 ,'CIRC':{'nb_of_arguments':2,'constraint':c.constraint_circ},
 'SQUARE':{'nb_of_arguments':2,'constraint':c.constraint_square},
 'DATA':{'nb_of_arguments':0},'SUPERLOCK':{'nb_of_arguments':2},
-'SUPERUNLOCK':{'nb_of_arguments':2}}
+'SUPERUNLOCK':{'nb_of_arguments':2},'FORWARDSTART':{'nb_of_arguments':1},'FORWARDSTOP':{'nb_of_arguments':1}}
 
 # A method to parse the message
 # If the message isn't valid, False will be returned
@@ -121,9 +122,34 @@ def lock_expired():
     global SUPERLOCK,LOCK,LOCK_TIME, LOCK_MAX_TIME
     return (not SUPERLOCK) and LOCK and (time.time() - LOCK_TIME >= LOCK_MAX_TIME)
 
+def data_update(data):
+    open('/var/www/data.html','w').close()
+    fil = open('/var/www/data.html','r+')
+    string =  '''<table>
+                    <tr>
+                        <td>Distance1</td>
+                        <td>''' + str(data['Distancesensor1']) + '''</td>
+                    </tr>
+                    <tr>
+                        <td>Distance2</td>
+                        <td>''' + str(data['Distancesensor2']) + '''</td>
+                    </tr>
+                </table> '''
+    fil.write(string)
+    fil.close()
+
+def data_updater():
+    while True:
+        time.sleep(5)
+        data = controller.get_sensor_data()
+        data_update(data)
+
+
+thread = threading.Thread(target=data_updater)
+thread.setDaemon('True')
+thread.start()
 while True:
     global LOCK_ID
-
     message = socket.recv()
     print "Received request: ", message
     message = parse_message(message)
@@ -210,6 +236,32 @@ while True:
                         return_message = 'FAILURE'
                 else:
                     return_message = 'SUCCES'
+        elif message[0] == 'FORWARDSTART':
+            id_ = message[1]
+            if not has_lock(id_):
+                return_message = 'NO_LOCK'
+            else:
+                if not TESTING_MODE:
+                    try:
+                        controller.start_command('forward',None)
+                        return_message = 'SUCCES'
+                    except:
+                        return_message = 'FAILURE'
+                else:
+                        return_message = 'SUCCES'
+        elif message[0] == 'FORWARDSTOP':
+            id_ = message[1]
+            if not has_lock(id_):
+                return_message = 'NO_LOCK'
+            else:
+                if not TESTING_MODE:
+                    try:
+                        controller.start_command('stop',None)
+                        return_message = 'SUCCES'
+                    except:
+                        return_message = 'FAILURE'
+                else:
+                        return_message = 'SUCCES'
     else:
         return_message = 'ILLEGAL_MESSAGE'
 
