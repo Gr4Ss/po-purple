@@ -1,3 +1,46 @@
+<!DOCTYPE html>
+<html>
+<head>
+
+    <meta charset="utf-8">
+
+    <title>P&O Purple</title>
+
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/jquery/3.0.0-alpha1/jquery.min.js"></script>
+    <script src="../../Website/bootstrap-3.3.5-dist/js/bootstrap.min.js"></script>
+    
+    <link rel="stylesheet" href="../../Website/bootstrap-3.3.5-dist/css/bootstrap-theme.min.css">
+    <link rel="stylesheet" href="../../Website/bootstrap-3.3.5-dist/css/bootstrap.min.css">
+    <link rel="stylesheet" href="../../Website/cssv2.css">
+</head>
+
+<body data-spy="scroll" data-target=".navbar" data-offset="50">
+  <script src="http://ajax.googleapis.com/ajax/libs/angularjs/1.3.14/angular.min.js"></script>
+    <nav class="navbar navbar-inverse navbar-fixed-top">
+      <div class="container">
+        <div class="navbar-header">
+          <button type="button" class="navbar-toggle collapsed" data-toggle="collapse" data-target="#navbar" aria-expanded="false" aria-controls="navbar">
+            <span class="sr-only">Toggle navigation</span>
+            <span class="icon-bar"></span>
+            <span class="icon-bar"></span>
+            <span class="icon-bar"></span>
+          </button>
+          <a class="navbar-brand" href="#">P&O Purple</a>
+        </div>
+        <div id="navbar" class="collapse navbar-collapse">
+          <ul class="nav navbar-nav">
+            <li class="active"><a href="#home" class="smooth-nav">Home</a></li>
+	    <li><a href="#videostream" class="smooth-nav">Videostream</a></li>
+            <li><a href="#about" class="smooth-nav">About</a></li>
+          </ul>
+        </div><!--/.nav-collapse -->
+      </div>
+    </nav>
+
+    <div class="container" id='home'>
+		<div class="starter-template">
 <div class="jumbotron">
   <h1>Get lock!</h1>
   <form>
@@ -149,7 +192,37 @@
       </h4>
     </div>
     <div id="collapseSix" class="panel-collapse collapse" role="tabpanel" aria-labelledby="headingSix">
-        <div class="form6">
+        <div class="panel-body">
+        <div class="touch-keys" >
+          <div class="row">
+            <div class="col-xs-4 col-xs-offset-4">
+              <button class="btn btn-default btn-block driveForward">
+              F
+              </button>
+            </div>
+          </div>
+          <div class="row">
+            <div class="col-xs-4">
+              <button class="btn btn-default btn-block driveLeft">
+              L
+              </button>
+            </div>
+            <div class="col-xs-4">
+              <button class="btn btn-default btn-block driveReverse">
+              B
+              </button>
+            </div>
+            <div class="col-xs-4">
+              <button class="btn btn-default btn-block driveRight">
+              R
+              </button>
+            </div>
+          </div>
+        </div>
+        <div class="keyboard-keys">
+        Or press the keyboard arrow keys to control the vehicle!
+        <script src="keyspress.js"></script>
+        </div>
         </div>
     </div>
   </div>
@@ -230,9 +303,6 @@
 </div>
 </div>
 
-
-<script src="https://ajax.googleapis.com/ajax/libs/jquery/1.11.3/jquery.min.js"></script>
-<script src="https://maxcdn.bootstrapcdn.com/bootstrap/3.3.5/js/bootstrap.min.js"></script>
 <script>
 $('.smooth-nav').click(function(){
 $('html, body').animate({
@@ -241,70 +311,19 @@ $('html, body').animate({
 return false;
 });
 </script>
-<script>
-// By Chris Coyier & tweaked by Mathias Bynens
-console.log('executing');
-$(function() {
-
-// Find all YouTube videos
-var $allVideos = $("iframe[src^='http://www.youtube.com']"),
-
-// The element that is fluid width
-$fluidEl = $("body");
-
-// Figure out and save aspect ratio for each video
-$allVideos.each(function() {
-
-$(this)
-.data('aspectRatio', this.height / this.width)
-
-// and remove the hard coded width/height
-.removeAttr('height')
-.removeAttr('width');
-
-});
-
-// When the window is resized
-// (You'll probably want to debounce this)
-$(window).resize(function() {
-
-var newWidth = $fluidEl.width();
-
-// Resize all videos according to their own aspect ratio
-$allVideos.each(function() {
-
-var $el = $(this);
-$el
-  .width(newWidth)
-  .height(newWidth * $el.data('aspectRatio'));
-
-});
-
-// Kick off one resize to fix all videos on page load
-}).resize();
-
-});
-</script>
-<script>
-function load_data(){
-$('#data_display').load("get_data.py");
-};
-
-setInterval(function(){load_data();
-                    console.log('get_data');},1000);
-</script>
 
 <script>
 var app = angular.module('formStraight', []);
 app.controller('controllerStraight', function($scope) {
   $scope.result = function(){
+    console.log($scope.distance == '');
     if ($scope.distance != ''){
       distance = parseInt($scope.distance);
       return ((distance<20 || distance > 600)) ? 'Please enter a number between 20 and 600':'';
     }
   };
 });
-
 </script>
+
 </body>
 </html>
