@@ -18,17 +18,19 @@ IP= 'localhost'
 context = zmq.Context()
 socket = context.socket(zmq.REQ)
 socket.connect("tcp://localhost:%s" % PORT)
-
+expire_time = expiration = datetime.datetime.now() + datetime.timedelta(days=366)
 # Checking if the user has already a cookie else ofer him one and ask if he wants some tea
 try:
     cookie = Cookie.SimpleCookie(os.environ["HTTP_COOKIE"])
     session_id = cookie["session"].value
+    cookie["session"]["expires"] =  expiration.strftime("%a, %d-%b-%Y %H:%M:%S PST")
 except (Cookie.CookieError, KeyError):
     cookie = Cookie.SimpleCookie()
     session_id = create_hash(32)
     cookie["session"] = session_id
     cookie["session"]["domain"] = IP
     cookie["session"]["path"] = "/"
+    cookie["session"]["expires"] = expiration.strftime("%a, %d-%b-%Y %H:%M:%S PST")
 
 print "Content-type: text/html"
 print cookie.output()

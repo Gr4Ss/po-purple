@@ -19,7 +19,7 @@ def create_hash(length):
 def response_parser(response):
     result = '<h1> PIETER = LOSER </h1>'
     if response == 'ILLEGAL_MESSAGE':
-        html_file = open('illegal_message.html')
+        html_file = open('illegalmessage.html')
         result = html_file.read()
         html_file.close()
     elif response == 'LOCK_TRUE' or response == 'LOCK_ALREAY':

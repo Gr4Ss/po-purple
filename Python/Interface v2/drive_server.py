@@ -166,7 +166,7 @@ while True:
             if TESTING_MODE:
                 return_message = str(time.time())
             else:
-                return_message = str(controller.get_data())
+                return_message = str(controller.get_sensor_data())
         elif message[0] == 'STRAIGHT':
             distance = int(message[1])
             id_ = message[2]

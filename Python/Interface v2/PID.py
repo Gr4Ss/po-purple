@@ -20,7 +20,7 @@ class PID:
     # Else the new value is calculated
     def new_value(self,error,dt):
         if abs(error) < self.__precision:
-             return 0 
+             return 0
         self.__integral += error *dt
         integral = self.__integral
         differential = (error - self.__error)/dt
