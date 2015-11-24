@@ -3,7 +3,7 @@ local bmSetup = os.clock()
 	LOAD LIBRARIES
 ]]
 -- Add the ./lua/ folder to the list of paths
-package.path = "lua/?.lua;lib/?.lua;"..package.path;
+package.path = "lua/?.lua;lualib/?.lua;"..package.path;
 
 -- Load in the libs, store them as locals for fast access
 local require = require;
