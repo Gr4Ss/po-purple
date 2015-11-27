@@ -144,10 +144,10 @@ def data_updater():
         data = controller.get_sensor_data()
         data_update(data)
 
-
-thread = threading.Thread(target=data_updater)
-thread.setDaemon('True')
-thread.start()
+if not TESTING_MODE:
+    thread = threading.Thread(target=data_updater)
+    thread.setDaemon('True')
+    thread.start()
 while True:
     global LOCK_ID
     message = socket.recv()

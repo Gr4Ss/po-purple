@@ -44,6 +44,22 @@ class Controller:
         self.__gpio.on()
         self.__command_going = False
         self.__command_thread = None
+    def get_car_width(self):
+        return self.__widthcar
+    def set_speed_engines(self,speed):
+        if len(speed) != len(self.__engines):
+            raise Exception
+        engines = self.__engines
+        for i in range(engies):
+            engines[i].set_speed(speed[i])
+    def flush_engines(self):
+        for engine in self.__engines:
+            engine.reset_count()
+    def get_engine_distance(self):
+        result = []
+        for engine in self.__engines:
+            result.append(engine.get_count()*self.__perimeter*self.__gearratio)
+        return result
     ## Turn the thread back off
     def kill_threads(self):
         self.__brickpi.off()
@@ -90,7 +106,7 @@ class Controller:
             distance2 = self.__rightengine.get_count()*self.__perimeter*self.__gearratio
             speeddif = pid.new_value(distance1-distance2,0.1)
             self.__rightengine.set_speed(240 + speeddif)
-            time.sleep(0.1)
+            time.sleep(0.05)
 
     def backward(self):
         pid = PID(5.,1/20.,1/50.,1.)
@@ -103,7 +119,7 @@ class Controller:
             distance2 = self.__rightengine.get_count()*self.__perimeter*self.__gearratio
             speeddif = pid.new_value(distance1-distance2,0.1)
             self.__rightengine.set_speed(-240 - speeddif)
-            time.sleep(0.1)
+            time.sleep(0.05)
 
     def stop(self):
         self.__leftengine.set_speed(0)
@@ -196,7 +212,8 @@ class Controller:
             outer_engine.set_speed(speed1)
             inner_engine.set_speed(speed2)
             time.sleep(0.1)
-
+    def rotate2(self,degree):
+        pass
     def ride_polygon(self,sides,distance):
         try:
             sides = float(sides)
@@ -267,7 +284,6 @@ class Controller:
             time.sleep(0.1)
         inner_engine.set_speed(0)
         outer_engine.set_speed(0)
-
     def drive(self,y,x):
         pass
     def rotate_left(self):

@@ -15,10 +15,17 @@ PORT = '5060'
 #IP = '192.168.137.156'
 IP= 'localhost'
 
+
 # Setting up a socket to communicate with the driving server
 context = zmq.Context()
 socket = context.socket(zmq.REQ)
 socket.connect("tcp://localhost:%s" % PORT)
+# Set timeout, wait only a certain time on drive server.
+socket.SNDTIMEO = 1000
+socket.RCVTIMEO = 20000
+socket.LINGER = 10000
+
+# Cookies njamie.
 expire_time = expiration = datetime.datetime.now() + datetime.timedelta(days=366)
 # Checking if the user has already a cookie else ofer him one and ask if he wants some tea
 try:
@@ -33,6 +40,7 @@ except (Cookie.CookieError, KeyError):
     cookie["session"]["path"] = "/"
     cookie["session"]["expires"] = expiration.strftime("%a, %d-%b-%Y %H:%M:%S PST")
 
+# Some CGI bookkeeping
 print "Content-type: text/html"
 print cookie.output()
 print
@@ -65,8 +73,12 @@ if (len(form)!= 0):
             break
         elif key == 'forwardstop':
             command = 'FORWARDSTOP_' + str(session_id)
-    socket.send(command)
-    response = socket.recv()
+    try:
+    	socket.send(command)
+    	response = socket.recv()
+    except:
+    	socket.close()
+    	response = "SERVERDOWN"
     print response_parser(response)
 
 # printing the rest of the body

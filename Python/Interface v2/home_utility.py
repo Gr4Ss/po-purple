@@ -1,5 +1,6 @@
 import random
 
+DIRECTORY = ''
 def create_hash(length):
     result = ''
     for i in range(0,length):
@@ -17,34 +18,39 @@ def create_hash(length):
     return result
 
 def response_parser(response):
+    global DIRECTORY
     result = '<h1> PIETER = LOSER </h1>'
     if response == 'ILLEGAL_MESSAGE':
-        html_file = open('illegalmessage.html')
+        html_file = open(DIRECTORY + 'illegalmessage.html')
         result = html_file.read()
         html_file.close()
     elif response == 'LOCK_TRUE' or response == 'LOCK_ALREADY':
-        html_file = open('lock.html')
+        html_file = open(DIRECTORY + 'lock.html')
         result = html_file.read()
         html_file.close()
     # if you get this message you got no l(u)(o)ck
     elif response == 'LOCK_FALSE':
-        html_file = open('gotnolock.html')
+        html_file = open(DIRECTORY + 'gotnolock.html')
         result = html_file.read()
         html_file.close()
     elif response == 'UNLOCK_TRUE':
-        html_file = open('unlock.html')
+        html_file = open(DIRECTORY + 'unlock.html')
         result = html_file.read()
         html_file.close()
     elif response == 'NO_LOCK' or response == 'UNLOCK_FALSE':
-        html_file = open('nolock.html')
+        html_file = open(DIRECTORY + 'nolock.html')
         result = html_file.read()
         html_file.close()
     elif response == 'SUCCES':
-        html_file = open('succes.html')
+        html_file = open(DIRECTORY + 'succes.html')
         result = html_file.read()
         html_file.close()
     elif response == 'FAILURE':
-        html_file = open('failure.html')
+        html_file = open(DIRECTORY + 'failure.html')
+        result = html_file.read()
+        html_file.close()
+    elif response == 'SERVERDOWN':
+        html_file = open(DIRECTORY + 'server_down.html')
         result = html_file.read()
         html_file.close()
     return result
