@@ -24,3 +24,7 @@ body {
 input {
    text-align: center;
 }
+
+.driveLeft, .driveRight, .driveForward, .driveReverse {
+	background-image: none;
+}

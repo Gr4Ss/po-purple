@@ -40,6 +40,7 @@ class PID2:
             self.__error = 0
         except:
             raise Exception('Argument exception')
+
     def new_value(self,value,dt):
         if abs(self.__threshold - value) < self.__precision and abs(self.__threshold) < abs(value) and sign(self.__threshold) == sign(value):
             return 0

@@ -44,6 +44,22 @@ class Controller:
         self.__gpio.on()
         self.__command_going = False
         self.__command_thread = None
+    def get_car_width(self):
+        return self.__widthcar
+    def set_speed_engines(self,speed):
+        if len(speed) != len(self.__engines):
+            raise Exception
+        engines = self.__engines
+        for i in range(engies):
+            engines[i].set_speed(speed[i])
+    def flush_engines(self):
+        for engine in self.__engines:
+            engine.reset_count()
+    def get_engine_distance(self):
+        result = []
+        for engine in self.__engines:
+            result.append(engine.get_count()*self.__perimeter*self.__gearratio)
+        return result
     ## Turn the thread back off
     def kill_threads(self):
         self.__brickpi.off()
@@ -90,7 +106,7 @@ class Controller:
             distance2 = self.__rightengine.get_count()*self.__perimeter*self.__gearratio
             speeddif = pid.new_value(distance1-distance2,0.1)
             self.__rightengine.set_speed(240 + speeddif)
-            time.sleep(0.1)
+            time.sleep(0.05)
 
     def backward(self):
         pid = PID(5.,1/20.,1/50.,1.)
@@ -103,7 +119,7 @@ class Controller:
             distance2 = self.__rightengine.get_count()*self.__perimeter*self.__gearratio
             speeddif = pid.new_value(distance1-distance2,0.1)
             self.__rightengine.set_speed(-240 - speeddif)
-            time.sleep(0.1)
+            time.sleep(0.05)
 
     def stop(self):
         self.__leftengine.set_speed(0)
@@ -196,6 +212,25 @@ class Controller:
             outer_engine.set_speed(speed1)
             inner_engine.set_speed(speed2)
             time.sleep(0.1)
+    def rotate2(self,degree):
+        ## reset the counters of the engiense
+        self.__leftengine.reset_count()
+        self.__rightengine.reset_count()
+        if degree < 0:
+            inner_engine = self.__leftengine
+        else:
+            inner_engine = self.__rightengine
+        distance = degree/180 * math.pi * self.__widthcar
+        pid = PID.PID2(20.,1./2.,5.,0.7,distance)
+        speed = MINIMUM_SPEED
+        inner_engine.set_speed(MINIMUM_SPEED)
+        while speed != 0 and self.__command_going:
+            distance = inner_engine.get_count() * self.__gearratio * self.__perimeter
+            speed = pid.new_value(distance,0.1)
+            if DEBUG:
+                print speed
+            inner_engine.set_speed(speed)
+            time.sleep(.1)
 
     def ride_polygon(self,sides,distance):
         try:
@@ -211,9 +246,9 @@ class Controller:
             print 'Angle: ', angle
         while sides > 0:
             self.ride_distance(distance)
-	        time.sleep(0.1)
+	    time.sleep(0.1)
             self.rotate(angle)
-	        time.sleep(0.1)
+	    time.sleep(0.1)
             sides -= 1
             if DEBUG:
                 print 'Sides: ', sides
@@ -225,7 +260,7 @@ class Controller:
             routspeed = sign(outspeed) * min(255,abs(outspeed))
             routspeed = sign(outspeed) * max(MINIMUM_SPEED*1.1,abs(outspeed))
             rinspeed = sign(outspeed) * abs(max(abs(inspeed),5)/outspeed) * routspeed
-	        return rinspeed,routspeed
+	    return rinspeed,routspeed
         return inspeed,outspeed
 
     def ride_circ(self,radius):
@@ -270,7 +305,18 @@ class Controller:
 
     def drive(self,y,x):
         pass
-    def rotate_left(self):
-        pass
-    def rotate_right(self):
-        pass
+
+    def left(self):
+        self.__rightengine.set_speed(240)
+        while self.__command_going:
+            pass
+
+    def right(self):
+        self.__leftengine.set_speed(240)
+        while self.__command_going:
+            pass
+
+    def get_distance(self):
+        distance = inner_engine.get_count()*self__perimeter*self.__gearratio
+        return distance
+
