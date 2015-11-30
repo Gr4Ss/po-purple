@@ -69,10 +69,20 @@ if (len(form)!= 0):
             command = 'SQUARE_' + str(form['square'].value) + '_' + str(session_id)
             break
         elif key == 'forwardstart':
-            command = 'FORWARDSTART_' + str(session_id)
+            command = 'FORWARD_' + str(session_id)
             break
-        elif key == 'forwardstop':
-            command = 'FORWARDSTOP_' + str(session_id)
+        elif key == 'leftstart':
+            command = 'LEFT_' + str(session_id)
+            break
+        elif key == 'rightstart':
+            command = 'RIGHT_' + str(session_id)
+            break
+        elif key == 'backwardstart':
+            command = 'RIGHT_' + str(session_id)
+            break
+        elif key == 'forwardstop' or 'leftstop' or 'rightstop' or ' backwardstop':
+            command = 'STOP_' + str(session_id)
+            break
     try:
     	socket.send(command)
     	response = socket.recv()

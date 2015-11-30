@@ -2,20 +2,22 @@ import threading
 import time
 import math
 from utility import *
-import Controller
+#import Controller
 import PID
-controller = Controller.Controller()
-MINIMUM_SPEED = 110
+#controller = Controller.Controller()
+MINIMUM_SPEED = 110.0
 class Driver:
     global MINIMUM_SPEED
     def __init__(self):
         # Storing the engines of this car
-        self.__widthcar = controller.get_car_width()
+        #self.__widthcar = controller.get_car_width()
         self.__values = []
         self.__distance = (0,0)
         self.__leftpid = PID.PID2(20,1/20.,1/10.,0.7,0)
         self.__rightpid = PID.PID2(20,1/20.,1/10.,0.7,0)
         self.__driving = True
+    def stop(self):
+        self.__driving = False
     def flush(self):
         self.__values = []
         self.__distance = (0,0)
@@ -45,3 +47,16 @@ class Driver:
                 except:
                     pass
             time.sleep(0.05)
+            
+    def correct_speed(self,lspeed,rspeed):
+        lst = [float(lspeed),float(rspeed)]
+        maxipos = maxabspos(lst)
+        minipos = (maxipos+1)%2
+        fraction = abs(lst[minipos]/lst[maxipos])
+        if abs(lst[maxipos]) > 255:
+            lst[maxipos] = sign(lst[maxipos]) * 255.0
+            lst[minipos] = sign(lst[minipos]) * max(MINIMUM_SPEED,255.0 * fraction)
+        elif abs(lst[minipos]) < MINIMUM_SPEED:
+            lst[minipos] = sign(lst[minipos]) * MINIMUM_SPEED
+            lst[maxipos] = sign(lst[maxipos]) * min(255.,MINIMUM_SPEED * 1./fraction)
+        return lst[0],lst[1]

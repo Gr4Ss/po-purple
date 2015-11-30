@@ -213,7 +213,25 @@ class Controller:
             inner_engine.set_speed(speed2)
             time.sleep(0.1)
     def rotate2(self,degree):
-        pass
+        ## reset the counters of the engiense
+        self.__leftengine.reset_count()
+        self.__rightengine.reset_count()
+        if degree < 0:
+            inner_engine = self.__leftengine
+        else:
+            inner_engine = self.__rightengine
+        distance = degree/180 * math.pi * self.__widthcar
+        pid = PID.PID2(20.,1./2.,5.,0.7,distance)
+        speed = MINIMUM_SPEED
+        inner_engine.set_speed(MINIMUM_SPEED)
+        while speed != 0 and self.__command_going:
+            distance = inner_engine.get_count() * self.__gearratio * self.__perimeter
+            speed = pid.new_value(distance,0.1)
+            if DEBUG:
+                print speed
+            inner_engine.set_speed(speed)
+            time.sleep(.1)
+
     def ride_polygon(self,sides,distance):
         try:
             sides = float(sides)
@@ -228,9 +246,9 @@ class Controller:
             print 'Angle: ', angle
         while sides > 0:
             self.ride_distance(distance)
-	        time.sleep(0.1)
+	    time.sleep(0.1)
             self.rotate(angle)
-	        time.sleep(0.1)
+	    time.sleep(0.1)
             sides -= 1
             if DEBUG:
                 print 'Sides: ', sides
@@ -242,7 +260,7 @@ class Controller:
             routspeed = sign(outspeed) * min(255,abs(outspeed))
             routspeed = sign(outspeed) * max(MINIMUM_SPEED*1.1,abs(outspeed))
             rinspeed = sign(outspeed) * abs(max(abs(inspeed),5)/outspeed) * routspeed
-	        return rinspeed,routspeed
+	    return rinspeed,routspeed
         return inspeed,outspeed
 
     def ride_circ(self,radius):
@@ -286,7 +304,11 @@ class Controller:
         outer_engine.set_speed(0)
     def drive(self,y,x):
         pass
-    def rotate_left(self):
-        pass
-    def rotate_right(self):
-        pass
+    def left(self):
+        self.__rightengine.set_speed(240)
+        while self.__command_going:
+            pass
+    def right(self):
+        self.__leftengine.set_speed(240)
+        while self.__command_going:
+            pass

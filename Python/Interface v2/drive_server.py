@@ -38,7 +38,9 @@ commands = {'LOCK':{'nb_of_arguments':1},'UNLOCK':{'nb_of_arguments':1},
 ,'CIRC':{'nb_of_arguments':2,'constraint':c.constraint_circ},
 'SQUARE':{'nb_of_arguments':2,'constraint':c.constraint_square},
 'DATA':{'nb_of_arguments':0},'SUPERLOCK':{'nb_of_arguments':2},
-'SUPERUNLOCK':{'nb_of_arguments':2},'FORWARDSTART':{'nb_of_arguments':1},'FORWARDSTOP':{'nb_of_arguments':1}}
+'SUPERUNLOCK':{'nb_of_arguments':2},'FORWARD':{'nb_of_arguments':1},
+'RIGHT':{'nb_of_arguments':1},'LEFT':{'nb_of_arguments':1},
+'BACKWARD':{'nb_of_arguments':1},'STOP':{'nb_of_arguments':1}}
 
 # A method to parse the message
 # If the message isn't valid, False will be returned
@@ -236,7 +238,7 @@ while True:
                         return_message = 'FAILURE'
                 else:
                     return_message = 'SUCCES'
-        elif message[0] == 'FORWARDSTART':
+        elif message[0] == 'FORWARD':
             id_ = message[1]
             if not has_lock(id_):
                 return_message = 'NO_LOCK'
@@ -249,7 +251,46 @@ while True:
                         return_message = 'FAILURE'
                 else:
                         return_message = 'SUCCES'
-        elif message[0] == 'FORWARDSTOP':
+        elif message[0] == 'LEFT':
+            id_ = message[1]
+            if not has_lock(id_):
+                return_message = 'NO_LOCK'
+            else:
+                if not TESTING_MODE:
+                    try:
+                        controller.start_command('left',None)
+                        return_message = 'SUCCES'
+                    except:
+                        return_message = 'FAILURE'
+                else:
+                        return_message = 'SUCCES'
+        elif message[0] == 'RIGHT':
+            id_ = message[1]
+            if not has_lock(id_):
+                return_message = 'NO_LOCK'
+            else:
+                if not TESTING_MODE:
+                    try:
+                        controller.start_command('right',None)
+                        return_message = 'SUCCES'
+                    except:
+                        return_message = 'FAILURE'
+                else:
+                        return_message = 'SUCCES'
+        elif message[0] == 'BACKWARD':
+            id_ = message[1]
+            if not has_lock(id_):
+                return_message = 'NO_LOCK'
+            else:
+                if not TESTING_MODE:
+                    try:
+                        controller.start_command('backward',None)
+                        return_message = 'SUCCES'
+                    except:
+                        return_message = 'FAILURE'
+                else:
+                        return_message = 'SUCCES'
+        elif message[0] == 'STOP':
             id_ = message[1]
             if not has_lock(id_):
                 return_message = 'NO_LOCK'
