@@ -40,7 +40,8 @@ commands = {'LOCK':{'nb_of_arguments':1},'UNLOCK':{'nb_of_arguments':1},
 'DATA':{'nb_of_arguments':0},'SUPERLOCK':{'nb_of_arguments':2},
 'SUPERUNLOCK':{'nb_of_arguments':2},'FORWARD':{'nb_of_arguments':1},
 'RIGHT':{'nb_of_arguments':1},'LEFT':{'nb_of_arguments':1},
-'BACKWARD':{'nb_of_arguments':1},'STOP':{'nb_of_arguments':1}}
+'BACKWARD':{'nb_of_arguments':1},'STOP':{'nb_of_arguments':1},
+'COMMAND':{'nb_of_arguments':2,'constraint':c.constraint_command}}
 
 # A method to parse the message
 # If the message isn't valid, False will be returned
@@ -58,7 +59,7 @@ def parse_message(message):
         else:
             constraint = commands.get(key,0).get('constraint',False)
             if constraint != False:
-                to_be_checked = int(split_message[1])
+                to_be_checked = split_message[1]
                 temp = constraint(to_be_checked)
                 if temp:
                     return split_message
@@ -150,6 +151,18 @@ if not TESTING_MODE:
     thread = threading.Thread(target=data_updater)
     thread.setDaemon('True')
     thread.start()
+
+def parse_command(commands):
+    cleaned_commands = commands[1:-1].split(',')
+    print cleaned_commands
+    result = ''
+    for command in cleaned_commands:
+        splitting = command[1:-1].split('/')
+        print splitting
+        comm = splitting[0]
+        valu = splitting[1]
+        result += comm + valu+ ','
+    return result[:-1]
 while True:
     global LOCK_ID
     message = socket.recv()
@@ -303,6 +316,14 @@ while True:
                         return_message = 'FAILURE'
                 else:
                         return_message = 'SUCCES'
+        elif message[0] == 'COMMAND':
+            id_= message[2]
+            if not has_lock(id_):
+                return_message = 'NO_LOCK'
+            else:
+                print parse_command(message[1])
+                ## Call Arno's function
+                return_message = 'SUCCES'
     else:
         return_message = 'ILLEGAL_MESSAGE'
 

@@ -9,7 +9,7 @@ from Sensor import *
 import PID
 
 ## The minimum speed to move
-MINIMUM_SPEED = 110
+MINIMUM_SPEED = 100
 ## Variable indicating how good batteries are working
 ## 1. -> full speed
 ## |
@@ -17,7 +17,7 @@ MINIMUM_SPEED = 110
 BATTERY = 1.
 ## 1 -> ON
 ## 0 -> OFF
-DEBUG = 1
+DEBUG = True
 
 class Controller:
     def __init__(self):
@@ -33,9 +33,9 @@ class Controller:
         # Storing the GPIO distance sensor
         self.__distancePi = DistanceSensor(17,4)
         # Storing the current gearration
-        self.__gearratio = 1./1.
+        self.__gearratio = 1.
         # Storing the perimeter of the wheels (2*pi*r)
-        self.__perimeter = 2*math.pi*2.758
+        self.__perimeter = 2*math.pi* 2.579
         # Storing a reference to a brickpi thread
         self.__brickpi = BrickPi_Thread(self.__engines,[self.__distanceLego])
         # Storing a reference to a gpio thread
@@ -44,23 +44,28 @@ class Controller:
         self.__gpio.on()
         self.__command_going = False
         self.__command_thread = None
+    # Return the width of the car
     def get_car_width(self):
         return self.__widthcar
+    # A method to set the speed of the engines
+    # If the number of speeds don't equal the number of engines an error is raised
     def set_speed_engines(self,speed):
         if len(speed) != len(self.__engines):
             raise Exception
         engines = self.__engines
         for i in range(engies):
             engines[i].set_speed(speed[i])
+    # A method to flush the counter values of the engines
     def flush_engines(self):
         for engine in self.__engines:
             engine.reset_count()
+    # return the distance traveled by the engines
     def get_engine_distance(self):
         result = []
         for engine in self.__engines:
             result.append(engine.get_count()*self.__perimeter*self.__gearratio)
         return result
-    ## Turn the thread back off
+    # Turn the thread back off
     def kill_threads(self):
         self.__brickpi.off()
         self.__gpio.off()
@@ -86,17 +91,15 @@ class Controller:
     ## Return the values of the sensor in a dictionary with keys
     ## Distancesensor1 -> GPIO distance sensor
     ## Distancesensor2 -> Lego MINDSTORM distance sensor
-    ## Coming soon : Top angle -> The angle of the top motor
-    ## Note: Not yet tested
     def get_sensor_data(self):
         result = dict()
         result['Distancesensor1'] = self.__distancePi.get_value()
         result['Distancesensor2'] = self.__distanceLego.get_value()
         ## result['Top angle'] = (self.__topengine.get_count()%1) *2*math.pi
         return result
-
+    # A method to drive forward
     def forward(self):
-        pid = PID(5.,1/20.,1/50.,1.)
+        pid = PID(15.,1/2.,2.,.1)
         self.__leftengine.set_speed(240)
         self.__rightengine.set_speed(240)
         self.__leftengine.reset_count()
@@ -107,9 +110,9 @@ class Controller:
             speeddif = pid.new_value(distance1-distance2,0.1)
             self.__rightengine.set_speed(240 + speeddif)
             time.sleep(0.05)
-
+    # A mehtod to drive backward
     def backward(self):
-        pid = PID(5.,1/20.,1/50.,1.)
+        pid = PID(15.,1/2.,2.,.1)
         self.__leftengine.set_speed(-240)
         self.__rightengine.set_speed(-240)
         self.__leftengine.reset_count()
@@ -118,24 +121,30 @@ class Controller:
             distance1 = self.__leftengine.get_count()*self.__perimeter*self.__gearratio
             distance2 = self.__rightengine.get_count()*self.__perimeter*self.__gearratio
             speeddif = pid.new_value(distance1-distance2,0.1)
-            self.__rightengine.set_speed(-240 - speeddif)
+            self.__rightengine.set_speed(-240 + speeddif)
             time.sleep(0.05)
-
+    # A method to stop driving
     def stop(self):
         self.__leftengine.set_speed(0)
         self.__rightengine.set_speed(0)
-
+    # A method to drive a given distance
     def ride_distance(self,distance):
+        distance = distance - (2.1 + 0.06*distance)
         self.__leftengine.reset_count()
         self.__rightengine.reset_count()
-        pid1 = PID.PID(5.,1/20.,1/50.,.5)
-        pid2 = PID.PID(20.,1/2.,1/5.,.5)
-        speed = MINIMUM_SPEED
+        P = math.sqrt(abs(distance)) * 5./math.sqrt(200.)
+        if DEBUG:
+            print 'P', P
+        D =  (1./20.)
+        I =  (1./50.)
+        pid1 = PID.PID(P,D,I,.5)
+        pid2 = PID.PID(25.,1.,7.5,.1)
+        speed = MINIMUM_SPEED*2.
         if DEBUG:
             print speed
         self.__leftengine.set_speed(speed)
         self.__rightengine.set_speed(speed)
-        while speed !=0 and self.__command_going:
+        while speed !=0:
             distance1 = self.__leftengine.get_count()*self.__perimeter*self.__gearratio
             distance2 = self.__rightengine.get_count()*self.__perimeter*self.__gearratio
             if DEBUG:
@@ -152,7 +161,6 @@ class Controller:
             time.sleep(0.01)
         self.__leftengine.set_speed(0)
         self.__rightengine.set_speed(0)
-
 
     def correct_speed(self,speed,speed_diff):
         # If the speed or speed + diff is bigger then 255 a correction must happen
@@ -172,9 +180,11 @@ class Controller:
             else:
                 return [-255+abs(speed_diff),-255]
         # If the absolute value is less then the MINIMUM_SPEED its turned up
-        elif abs(speed) < MINIMUM_SPEED:
-            signed = sign(speed)
-            return [signed*MINIMUM_SPEED,signed*MINIMUM_SPEED+speed_diff]
+        elif speed < MINIMUM_SPEED or speed+speed_diff < MINIMUM_SPEED:
+	           if speed_diff > 0:
+                   return [MINIMUM_SPEED,MINIMUM_SPEED+speed_diff]
+               else:
+                   return [MINIMUM_SPEED-speed_diff,MINIMUM_SPEED]
         return [speed,speed+speed_diff]
 
 
@@ -212,6 +222,7 @@ class Controller:
             outer_engine.set_speed(speed1)
             inner_engine.set_speed(speed2)
             time.sleep(0.1)
+
     def rotate2(self,degree):
         ## reset the counters of the engiense
         self.__leftengine.reset_count()
@@ -315,8 +326,3 @@ class Controller:
         self.__leftengine.set_speed(240)
         while self.__command_going:
             pass
-
-    def get_distance(self):
-        distance = inner_engine.get_count()*self__perimeter*self.__gearratio
-        return distance
-

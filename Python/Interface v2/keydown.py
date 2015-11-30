@@ -45,47 +45,29 @@ print "Content-type: text/html"
 print cookie.output()
 print
 
-# printing the header part of the html
-header = open('header.html')
-print header.read()
-header.close()
 
 form = cgi.FieldStorage()
-if (len(form)!= 0):
-    for key in form.keys():
-        if key == 'lock':
-            command = 'LOCK_' + str(session_id)
-            break
-        elif key == 'unlock':
-            command = 'UNLOCK_' + str(session_id)
-            break
-        elif key == 'straight':
-            command = 'STRAIGHT_' + str(form['straight'].value) + '_' + str(session_id)
-            break
-        elif key == 'circ':
-            command = 'CIRC_' + str(form['circ'].value) + '_' + str(session_id)
-            break
-        elif key == 'square':
-            command = 'SQUARE_' + str(form['square'].value) + '_' + str(session_id)
-            break
-        elif key == 'commands':
-            recv_commands = form['commands'].value
-            valid = parse_command(recv_commands)
-            if valid != False:
-                command = 'COMMAND_' + str(valid) + '_' + str(session_id)
-            else:
-                command = 'BLA'
-            break
-
-    try:
-    	socket.send(command)
-    	response = socket.recv()
-    except:
-    	socket.close()
-    	response = "SERVERDOWN"
-    print response_parser(response)
-
-# printing the rest of the body
-body = open('body.html')
-print body.read()
-body.close()
+print form
+for key in form.keys():
+    if key == 'forwardstart':
+        command = 'FORWARD_' + str(session_id)
+        break
+    elif key == 'leftstart':
+        command = 'LEFT_' + str(session_id)
+        break
+    elif key == 'rightstart':
+        command = 'RIGHT_' + str(session_id)
+        break
+    elif key == 'backwardstart':
+        command = 'BACKWARD_' + str(session_id)
+        break
+    elif key == 'forwardstop' or key == 'leftstop' or key == 'rightstop' or key == 'backwardstop':
+        command = 'STOP_' + str(session_id)
+        break
+try:
+    socket.send(command)
+    response = socket.recv()
+except:
+    socket.close()
+    response = "SERVERDOWN"
+print response

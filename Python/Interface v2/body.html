@@ -22,20 +22,19 @@
           The robot uses 2 PID-controllers to drive a straight line.
           The first PID-controller has as input the distance yet to be driven and has as output a speed for both engines.
           The input of the second PID-controller is supplied with the distance difference between the
-          left and the right wheel, and present at it's output the speed differce between both engines.
+          left and the right wheel, and present at it's output the speed differce between both engines.</br>
+          <strong> The distace must between 20 cm and 6m <strong>
         </p>
-        <div ng-app="formStraight" ng-controller="controllerStraight">
+
         <div class="form1" >
           <form class="form-horizontal">
             <div class="form-group">
               <label for="distance">Distance</label>
-              <input type="number"  id="distance"  ng-model="distance" placeholder="in cm" name='straight'>
+              <input type="number"  id="distance" placeholder="in cm" name='straight'>
             </div>
-            {{ result() }}
             <button type="submit" class="btn btn-default btn-lg btn-block">Drive straight</button>
           </form>
         </div>
-      </div>
       </div>
     </div>
   </div>
@@ -126,15 +125,40 @@
     <div id="collapseFive" class="panel-collapse collapse" role="tabpanel" aria-labelledby="headingFive">
       <div class="panel-body">
         <div class="form5">
-          <p> <strong>Note:</strong> Coming soon </p>
+          <p> <strong>Note:</strong> To be tested </p>
           <form class="form-horizontal">
             <p>
-              <textarea  rows="3" class="form-control" placeholder="Send list of commands"></textarea>
+              <textarea  rows="3" class="form-control commandList" placeholder="Send list of commands" method='POST' name='commands'></textarea>
             </p>
             <p>
               <button type="submit" class="btn btn-default btn-lg btn-block">Send</button>
             </p>
+            <p>
+              <button type="reset" class="btn btn-default btn-lg btn-block">Reset</button>
+            </p>
           </form>
+          <p>
+            <div class="row">
+              <div class="col-xs-2">
+                <input type="number" class="valueLeft" placeholder="left"></input>
+              </div>
+              <div class="col-xs-2">
+                <button class="btn btn-default btn-block nextLeft">Left</button>
+              </div>
+              <div class="col-xs-2">
+                <input type="number" class="valueRight" placeholder="right"></input>
+              </div>
+              <div class="col-xs-2">
+                <button class="btn btn-default btn-block nextStraight">Right</button>
+              </div>
+              <div class="col-xs-2">
+                <input type="number" class="valueDistance" placeholder="distance (cm)"></input>
+              </div>
+              <div class="col-xs-2">
+                <button class="btn btn-default btn-block nextDistance">Distance</button>
+              </div>
+            </div>
+          </p>
         </div>
       </div>
     </div>
@@ -179,6 +203,7 @@
         <div class="keyboard-keys">
         Or press the keyboard arrow keys to control the vehicle!
         <script src="keyspress.js"></script>
+        </div>
         </div>
     </div>
   </div>
@@ -259,9 +284,6 @@
 </div>
 </div>
 
-
-<script src="https://ajax.googleapis.com/ajax/libs/jquery/1.11.3/jquery.min.js"></script>
-<script src="https://maxcdn.bootstrapcdn.com/bootstrap/3.3.5/js/bootstrap.min.js"></script>
 <script>
 $('.smooth-nav').click(function(){
 $('html, body').animate({
@@ -270,70 +292,23 @@ $('html, body').animate({
 return false;
 });
 </script>
-<script>
-// By Chris Coyier & tweaked by Mathias Bynens
-console.log('executing');
-$(function() {
-
-// Find all YouTube videos
-var $allVideos = $("iframe[src^='http://www.youtube.com']"),
-
-// The element that is fluid width
-$fluidEl = $("body");
-
-// Figure out and save aspect ratio for each video
-$allVideos.each(function() {
-
-$(this)
-.data('aspectRatio', this.height / this.width)
-
-// and remove the hard coded width/height
-.removeAttr('height')
-.removeAttr('width');
-
-});
-
-// When the window is resized
-// (You'll probably want to debounce this)
-$(window).resize(function() {
-
-var newWidth = $fluidEl.width();
-
-// Resize all videos according to their own aspect ratio
-$allVideos.each(function() {
-
-var $el = $(this);
-$el
-  .width(newWidth)
-  .height(newWidth * $el.data('aspectRatio'));
-
-});
-
-// Kick off one resize to fix all videos on page load
-}).resize();
-
-});
-</script>
-<script>
-function load_data(){
-$('#data_display').load("data.html");
-};
-
-setInterval(function(){load_data();
-                    console.log('get_data');},1000);
-</script>
 
 <script>
-var app = angular.module('formStraight', []);
-app.controller('controllerStraight', function($scope) {
-  $scope.result = function(){
-    if ($scope.distance != ''){
-      distance = parseInt($scope.distance);
-      return ((distance<20 || distance > 600)) ? 'Please enter a number between 20 and 600':'';
-    }
-  };
+$('.nextLeft').click(function(){
+  $('.commandList').val($('.commandList').val() + 'Left(' + $('.valueLeft').val() + '),');
+  $('.valueLeft').val('');
 });
 
+$('.nextStraight').click(function(){
+  $('.commandList').val($('.commandList').val() + 'Right(' + $('.valueRight').val() + '),');
+  $('.valueRight').val('');
+});
+
+$('.nextDistance').click(function(){
+  $('.commandList').val($('.commandList').val() + 'Distance(' + $('.valueDistance').val() + '),');
+  $('.valueDistance').val('');
+});
 </script>
+
 </body>
 </html>

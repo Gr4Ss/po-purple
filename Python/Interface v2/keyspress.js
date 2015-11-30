@@ -17,25 +17,36 @@ $("body").keyup(function(e) {
       $(".driveLeft").css("background-color", "white");
       $(".driveLeft").css("color", "black");
       $(".driveLeft").css("background-image", "none");
+      $.post("keydown.py",{
+          leftstop: "TeamPaarsIsCool"
+        });
       break;
     case 38:
       moveUp = 0;
       $(".driveForward").css("background-color", "white");
       $(".driveForward").css("color", "black");
       $(".driveForward").css("background-image", "none");
-      $.post("home.py",'forwardstop');
+      $.post("keydown.py",{
+          forwardstop: "TeamPaarsIsCool"
+        });
       break;
     case 39:
       moveRight = 0;
       $(".driveRight").css("background-color", "white");
       $(".driveRight").css("color", "black");
       $(".driveRight").css("background-image", "none");
+      $.post("keydown.py",{
+          rightstop: "TeamPaarsIsCool"
+        });
       break;
     case 40:
       moveDown = 0;
       $(".driveReverse").css("background-color", "white");
       $(".driveReverse").css("color", "black");
       $(".driveReverse").css("background-image", "none");
+      $.post("keydown.py",{
+          backwardstop: "TeamPaarsIsCool"
+        });
       break;
     }
   e.preventDefault();
@@ -46,22 +57,33 @@ switch (e.which) {
       moveLeft = 1;
       $(".driveLeft").css("background-color", "green");
       $(".driveLeft").css("color", "white");
+      $.post("keydown.py",{
+          leftstart: "TeamPaarsIsCool"
+        });
       break;
     case 38:
       moveUp = 1;
       $(".driveForward").css("background-color", "green");
       $(".driveForward").css("color", "white");
-      $.post("home.py",'forwardstart');
+      $.post("keydown.py",{
+          forwardstart: "TeamPaarsIsCool"
+        });
       break;
     case 39:
       moveRight = 1;
       $(".driveRight").css("background-color", "green");
       $(".driveRight").css("color", "white");
+      $.post("keydown.py",{
+          rightstart: "TeamPaarsIsCool"
+        });
       break;
     case 40:
       moveDown = 1;
       $(".driveReverse").css("background-color", "green");
       $(".driveReverse").css("color", "white");
+      $.post("keydown.py",{
+          backwardstart: "TeamPaarsIsCool"
+        });
       break;
   }
 });
