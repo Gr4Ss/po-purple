@@ -302,13 +302,21 @@ class Controller:
             time.sleep(0.1)
         inner_engine.set_speed(0)
         outer_engine.set_speed(0)
+
     def drive(self,y,x):
         pass
+
     def left(self):
         self.__rightengine.set_speed(240)
         while self.__command_going:
             pass
+
     def right(self):
         self.__leftengine.set_speed(240)
         while self.__command_going:
             pass
+
+    def get_distance(self):
+        distance = inner_engine.get_count()*self__perimeter*self.__gearratio
+        return distance
+
