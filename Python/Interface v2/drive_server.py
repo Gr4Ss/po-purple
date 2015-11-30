@@ -81,7 +81,7 @@ def get_lock(id_):
         LOCK_ID = id_
         LOCK_TIME = time.time()
         return True
-
+# A method to get a super lock
 def get_super_lock(passw,id_):
     global SUPERLOCK,LOCK,LOCK_ID,LOCK_TIME
     if SUPERLOCK or passw != 'purplerain':
@@ -91,6 +91,7 @@ def get_super_lock(passw,id_):
         SUPERLOCK = True
         LOCK_ID = id_
         LOCK_TIME = None
+        return True
 # A method to free the lock.
 # As the given id has the lock, the lock will be freed and True will be returned
 # Else the lock will remain and False will be returned
@@ -245,7 +246,7 @@ while True:
             else:
                 if not TESTING_MODE:
                     try:
-                        controller.start_command('drive_square',(side))
+                        controller.start_command('drive_square','(' + str(side) + ',)')
                         return_message = 'SUCCES'
                     except:
                         return_message = 'FAILURE'
