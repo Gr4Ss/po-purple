@@ -22,6 +22,8 @@ local drive = require("drive");
 	LOCALIZE GLOBALS
 ]]
 local mathAbs = math.abs;
+local mathMax = math.max;
+local mathSqrt = math.sqrt;
 local osClock = os.clock;
 local print = print;
 local tableSort = table.sort;
@@ -32,11 +34,14 @@ local tableSort = table.sort;
 -- Change to your liking
 local DEBUG = true; 		-- Do debug prints/paints/etc.
 local image = arg[1] or "picture_0";	-- Name of the picture to load in
+
+local intersectionsToWait;
+local intersectionsPrevious = 0;
 print("Setup:       ", osClock() - bmSetup);
 
 
 function imageRecognition(nextTurn, getDistance, driveDistance, turnAngle)
-	local oldPos = getDistance();
+	--local oldPos = getDistance();
 	--[[
 		Load in the image, set up some image-related variables
 	]]
@@ -155,17 +160,31 @@ function imageRecognition(nextTurn, getDistance, driveDistance, turnAngle)
 	print("Connect: ", osClock() - bmConnect);
 	print("Postprocess: ", osClock() - bmRDP);
 
+			for k, v in ipairs(realNodes) do
+			print(v[1], v[2], #v[3]);
+			for k, v1 in pairs(v[3]) do
+				print("    "..k, v1[1], v1[2])
+			end;
+		end;
+
 	print("--- DRIVE LOGIC ---");
 	--[[
 		Find the start node
 	]]
 	local bmStartNode = osClock();
-	start = drive.findStart(realNodes, {0, util.startCM});
+	local start = drive.findStart(realNodes, {0, util.startCM});
 	print("Start: ", osClock() - bmStartNode);
 
 	local bmTarget = osClock();
-	target, bend, turn, deadEnd = drive.findTarget(start, nextTurn);
+	local target, bend, turn, deadEnd, intersectionsAhead = drive.findTarget(start, (nextTurn == "l" and -1) or (nextTurn == "r" and 1), intersections);
 	print("Target: ", osClock() - bmTarget);
+
+	if (not intersectionsToWait) then
+		--Update nextTurn and intersectiosnToWait
+	end;
+
+	local intersectionsDiff = mathMax(intersectionsPrevious - intersectionsAhead, 0);
+	intersectionsToWait = intersectionsToWait - intersectionsDiff;
 
 	local curPos = getDistance();
 	target[2] = target[2] - curPos + oldPos;
@@ -174,6 +193,10 @@ function imageRecognition(nextTurn, getDistance, driveDistance, turnAngle)
 	if (distance < ((curPos - oldPos) * 2 + util.startCM) ^ 2) then
 		if  (bend or turn) then
 			print("TURN MODE");
+
+			if (bend) then
+				--Update nextTurn and intersectionsToWait;
+			end;
 		elseif (deadEnd) then
 			print("DEAD END REACHED");
 		end;
@@ -181,7 +204,7 @@ function imageRecognition(nextTurn, getDistance, driveDistance, turnAngle)
 		if (mathAbs(target[1]) < 1.5) then
 			driveDistance(target[2]);
 		else
-			print("ADJUST")
+			print("ADJUST");
 		end;
 	end;
 
@@ -196,12 +219,7 @@ function imageRecognition(nextTurn, getDistance, driveDistance, turnAngle)
 
 		print("----------------------");
 		--DEBUG: real coordinates
-		for k, v in ipairs(realNodes) do
-			print(v[1], v[2], #v[3]);
-			for k, v1 in pairs(v[3]) do
-				print("    "..k, v1[1], v1[2])
-			end;
-		end;
+
 		--]]
 
 		print("----------------------");

@@ -23,12 +23,13 @@ end;
 
 local minAngle = 170 / 180 * math.pi;
 
-function drive.findTarget(start, nextTurn)
+function drive.findTarget(start, nextTurn, intersections)
 	local previousNode = start;
 	local currentNode = start[3][1];
 	local bend = false;
 	local turn = false;
 	local deadEnd = false;
+	local intersectionsAhead = 0;
 	while (currentNode) do
 		if (#currentNode[3] == 1) then
 			deadEnd = true;
@@ -40,7 +41,7 @@ function drive.findTarget(start, nextTurn)
 			end;
 
 			local x1, y1 = nextNode[1] - currentNode[1], nextNode[2] - currentNode[2];
-			local x2, y2 = previousNode[1] - currentNode[1], previousNode[2] - currentNode[2];
+			local x2, y2 = 0, -1;
 			local len1, len2 = x1 * x1 + y1 * y1, x2 * x2, y2 * y2;
 			if (mathAcos((x1 * x2 + y1 * y2) / mathSqrt(len1 * len2)) > minAngle) then
 				previousNode = currentNode;
@@ -50,13 +51,48 @@ function drive.findTarget(start, nextTurn)
 				break;
 			end;
 		elseif (nextTurn) then
-			--#TODO
+			local doBreak = true;
+			for k, v in ipairs(currentNode[3]) do
+				if (v == previousNode) then
+					local next = (k + nextTurn) % #currentNode[3];
+					if (next == 0) then next = #currentNode[3] end;
+
+					local nextNode = currentNode[3][k + nextTurn];
+					local x1, y1 = nextNode[1] - currentNode[1], nextNode[2] - currentNode[2];
+					local x2, y2 = 0, -1;
+					local len1, len2 = x1 * x1 + y1 * y1, x2 * x2, y2 * y2;
+					if (mathAcos((x1 * x2 + y1 * y2) / mathSqrt(len1 * len2)) > minAngle) then
+						previousNode = currentNode;
+						currentNode = nextNode;
+						doBreak = false;
+						break;
+					else
+						intersectionsAhead = intersectionsAhead + 1;
+						if (intersectionsAhead == intersections) then
+							turn = true;
+							break;
+						else
+							next = (k + nextTurn) % #currentNode[3];
+							if (next == 0) then next = #currentNode[3] end;
+							previousNode = currentNode;
+							currentNode = currentNode[3][next];
+							doBreak = false;
+							break;
+						end;
+					end;
+				end;
+			end;
+
+			if (doBreak) then
+				turn = true;
+				break;
+			end;
 		else
 			local doBreak = true;
 			for k, v in ipairs(currentNode[3]) do
 				if (v ~= previousNode) then
 					local x1, y1 = v[1] - currentNode[1], v[2] - currentNode[2];
-					local x2, y2 = previousNode[1] - currentNode[1], previousNode[2] - currentNode[2];
+					local x2, y2 = 0, -1;
 					local len1, len2 = x1 * x1 + y1 * y1, x2 * x2, y2 * y2;
 					if (mathAcos((x1 * x2 + y1 * y2) / mathSqrt(len1 * len2)) > minAngle) then
 						previousNode = currentNode;
@@ -74,7 +110,7 @@ function drive.findTarget(start, nextTurn)
 		end;
 	end;
 
-	return currentNode, bend, turn, deadEnd;
+	return currentNode, bend, turn, deadEnd, intersectionsAhead;
 end;
 
 return drive;
