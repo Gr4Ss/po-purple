@@ -172,12 +172,28 @@
           <p> <strong>Note:</strong> Coming soon </p>
           <form class="form-horizontal">
             <p>
-              <textarea  rows="3" class="form-control" placeholder="Send list of commands"></textarea>
+              <textarea  rows="3" class="form-control commandList" placeholder="Send list of commands"></textarea>
             </p>
             <p>
               <button type="submit" class="btn btn-default btn-lg btn-block">Send</button>
             </p>
+            <p>
+              <button type="reset" class="btn btn-default btn-lg btn-block">Reset</button>
+            </p>
           </form>
+          <p>
+            <div class="row">
+              <div class="col-xs-4">
+                <button class="btn btn-default btn-block nextLeft">Left</button>
+              </div>
+              <div class="col-xs-4">
+                <button class="btn btn-default btn-block nextStraight">Straight</button>
+              </div>
+              <div class="col-xs-4">
+                <button class="btn btn-default btn-block nextRight">Right</button>
+              </div>
+            </div>
+          </p>
         </div>
       </div>
     </div>
@@ -322,6 +338,20 @@ app.controller('controllerStraight', function($scope) {
       return ((distance<20 || distance > 600)) ? 'Please enter a number between 20 and 600':'';
     }
   };
+});
+</script>
+
+<script>
+$('.nextLeft').click(function(){
+  $('.commandList').val($('.commandList').val() + 'Left, ');
+});
+
+$('.nextStraight').click(function(){
+  $('.commandList').val($('.commandList').val() + 'Straight, ');
+});
+
+$('.nextRight').click(function(){
+  $('.commandList').val($('.commandList').val() + 'Right, ');
 });
 </script>
 
