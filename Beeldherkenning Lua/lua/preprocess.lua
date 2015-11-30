@@ -19,6 +19,10 @@ function preprocess.getMinLuma(getPixel, width, height)
 		end;
 	end;
 
+	for i = 1, 255 do
+		print(i, (lumaList[i] or 0) - (lumaList[i + 1] or 0));
+	end;
+
 	-- Determine where the white pixels peak,
 	-- where the peak stops and where the black pixels peak
 	local inWhite, passedWhite, sum;
@@ -30,10 +34,12 @@ function preprocess.getMinLuma(getPixel, width, height)
 		elseif (not passedWhite) then
 			sum = 0;
 			for j = i, i - 10, -1 do
-				sum = sum + mathAbs((lumaList[i] or 0) - (lumaList[i + 1] or 0));
+				print(i, sum)
+				sum = sum + mathAbs((lumaList[j] or 0) - (lumaList[j + 1] or 0));
 			end;
 			if (sum < 200) then
-				passedWhite = i - 10
+				passedWhite = i - 10;
+				print(passedWhite)
 			end;
 		elseif ((lumaList[i] or 0) - (lumaList[i + 1] or 0) > 250) then
 			luma = i;
@@ -44,6 +50,7 @@ function preprocess.getMinLuma(getPixel, width, height)
 	-- Find where the black pixels start to peak
 	for i = luma, 255 do
 		if ((lumaList[i] or 0) - (lumaList[i + 1] or 0) < 0) then
+			print(i)
 			-- Return the middle between the end of the white pixel peak 
 			-- and the start of the black pixel peak
 			return mathFloor(passedWhite + i) / 2;

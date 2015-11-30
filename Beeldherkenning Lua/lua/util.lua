@@ -121,4 +121,6 @@ function util.realXToPixel(xCM, yCM, width, height)
 	return (-1) * xCM / (((x - horizon) / (height - horizon)) * baseWidth / width) + width / 2;
 end;
 
+util.startCM = startCM;
+
 return util;
