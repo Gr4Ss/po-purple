@@ -38,8 +38,9 @@ def input_handler():
             socket.send('STOP_'+id_)
         elif inp == 'E':
             GOING = False
-        response = socket.recv()
-        print response
+        if GOING:
+            response = socket.recv()
+            print response
 if __name__ == '__main__':
     input_handler()
     socket.send('SUPERUNLOCK_purplerain_'+id_)

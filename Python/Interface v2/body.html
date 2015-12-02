@@ -177,24 +177,35 @@
         <div class="touch-keys" >
           <div class="row">
             <div class="col-xs-4 col-xs-offset-4">
-              <button class="btn btn-default btn-block driveForward">
+              <style>
+                .not_pressed{
+                    background-color: white;
+                    color: black;
+                    background-image: none;
+                }
+                .pressed{
+                  background-color:grey;
+                  color:white;
+                }
+              </style>
+              <button class="btn btn-default btn-block driveForward" onmouseup="keyUpReleased()" onmousedown="keyUpPressed()">
               F
               </button>
             </div>
           </div>
           <div class="row">
             <div class="col-xs-4">
-              <button class="btn btn-default btn-block driveLeft">
+              <button class="btn btn-default btn-block driveLeft not_pressed" onmouseup="keyLeftReleased()" onmousedown="keyLeftPressed()">
               L
               </button>
             </div>
             <div class="col-xs-4">
-              <button class="btn btn-default btn-block driveReverse">
+              <button class="btn btn-default btn-block driveReverse" onmouseup="keyDownReleased()" onmousedown="keyDownPressed()">
               B
               </button>
             </div>
             <div class="col-xs-4">
-              <button class="btn btn-default btn-block driveRight">
+              <button class="btn btn-default btn-block driveRight" onmouseup="keyRightReleased()" onmousedown="keyRightPressed()">
               R
               </button>
             </div>

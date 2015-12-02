@@ -6,10 +6,11 @@ from Engine import *
 from BrickPi_thread import *
 from GPIO_thread import *
 from Sensor import *
+import Linefollower as follow
 import PID
 
 ## The minimum speed to move
-MINIMUM_SPEED = 100
+MINIMUM_SPEED = 155
 ## Variable indicating how good batteries are working
 ## 1. -> full speed
 ## |
@@ -127,6 +128,40 @@ class Controller:
     def stop(self):
         self.__leftengine.set_speed(0)
         self.__rightengine.set_speed(0)
+
+    def follow_line1(self):
+        follow.start()
+        self.__leftengine.reset_count()
+        self.__rightengine.reset_count()
+        pidleft = PID.PID2(50.,5.,10.,0.5)
+        pidright = PID.PID2(50.,5.,10.,0.5)
+        goaldistanceleft,goaldistanceright = follow.get_data()[0],follow.get_data()[1]
+        while self.__going:
+            distanceleft = self.__leftengine.get_count()*self.__perimeter*self.__gearratio
+            distanceright = self.__rightengine.get_count()*self.__perimeter*self.__gearratio
+            speedleft = pidleft.new_value(goaldistanceleft-distanceleft,0.1)
+            speedright = pidright.new_value(goaldistanceright-distanceright,0.1)
+            speedleft,speedright = correct_speed3(speedleft,speedright)
+            self.__leftengine.set_speed(speedleft)
+            self.__rightengine.set_speed(speedright)
+            if (abs(goaldistanceleft - distanceleft)< 1.) and (abs(goaldistanceright - distanceright) < 1.):
+                goaldistanceleft,goaldistanceright = follow.get_data()[0],follow.get_data()[1]
+            time.sleep(0.1)
+        self.__leftengine.set_speed(0)
+        self.__rightengine.set_speed(0)
+
+    def correct_speed3(self,lspeed,rspeed):
+        lst = [float(lspeed),float(rspeed)]
+        maxipos = maxabspos(lst)
+        minipos = (maxipos+1)%2
+        fraction = abs(lst[minipos]/lst[maxipos])
+        if abs(lst[maxipos]) > 255:
+            lst[maxipos] = sign(lst[maxipos]) * 255.0
+            lst[minipos] = sign(lst[minipos]) * max(MINIMUM_SPEED,255.0 * fraction)
+        elif abs(lst[minipos]) < MINIMUM_SPEED:
+            lst[minipos] = sign(lst[minipos]) * MINIMUM_SPEED
+            lst[maxipos] = sign(lst[maxipos]) * min(255.,MINIMUM_SPEED * 1./fraction)
+        return lst[0],lst[1]
     # A method to drive a given distance
     def ride_distance(self,distance):
         distance = distance - (2.1 + 0.06*distance)
