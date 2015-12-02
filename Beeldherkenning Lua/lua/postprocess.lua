@@ -264,7 +264,7 @@ function postprocess.mergeRealNodes(realNodes)
 				end;
 			end;
 
-			-- TODO: ensure edge update happens properly in case nodes aren't linked triangularly
+			--#TODO: ensure edge update happens properly in case nodes aren't linked triangularly
 			for j = #toRemove, 1, -1 do
 				util.deleteEdge(currentNode, currentNode[3][toRemove[j]]);
 			end;
