@@ -1,3 +1,4 @@
+# Outdated file NOT USED ANYMORE
 #!/usr/bin/python
 import cgi
 import cgitb

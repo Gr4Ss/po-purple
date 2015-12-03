@@ -6,7 +6,7 @@ from Engine import *
 from BrickPi_thread import *
 from GPIO_thread import *
 from Sensor import *
-import Linefollower as follow
+#import Linefollower as follow
 import PID
 
 ## The minimum speed to move
@@ -96,6 +96,8 @@ class Controller:
         result = dict()
         result['Distancesensor1'] = self.__distancePi.get_value()
         result['Distancesensor2'] = self.__distanceLego.get_value()
+        result['SpeedLeft'] = self.__leftengine.get_value()
+        result['SpeedRight'] = self.__rightengine.get_value()
         ## result['Top angle'] = (self.__topengine.get_count()%1) *2*math.pi
         return result
     # A method to drive forward
@@ -145,7 +147,7 @@ class Controller:
             self.__leftengine.set_speed(speedleft)
             self.__rightengine.set_speed(speedright)
             if (abs(goaldistanceleft - distanceleft)< 1.) and (abs(goaldistanceright - distanceright) < 1.):
-                goaldistanceleft,goaldistanceright = follow.get_data()[0],follow.get_data()[1]
+                goaldistanceleft,goaldistanceright += follow.get_data()[0],follow.get_data()[1]
             time.sleep(0.1)
         self.__leftengine.set_speed(0)
         self.__rightengine.set_speed(0)
@@ -163,7 +165,7 @@ class Controller:
             lst[maxipos] = sign(lst[maxipos]) * min(255.,MINIMUM_SPEED * 1./fraction)
         return lst[0],lst[1]
     # A method to drive a given distance
-    def ride_distance(self,distance):
+    def ride_distance(self,distance,going=False):
         distance = distance - (2.1 + 0.06*distance)
         self.__leftengine.reset_count()
         self.__rightengine.reset_count()
@@ -179,7 +181,7 @@ class Controller:
             print speed
         self.__leftengine.set_speed(speed)
         self.__rightengine.set_speed(speed)
-        while speed !=0:
+        while (speed !=0 and (self.__going or going)):
             distance1 = self.__leftengine.get_count()*self.__perimeter*self.__gearratio
             distance2 = self.__rightengine.get_count()*self.__perimeter*self.__gearratio
             if DEBUG:
@@ -224,7 +226,7 @@ class Controller:
 
 
     ## A method to rotate
-    def rotate(self,degree):
+    def rotate(self,degree,going):
         ## reset the counters of the engiense
         self.__leftengine.reset_count()
         self.__rightengine.reset_count()
@@ -245,7 +247,7 @@ class Controller:
             print 'Speed: ', speed1, speed2
         outer_engine.set_speed(speed1)
         inner_engine.set_speed(speed2)
-        while (not (speed1 == 0 and speed2 == 0)) and self.__command_going:
+        while (not (speed1 == 0 and speed2 == 0)) and (self.__command_going or going):
             distance1 = outer_engine.get_count()*self.__perimeter*self.__gearratio
             distance2 = inner_engine.get_count()*self.__perimeter*self.__gearratio
             if DEBUG:
@@ -292,9 +294,9 @@ class Controller:
             print 'Angle: ', angle
         while sides > 0:
             self.ride_distance(distance)
-	    time.sleep(0.1)
+	        time.sleep(0.1)
             self.rotate(angle)
-	    time.sleep(0.1)
+	        time.sleep(0.1)
             sides -= 1
             if DEBUG:
                 print 'Sides: ', sides
@@ -306,7 +308,7 @@ class Controller:
             routspeed = sign(outspeed) * min(255,abs(outspeed))
             routspeed = sign(outspeed) * max(MINIMUM_SPEED*1.1,abs(outspeed))
             rinspeed = sign(outspeed) * abs(max(abs(inspeed),5)/outspeed) * routspeed
-	    return rinspeed,routspeed
+	        return rinspeed,routspeed
         return inspeed,outspeed
 
     def ride_circ(self,radius):

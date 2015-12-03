@@ -3,6 +3,7 @@ import time
 import constraints as c
 import threading
 
+# In testing mode no drive commands are executed
 TESTING_MODE = True
 
 if not TESTING_MODE:
@@ -128,17 +129,14 @@ def lock_expired():
 
 def data_update(data):
     open('/var/www/data.html','w').close()
-    fil = open('/var/www/data.html','r+')
-    string =  '''<table>
-                    <tr>
-                        <td>Distance1</td>
-                        <td>''' + str(data['Distancesensor1']) + '''</td>
-                    </tr>
-                    <tr>
-                        <td>Distance2</td>
-                        <td>''' + str(data['Distancesensor2']) + '''</td>
-                    </tr>
-                </table> '''
+    fil = open('/var/www/data.json','r+')
+    distance1 = 0 if data['Distancesensor1'] == None else data['Distancesensor1']
+    distance2 = 0 if data['Distancesensor2'] == None else data['Distancesensor2']
+    speedL = 0 if data['SpeedLeft'] == None else data['SpeedLeft']
+    speedR = 0 if data['SpeedRight'] == None else data['SpeedRight']
+    string = ''' {
+                {'distance1': %s},{'distace2': %s},{'speedLeft':%s},{'speedRight':%s}
+                } ''' % (distance1,distance2,speedL,speedR)
     fil.write(string)
     fil.close()
 

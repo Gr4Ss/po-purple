@@ -1,5 +1,5 @@
 import random
-
+# Storing the location of the html files
 DIRECTORY = ''
 def create_hash(length):
     result = ''
