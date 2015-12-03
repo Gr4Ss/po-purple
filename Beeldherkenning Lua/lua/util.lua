@@ -90,12 +90,24 @@ function util.distanceToSqr(node1, node2)
 	return (node1[1] - node2[1]) * (node1[1] - node2[1]) + (node1[2] - node2[2]) * (node1[2] - node2[2]);
 end;
 
+function util.getNextTurn(turnList, commaLocation)
+	local nextComma = string.find(turnList, ",", commaLocation);
+	if (nextComma) then
+		local nextTurn = string.sub(turnList, commaLocation + 1, commaLocation + 1);
+		local intersectionsToWait = string.sub(turnList, commaLocation + 2, nextComma - 1);
+
+		return nextTurn, intersectionsToWait, nextComma;
+	else
+		print("NO NEXT TURN");
+	end;
+end;
+
 -- Transform pixel positions to real coordinates and the other way around.
-local startCM = 5.5;
-local middleCM = 12.4;
-local horizon = -5;
-local heightCamera = 4.4;
-local baseWidth = 6.2;
+local startCM = 5.4;
+local middleCM = 10.9;
+local horizon = -13;
+local heightCamera = 3.5;
+local baseWidth = 6.7;
 local a = mathSqrt(1 + (heightCamera * heightCamera) / (middleCM * middleCM));
 local thetaMiddle = mathAtan(heightCamera / middleCM);
 local mathSinThetaMiddle = mathSin(thetaMiddle);
