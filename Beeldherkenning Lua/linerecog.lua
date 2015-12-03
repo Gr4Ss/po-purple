@@ -1,4 +1,4 @@
-local bmSetup = os.clock()
+--local bmSetup = os.clock()
 --[[
 	LOAD LIBRARIES
 ]]
@@ -22,6 +22,7 @@ local drive = require("drive");
 	LOCALIZE GLOBALS
 ]]
 local mathAbs = math.abs;
+local mathAcos = math.acos;
 local mathMax = math.max;
 local mathSqrt = math.sqrt;
 local osClock = os.clock;
@@ -36,39 +37,41 @@ local DEBUG = true; 		-- Do debug prints/paints/etc.
 local image = arg[1] or "picture_0";	-- Name of the picture to load in
 
 local intersectionsToWait;
+local nextTurn;
 local intersectionsPrevious = 0;
+local commaLocation = 0;
 print("Setup:       ", osClock() - bmSetup);
 
 
-function imageRecognition(nextTurn, getDistance, driveDistance, turnAngle)
+function imageRecognition(turnList, getDistance, startCommand, stopCommand, driveDistance, turnAngle)
 	--local oldPos = getDistance();
 	--[[
 		Load in the image, set up some image-related variables
 	]]
-	local bmLoad = osClock();
+	--local bmLoad = osClock();
 
 	local image = libjpeg.load({path = image..".jpg"});
 	local getPixel, setPixel = bitmap.pixel_interface(image);
 	local width = image.w - 1;
 	local height = image.h - 1;
 
-	print("Loading:     ", osClock() - bmLoad);
+	--print("Loading:     ", osClock() - bmLoad);
 
-	print("--- PREPROCESS ---");
+	--print("--- PREPROCESS ---");
 	--[[
 		Calculate the min luma value to compensate for different lightning
 	]]
-	local bmCalcBlackWhite = osClock();
+	--local bmCalcBlackWhite = osClock();
 	local minLuma = preprocess.getMinLuma(getPixel, width, height);
-	print(minLuma)
-	print("Calc B-W:    ", osClock() - bmCalcBlackWhite);
+	--print(minLuma)
+	--print("Calc B-W:    ", osClock() - bmCalcBlackWhite);
 
 	--[[
 		Turn the image into black/white
 	]]
-	local bmBlackWhite = osClock();
+	--local bmBlackWhite = osClock();
 	local firstWhite, lastWhite, lowestWhite = preprocess.makeBlackWhite(getPixel, setPixel, width, height, minLuma);
-	print("Black-white: ", osClock() - bmBlackWhite);
+	--print("Black-white: ", osClock() - bmBlackWhite);
 
 	--DEBUG
 	if (DEBUG) then
@@ -79,10 +82,10 @@ function imageRecognition(nextTurn, getDistance, driveDistance, turnAngle)
 	--[[
 		Remove noise
 	]]
-	local bmNoise = osClock();
+	--local bmNoise = osClock();
 	preprocess.reduceNoise(getPixel, setPixel, width, height, firstWhite, lastWhite, lowestWhite);
-	print("Noise:       ", osClock() - bmNoise);
-	print("Preprocess:  ", osClock() - bmCalcBlackWhite);
+	--print("Noise:       ", osClock() - bmNoise);
+	--print("Preprocess:  ", osClock() - bmCalcBlackWhite);
 
 	--DEBUG
 	if (DEBUG) then
@@ -90,97 +93,98 @@ function imageRecognition(nextTurn, getDistance, driveDistance, turnAngle)
 	end;
 	--]]
 
-	print("--- GRAPH ---");
+	--print("--- GRAPH ---");
 	--[[
 		Find all white pixels adjacent to black pixels
 		and turn them into nodes.
 	]]
-	local bmGraph = osClock();
+	--local bmGraph = osClock();
 	local nodeList, nodes = graph.getNodes(getPixel, width, height, firstWhite, lastWhite, lowestWhite);
-	print("Nodes:       ", osClock() - bmGraph);
+	--print("Nodes:       ", osClock() - bmGraph);
 
 	--[[
 		Sort the nodes based on the sortNodes
 	]]
-	local bmSort = osClock();
+	--local bmSort = osClock();
 	tableSort(nodeList, util.sortNodes);
-	print("Sort Nodes:   ", osClock() - bmSort);
+	--print("Sort Nodes:   ", osClock() - bmSort);
 
 	--[[
 		Generate the edges for all the nodes
 	]]
-	local bmEdges = osClock();
+	--local bmEdges = osClock();
 	graph.createEdges(nodeList, nodes);
 	graph.cleanUpEdges(nodeList, nodes);
-	print("Edges:       ", osClock() - bmEdges);
+	--print("Edges:       ", osClock() - bmEdges);
 
 	--[[
 		Group (in)directly linked nodes together
 	]]
-	local bmGrouping = osClock();
+	--local bmGrouping = osClock();
 	local groups = graph.createGroups(nodeList, nodes);
-	print("Grouping:    ", osClock() - bmGrouping);
-	print("Graph:       ", osClock() - bmGraph);
+	--print("Grouping:    ", osClock() - bmGrouping);
+	--print("Graph:       ", osClock() - bmGraph);
 
-	print("--- POSTPROCESS ---");
+	--print("--- POSTPROCESS ---");
 	--[[
 		Reduce the number of nodes in a group
 		Uses the Ramer-Douglas-Peucker algorithm
 	]]
-	local bmRDP = osClock();
+	--local bmRDP = osClock();
 	postprocess.RDP(groups, height);
-	print("RDP:         ", osClock() - bmRDP);
+	--print("RDP:         ", osClock() - bmRDP);
 
 	--[[
 		Link groups together if their end/start are near each other.
 	]]
-	local bmLink = osClock();
+	--local bmLink = osClock();
 	postprocess.linkGroups(groups, height);
-	print("Linking:     ", osClock() - bmLink);
+	--print("Linking:     ", osClock() - bmLink);
 
 	--[[
 		Create real points from the remaining nodes
 	]]
-	local bmReal = osClock();
+	--local bmReal = osClock();
 	local realNodes = postprocess.transformToRealNodes(groups, width, height);
-	print("Real Nodes:  ", osClock() - bmReal);
+	--print("Real Nodes:  ", osClock() - bmReal);
 
 	--[[
 		Merge points at intersections together
 	]]
-	local bmMerge = osClock();
+	--local bmMerge = osClock();
 	postprocess.mergeRealNodes(realNodes);
-	print("Merge Nodes: ", osClock() - bmMerge);
+	--print("Merge Nodes: ", osClock() - bmMerge);
 
 	--[[
 		Connect broken lines
 	]]
-	local bmConnect = osClock();
+	--local bmConnect = osClock();
 	postprocess.connectLines(realNodes);
-	print("Connect: ", osClock() - bmConnect);
-	print("Postprocess: ", osClock() - bmRDP);
+	--print("Connect: ", osClock() - bmConnect);
+	--print("Postprocess: ", osClock() - bmRDP);
 
 			for k, v in ipairs(realNodes) do
-			print(v[1], v[2], #v[3]);
+			--print(v[1], v[2], #v[3]);
 			for k, v1 in pairs(v[3]) do
-				print("    "..k, v1[1], v1[2])
+				--print("    "..k, v1[1], v1[2])
 			end;
 		end;
 
-	print("--- DRIVE LOGIC ---");
+	--print("--- DRIVE LOGIC ---");
 	--[[
 		Find the start node
 	]]
-	local bmStartNode = osClock();
+	--local bmStartNode = osClock();
 	local start = drive.findStart(realNodes, {0, util.startCM});
-	print("Start: ", osClock() - bmStartNode);
+	--print("Start: ", osClock() - bmStartNode);
 
-	local bmTarget = osClock();
+	--local bmTarget = osClock();
 	local target, bend, turn, deadEnd, intersectionsAhead = drive.findTarget(start, (nextTurn == "l" and -1) or (nextTurn == "r" and 1), intersections);
-	print("Target: ", osClock() - bmTarget);
+	print(target[1], target[2], bend, turn, deadEnd, intersectionsAhead)
+	--print("Target: ", osClock() - bmTarget);
 
 	if (not intersectionsToWait) then
-		--Update nextTurn and intersectiosnToWait
+		nextTurn, intersectionsToWait, commaLocation = util.getNextTurn(turnList, commaLocation);
 	end;
 
 	local intersectionsDiff = mathMax(intersectionsPrevious - intersectionsAhead, 0);
@@ -188,14 +192,18 @@ function imageRecognition(nextTurn, getDistance, driveDistance, turnAngle)
 
 	local curPos = getDistance();
 	target[2] = target[2] - curPos + oldPos;
-
 	local distance = util.distanceToSqr({0, 0}, target);
 	if (distance < ((curPos - oldPos) * 2 + util.startCM) ^ 2) then
 		if  (bend or turn) then
 			print("TURN MODE");
+			stopCommand();
+			driveDistance(target[2]);
+			local nextNode = turn or bend;
+			local x1, y1 = nextNode[1] - currentNodetarget[1], nextNode[2] - target[2];
+			turnAngle(mathAcos((-1 * y1) / mathSqrt(x1 * x1 + y1 * y1)));
 
 			if (bend) then
-				--Update nextTurn and intersectionsToWait;
+				nextTurn, intersectionsToWait, commaLocation = util.getNextTurn(turnList, commaLocation);
 			end;
 		elseif (deadEnd) then
 			print("DEAD END REACHED");
@@ -204,7 +212,9 @@ function imageRecognition(nextTurn, getDistance, driveDistance, turnAngle)
 		if (mathAbs(target[1]) < 1.5) then
 			driveDistance(target[2]);
 		else
-			print("ADJUST");
+			local radius = (((target[2] / 1.5) ^ 2) - (target[1] ^ 2)) / target[1];
+			print("Correcting (radius): ", radius);
+			startCommand("drive_circ", radius),
 		end;
 	end;
 

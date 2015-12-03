@@ -47,7 +47,7 @@ function drive.findTarget(start, nextTurn, intersections)
 				previousNode = currentNode;
 				currentNode = nextNode;
 			else
-				bend = true;
+				bend = nextNode;
 				break;
 			end;
 		elseif (nextTurn) then
@@ -59,9 +59,8 @@ function drive.findTarget(start, nextTurn, intersections)
 
 					local nextNode = currentNode[3][k + nextTurn];
 					local x1, y1 = nextNode[1] - currentNode[1], nextNode[2] - currentNode[2];
-					local x2, y2 = 0, -1;
-					local len1, len2 = x1 * x1 + y1 * y1, x2 * x2, y2 * y2;
-					if (mathAcos((x1 * x2 + y1 * y2) / mathSqrt(len1 * len2)) > minAngle) then
+					local len1 = x1 * x1 + y1 * y1;
+					if (mathAcos((-1 * y1) / mathSqrt(len1)) > minAngle) then
 						previousNode = currentNode;
 						currentNode = nextNode;
 						doBreak = false;
@@ -69,7 +68,7 @@ function drive.findTarget(start, nextTurn, intersections)
 					else
 						intersectionsAhead = intersectionsAhead + 1;
 						if (intersectionsAhead == intersections) then
-							turn = true;
+							turn = nextNode;
 							break;
 						else
 							next = (k + nextTurn) % #currentNode[3];
@@ -84,7 +83,6 @@ function drive.findTarget(start, nextTurn, intersections)
 			end;
 
 			if (doBreak) then
-				turn = true;
 				break;
 			end;
 		else
