@@ -1,5 +1,6 @@
 // Get context with jQuery - using jQuery's .get() method.
-var ctx = $("#myChart").get(0).getContext("2d");
+var ctx = $("#speedChart").get(0).getContext("2d");
+console.log(ctx);
 // This will get the first returned node in the jQuery collection.
 
 var data = {
@@ -79,20 +80,22 @@ legendTemplate : "<ul class=\"<%=name.toLowerCase()%>-legend\"><% for (var i=0; 
 var myLineChart = new Chart(ctx).Line(data,option);
 window.setInterval(function(){
 load_data();
+console.log('Loaded')
 }, 3000);
 
 function load_data(){
 $.getJSON( "data.json", function( data ) {
-console.log(data);
-var items = [];
-$.each( data, function( key, val ) {
-items.push(val);
-});
-var dt = new Date();
-var time = dt.getHours() + ":" + dt.getMinutes() + ":" + dt.getSeconds();
-myLineChart.addData(items[2:], time);
-if (myLineChart.labels.length >= 8){
-  myLineChart.removeData();
+  console.log(data);
+  var items = [];
+  $.each( data, function( key, val ) {
+    items.push(val);
+  });
+  var dt = new Date();
+  var time = dt.getHours() + ":" + dt.getMinutes() + ":" + dt.getSeconds();
+  myLineChart.addData(items.slice(2), time);
+  if (myLineChart.datasets[0].points.length >= 8){
+    myLineChart.removeData();
 }
-myLineChart.update();});
+  myLineChart.update();
+});
 }

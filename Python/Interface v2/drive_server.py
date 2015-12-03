@@ -107,7 +107,7 @@ def free_lock(id_):
         return False
 def free_super_lock(passw,id_):
     global LOCK, LOCK_ID, LOCK_TIME,SUPERLOCK
-    if has_lock(id_) and SUPERLOCK and passw == purplerain:
+    if has_lock(id_) and SUPERLOCK and passw == 'purplerain':
         LOCK = False
         SUPERLOCK = False
         LOCK_ID = None
@@ -135,7 +135,7 @@ def data_update(data):
     speedL = 0 if data['SpeedLeft'] == None else data['SpeedLeft']
     speedR = 0 if data['SpeedRight'] == None else data['SpeedRight']
     string = ''' {
-                {'distance1': %s},{'distace2': %s},{'speedLeft':%s},{'speedRight':%s}
+                {'distance1':%s},{'distace2':%s},{'speedLeft':%s},{'speedRight':%s}
                 } ''' % (distance1,distance2,speedL,speedR)
     fil.write(string)
     fil.close()

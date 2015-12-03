@@ -4,7 +4,7 @@ PORT = '5060'
 # Setting up a socket to communicate with the driving server
 context = zmq.Context()
 socket = context.socket(zmq.REQ)
-socket.connect("tcp://localhost:%s" % PORT)
+socket.connect("tcp://192.168.137.156:%s" % PORT)
 # Set timeout, wait only a certain time on drive server.
 socket.SNDTIMEO = 1000
 socket.RCVTIMEO = 20000
@@ -24,8 +24,10 @@ def input_handler():
      GOING = True
      while GOING:
         inp = raw_input('Enter next command: ')
+        correct = True
         if not is_legal_input(inp):
             print 'Not a valid commad'
+            correct = False
         if inp == 'F':
             socket.send('FORWARD_'+id_)
         elif inp == 'B':
@@ -38,7 +40,8 @@ def input_handler():
             socket.send('STOP_'+id_)
         elif inp == 'E':
             GOING = False
-        if GOING:
+
+        if GOING and correct:
             response = socket.recv()
             print response
 if __name__ == '__main__':

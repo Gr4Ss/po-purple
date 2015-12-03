@@ -96,13 +96,13 @@ class Controller:
         result = dict()
         result['Distancesensor1'] = self.__distancePi.get_value()
         result['Distancesensor2'] = self.__distanceLego.get_value()
-        result['SpeedLeft'] = self.__leftengine.get_value()
-        result['SpeedRight'] = self.__rightengine.get_value()
+        result['SpeedLeft'] = self.__leftengine.get_speed()
+        result['SpeedRight'] = self.__rightengine.get_speed()
         ## result['Top angle'] = (self.__topengine.get_count()%1) *2*math.pi
         return result
     # A method to drive forward
     def forward(self):
-        pid = PID(15.,1/2.,2.,.1)
+        pid = PID.PID(15.,1/2.,2.,.1)
         self.__leftengine.set_speed(240)
         self.__rightengine.set_speed(240)
         self.__leftengine.reset_count()
@@ -113,9 +113,11 @@ class Controller:
             speeddif = pid.new_value(distance1-distance2,0.1)
             self.__rightengine.set_speed(240 + speeddif)
             time.sleep(0.05)
+        self.__leftengine.set_speed(0)
+        self.__rightengine.set_speed(0)
     # A mehtod to drive backward
     def backward(self):
-        pid = PID(15.,1/2.,2.,.1)
+        pid = PID.PID(15.,1/2.,2.,.1)
         self.__leftengine.set_speed(-240)
         self.__rightengine.set_speed(-240)
         self.__leftengine.reset_count()
@@ -126,6 +128,8 @@ class Controller:
             speeddif = pid.new_value(distance1-distance2,0.1)
             self.__rightengine.set_speed(-240 + speeddif)
             time.sleep(0.05)
+        self.__leftengine.set_speed(0)
+        self.__rightengine.set_speed(0)
     # A method to stop driving
     def stop(self):
         self.__leftengine.set_speed(0)
@@ -147,7 +151,8 @@ class Controller:
             self.__leftengine.set_speed(speedleft)
             self.__rightengine.set_speed(speedright)
             if (abs(goaldistanceleft - distanceleft)< 1.) and (abs(goaldistanceright - distanceright) < 1.):
-                goaldistanceleft,goaldistanceright += follow.get_data()[0],follow.get_data()[1]
+                goaldistanceleft += follow.get_data()[0]
+                goaldistanceright += follow.get_data()[1]
             time.sleep(0.1)
         self.__leftengine.set_speed(0)
         self.__rightengine.set_speed(0)
@@ -358,8 +363,10 @@ class Controller:
         self.__rightengine.set_speed(240)
         while self.__command_going:
             pass
+        self.__rightengine.set_speed(0)
 
     def right(self):
         self.__leftengine.set_speed(240)
         while self.__command_going:
             pass
+        self.__leftengine.set_speed(0)
