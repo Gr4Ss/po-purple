@@ -209,7 +209,7 @@ function imageRecognition(turnList, getDistance, startCommand, stopCommand, driv
 		end;
 	else
 		if (mathAbs(target[1]) < 1.5) then
-			driveDistance(target[2]);
+			startCommand("forward", target[2]);
 		else
 			local radius = ((target[2] ^ 2) - (target[1] ^ 2)) / target[1];
 			startCommand("drive_circ", radius);
