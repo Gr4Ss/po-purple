@@ -93,12 +93,15 @@ end;
 function util.getNextTurn(turnList, commaLocation)
 	local nextComma = string.find(turnList, ",", commaLocation);
 	if (nextComma) then
-		local nextTurn = string.sub(turnList, commaLocation + 1, commaLocation + 1);
-		local intersectionsToWait = string.sub(turnList, commaLocation + 2, nextComma - 1);
-
-		return nextTurn, intersectionsToWait, nextComma;
+		return string.sub(turnList, commaLocation + 1, commaLocation + 1),
+			tonumber(string.sub(turnList, commaLocation + 2, nextComma - 1)), nextComma;
 	else
-		print("NO NEXT TURN");
+		if (commaLocation < #turnList) then
+			return string.sub(turnList, commaLocation + 1, commaLocation + 1),
+				tonumber(string.sub(turnList, commaLocation + 2, -1)), #turnList;
+		else
+			return "d", 0, #turnList;
+		end;
 	end;
 end;
 

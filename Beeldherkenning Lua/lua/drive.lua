@@ -6,6 +6,7 @@ local util = util;
 local ipairs = ipairs;
 local mathAcos = math.acos;
 local mathHuge = math.huge;
+local mathSqrt = math.sqrt;
 
 function drive.findStart(realNodes, zero)
 	local start;
@@ -57,7 +58,7 @@ function drive.findTarget(start, nextTurn, intersections)
 					local next = (k + nextTurn) % #currentNode[3];
 					if (next == 0) then next = #currentNode[3] end;
 
-					local nextNode = currentNode[3][k + nextTurn];
+					local nextNode = currentNode[3][next];
 					local x1, y1 = nextNode[1] - currentNode[1], nextNode[2] - currentNode[2];
 					local len1 = x1 * x1 + y1 * y1;
 					if (mathAcos((-1 * y1) / mathSqrt(len1)) > minAngle) then
@@ -71,7 +72,7 @@ function drive.findTarget(start, nextTurn, intersections)
 							turn = nextNode;
 							break;
 						else
-							next = (k + nextTurn) % #currentNode[3];
+							next = (next + nextTurn) % #currentNode[3];
 							if (next == 0) then next = #currentNode[3] end;
 							previousNode = currentNode;
 							currentNode = currentNode[3][next];
@@ -90,9 +91,8 @@ function drive.findTarget(start, nextTurn, intersections)
 			for k, v in ipairs(currentNode[3]) do
 				if (v ~= previousNode) then
 					local x1, y1 = v[1] - currentNode[1], v[2] - currentNode[2];
-					local x2, y2 = 0, -1;
-					local len1, len2 = x1 * x1 + y1 * y1, x2 * x2, y2 * y2;
-					if (mathAcos((x1 * x2 + y1 * y2) / mathSqrt(len1 * len2)) > minAngle) then
+					local len1 = x1 * x1 + y1 * y1;
+					if (mathAcos((-1 * y1) / mathSqrt(len1)) > minAngle) then
 						previousNode = currentNode;
 						currentNode = v;
 						doBreak = false;
