@@ -61,8 +61,17 @@ for key in form.keys():
     elif key == 'backwardstart':
         command = 'BACKWARD_' + str(session_id)
         break
-    elif key == 'forwardstop' or key == 'leftstop' or key == 'rightstop' or key == 'backwardstop':
-        command = 'STOP_' + str(session_id)
+    elif key == 'forwardstop':
+        command = 'FORWARDSTOP_' + str(session_id)
+        break
+    elif key == 'leftstop':
+        command = 'LEFTSTOP_' + str(session_id)
+        break
+    elif key == 'rightstop':
+        command = 'RIGHTSTOP_' + str(session_id)
+        break
+    elif key == 'backwardstop':
+        command = 'BACKWARDSTOP_' + str(session_id)
         break
 try:
     socket.send(command)

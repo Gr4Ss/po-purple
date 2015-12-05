@@ -34,7 +34,7 @@ try:
     cookie["session"]["expires"] =  expiration.strftime("%a, %d-%b-%Y %H:%M:%S PST")
 except (Cookie.CookieError, KeyError):
     cookie = Cookie.SimpleCookie()
-    session_id = create_hash(32)
+    session_id = create_hash(16)
     cookie["session"] = session_id
     cookie["session"]["domain"] = IP
     cookie["session"]["path"] = "/"

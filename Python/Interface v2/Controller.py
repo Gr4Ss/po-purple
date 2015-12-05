@@ -6,7 +6,7 @@ from Engine import *
 from BrickPi_thread import *
 from GPIO_thread import *
 from Sensor import *
-#import Linefollower as follow
+import drive_Frederik as c1
 import PID
 
 ## The minimum speed to move
@@ -45,9 +45,31 @@ class Controller:
         self.__gpio.on()
         self.__command_going = False
         self.__command_thread = None
-    # Return the width of the car
-    def get_car_width(self):
-        return self.__widthcar
+    # Start a commands
+    # If there is already a command going, stop that first
+    # Start thread
+    # @post self.__command_going = True
+    # @post self.__command_thread = new thread
+    def start_command(self,command,arguments = None):
+        if self.__command_going:
+            self.stop_commmand()
+        self.__command_going = True
+        if arguments != None:
+            thread = threading.Thread(target= command,args=arguments)
+        else:
+            thread = threading.Thread(target= command)
+        self.__command_thread = thread
+        self.__command_thread.setDaemon('True')
+        self.__command_thread.start()
+    # A method to stop the going command
+    # if there is a command going stop it
+    # @post self.__command_going = False
+    # @post self.__command_thread = None
+    def stop_commmand(self):
+        if self.__command_going:
+            self.__command_going = False
+            self.__command_thread.join()
+            self.__command_thread = None
     # A method to set the speed of the engines
     # If the number of speeds don't equal the number of engines an error is raised
     def set_speed_engines(self,speed):
@@ -70,24 +92,6 @@ class Controller:
     def kill_threads(self):
         self.__brickpi.off()
         self.__gpio.off()
-
-    def start_command(self,command,arguments):
-        if self.__command_going:
-            self.stop_commmand()
-        self.__command_going = True
-        if arguments != None:
-            exec('thread = threading.Thread(target=self.' + command +',args='+ str(arguments) +')')
-        else:
-            exec('thread = threading.Thread(target=self.' + command +')')
-        self.__command_thread = thread
-        self.__command_thread.setDaemon('True')
-        self.__command_thread.start()
-
-    def stop_commmand(self):
-        if self.__command_going:
-            self.__command_going = False
-            self.__command_thread.join()
-            self.__command_thread = None
 
     ## Return the values of the sensor in a dictionary with keys
     ## Distancesensor1 -> GPIO distance sensor
@@ -130,17 +134,30 @@ class Controller:
             time.sleep(0.05)
         self.__leftengine.set_speed(0)
         self.__rightengine.set_speed(0)
+    # A method to turn left
+    def left(self):
+        self.__rightengine.set_speed(240)
+        while self.__command_going:
+            pass
+        self.__rightengine.set_speed(0)
+    # A method to turn right
+    def right(self):
+        self.__leftengine.set_speed(240)
+        while self.__command_going:
+            pass
+        self.__leftengine.set_speed(0)
+
     # A method to stop driving
     def stop(self):
         self.__leftengine.set_speed(0)
         self.__rightengine.set_speed(0)
 
     def follow_line1(self):
-        follow.start()
+        follow = c1.Frederik()
         self.__leftengine.reset_count()
         self.__rightengine.reset_count()
-        pidleft = PID.PID2(50.,5.,10.,0.5)
-        pidright = PID.PID2(50.,5.,10.,0.5)
+        pidleft = PID.PID2(50.,5.,10.,0.5,0)
+        pidright = PID.PID2(50.,5.,10.,0.5,0)
         goaldistanceleft,goaldistanceright = follow.get_data()[0],follow.get_data()[1]
         while self.__going:
             distanceleft = self.__leftengine.get_count()*self.__perimeter*self.__gearratio
@@ -154,6 +171,7 @@ class Controller:
                 goaldistanceleft += follow.get_data()[0]
                 goaldistanceright += follow.get_data()[1]
             time.sleep(0.1)
+        follow.stop()
         self.__leftengine.set_speed(0)
         self.__rightengine.set_speed(0)
 
@@ -222,16 +240,16 @@ class Controller:
             else:
                 return [-255+abs(speed_diff),-255]
         # If the absolute value is less then the MINIMUM_SPEED its turned up
-        elif speed < MINIMUM_SPEED or speed+speed_diff < MINIMUM_SPEED:
-	           if speed_diff > 0:
-                   return [MINIMUM_SPEED,MINIMUM_SPEED+speed_diff]
-               else:
-                   return [MINIMUM_SPEED-speed_diff,MINIMUM_SPEED]
+    elif abs(speed) < MINIMUM_SPEED or abs(speed+speed_diff) < MINIMUM_SPEED:
+            if sign(speed)* speed_diff > 0:
+                   return [MINIMUM_SPEED,MINIMUM_SPEED+sign(speed)*speed_diff]
+            else:
+                   return [MINIMUM_SPEED-sign(speed)*speed_diff,MINIMUM_SPEED]
         return [speed,speed+speed_diff]
 
 
     ## A method to rotate
-    def rotate(self,degree,going):
+    def rotate(self,radial,going):
         ## reset the counters of the engiense
         self.__leftengine.reset_count()
         self.__rightengine.reset_count()
@@ -243,7 +261,7 @@ class Controller:
             inner_engine = self.__leftengine
             outer_engine = self.__rightengine
         # Calculate the distance to be driven
-        distance = self.__widthcar/2. * abs(degree)
+        distance = self.__widthcar/2. * abs(radial)
         pid1 = PID.PID(10.,1./2.,10/2.,.6)
         pid2 = PID.PID(10.,1./2.,10/2.,.6)
         speed1 = pid1.new_value(distance,0.1)
@@ -264,8 +282,8 @@ class Controller:
             outer_engine.set_speed(speed1)
             inner_engine.set_speed(speed2)
             time.sleep(0.1)
-
-    def rotate2(self,degree):
+    # Only one wheel rotate in stead of two
+    def rotate2(self,radial):
         ## reset the counters of the engiense
         self.__leftengine.reset_count()
         self.__rightengine.reset_count()
@@ -273,7 +291,7 @@ class Controller:
             inner_engine = self.__leftengine
         else:
             inner_engine = self.__rightengine
-        distance = degree/180 * math.pi * self.__widthcar
+        distance = abs(radial) * self.__widthcar
         pid = PID.PID2(20.,1./2.,5.,0.7,distance)
         speed = MINIMUM_SPEED
         inner_engine.set_speed(MINIMUM_SPEED)
@@ -299,9 +317,9 @@ class Controller:
             print 'Angle: ', angle
         while sides > 0:
             self.ride_distance(distance)
-	        time.sleep(0.1)
+            time.sleep(0.1)
             self.rotate(angle)
-	        time.sleep(0.1)
+            time.sleep(0.1)
             sides -= 1
             if DEBUG:
                 print 'Sides: ', sides
@@ -313,7 +331,7 @@ class Controller:
             routspeed = sign(outspeed) * min(255,abs(outspeed))
             routspeed = sign(outspeed) * max(MINIMUM_SPEED*1.1,abs(outspeed))
             rinspeed = sign(outspeed) * abs(max(abs(inspeed),5)/outspeed) * routspeed
-	        return rinspeed,routspeed
+            return rinspeed,routspeed
         return inspeed,outspeed
 
     def ride_circ(self,radius):
@@ -355,18 +373,3 @@ class Controller:
             time.sleep(0.1)
         inner_engine.set_speed(0)
         outer_engine.set_speed(0)
-
-    def drive(self,y,x):
-        pass
-
-    def left(self):
-        self.__rightengine.set_speed(240)
-        while self.__command_going:
-            pass
-        self.__rightengine.set_speed(0)
-
-    def right(self):
-        self.__leftengine.set_speed(240)
-        while self.__command_going:
-            pass
-        self.__leftengine.set_speed(0)

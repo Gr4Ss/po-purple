@@ -45,7 +45,7 @@ class PID2:
         if abs(self.__threshold - value) < self.__precision and abs(self.__threshold) < abs(value) and sign(self.__threshold) == sign(value):
             return 0
         error = self.__threshold - value
-        self.__integral += error * dt
+        self.__integral += error * float(dt)
         integral = self.__integral
         differential = (error - self.__error)/dt
         proportional = error

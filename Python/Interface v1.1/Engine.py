@@ -52,6 +52,3 @@ class Engine:
     def get_global_count(self):
         exec('angle = BrickPi.Encoder[PORT_'+self.__port+']')
         return (angle-self.__global_angle)/720.
- 
-    
-  

@@ -2,6 +2,8 @@ import zmq
 import time
 import constraints as c
 import threading
+from Manual_Drive import *
+
 
 # In testing mode no drive commands are executed
 TESTING_MODE = True
@@ -11,6 +13,7 @@ if not TESTING_MODE:
     import Controller
 # create controller entity
     controller = Controller.Controller()
+    manualDrive = ManualDrive(controller.start_command,controller.forward,controller.backward,controller.left,controller.right,controller.stop)
 
 # The port to which this server will listen
 PORT = '5060'
@@ -40,8 +43,10 @@ commands = {'LOCK':{'nb_of_arguments':1},'UNLOCK':{'nb_of_arguments':1},
 'SQUARE':{'nb_of_arguments':2,'constraint':c.constraint_square},
 'DATA':{'nb_of_arguments':0},'SUPERLOCK':{'nb_of_arguments':2},
 'SUPERUNLOCK':{'nb_of_arguments':2},'FORWARD':{'nb_of_arguments':1},
-'RIGHT':{'nb_of_arguments':1},'LEFT':{'nb_of_arguments':1},
-'BACKWARD':{'nb_of_arguments':1},'STOP':{'nb_of_arguments':1},
+'FORWARDSTOP':{'nb_of_arguments':1},'RIGHT':{'nb_of_arguments':1},
+'RIGHTSTOP':{'nb_of_arguments':1},'LEFT':{'nb_of_arguments':1},
+'LEFTSTOP':{'nb_of_arguments':1}, 'BACKWARDSTOP':{'nb_of_arguments':1},
+'BACKWARD':{'nb_of_arguments':1}, 'STOP':{'nb_of_arguments':1},
 'COMMAND':{'nb_of_arguments':2,'constraint':c.constraint_command}}
 
 # A method to parse the message
@@ -55,9 +60,11 @@ def parse_message(message):
         return False
     else:
         nb_of_arguments = commands.get(key,0).get('nb_of_arguments',0)
+        # Check if the message has the valid number of arguments
         if len(split_message)-1 != nb_of_arguments:
             return False
         else:
+            # Check if there is any constraint
             constraint = commands.get(key,0).get('constraint',False)
             if constraint != False:
                 to_be_checked = split_message[1]
@@ -127,19 +134,22 @@ def lock_expired():
     global SUPERLOCK,LOCK,LOCK_TIME, LOCK_MAX_TIME
     return (not SUPERLOCK) and LOCK and (time.time() - LOCK_TIME >= LOCK_MAX_TIME)
 
+# Write data in /var/www/data.html
 def data_update(data):
-    open('/var/www/data.html','w').close()
+    # clear  /var/www/data.json
+    open('/var/www/data.json','w').close()
+    # Write the new data in /var/www/data.json
     fil = open('/var/www/data.json','r+')
     distance1 = 0 if data['Distancesensor1'] == None else data['Distancesensor1']
     distance2 = 0 if data['Distancesensor2'] == None else data['Distancesensor2']
     speedL = 0 if data['SpeedLeft'] == None else data['SpeedLeft']
     speedR = 0 if data['SpeedRight'] == None else data['SpeedRight']
     string = ''' {
-                {'distance1':%s},{'distace2':%s},{'speedLeft':%s},{'speedRight':%s}
+                "distance1":%s,"distance2":%s,"speedLeft":%s,"speedRight":%s
                 } ''' % (distance1,distance2,speedL,speedR)
     fil.write(string)
     fil.close()
-
+# Every 5 seconds the data is updated
 def data_updater():
     while True:
         time.sleep(5)
@@ -150,18 +160,21 @@ if not TESTING_MODE:
     thread = threading.Thread(target=data_updater)
     thread.setDaemon('True')
     thread.start()
-
+# if a message with command is received it must be parse_command
+# commands are in the form [(L/4),(R/3)]
 def parse_command(commands):
+    # Throw away the [ ] and split on ,
     cleaned_commands = commands[1:-1].split(',')
-    print cleaned_commands
     result = ''
     for command in cleaned_commands:
+        # Throw away the ( ) and split on /
         splitting = command[1:-1].split('/')
-        print splitting
         comm = splitting[0]
         valu = splitting[1]
         result += comm + valu+ ','
+    # Throw away the last ,
     return result[:-1]
+
 while True:
     global LOCK_ID
     message = socket.recv()
@@ -169,6 +182,7 @@ while True:
     message = parse_message(message)
     return_message = ''
     if (message!= False):
+        # Check if the current lock has expired
         if lock_expired():
             free_lock(LOCK_ID)
         if message[0] == 'LOCK':
@@ -203,11 +217,6 @@ while True:
                 return_message = 'UNLOCK_TRUE'
             else:
                 return_message = 'UNLOCK_FALSE'
-        #elif message[0] == 'DATA':
-        #    if TESTING_MODE:
-        #        return_message = str(time.time())
-        #    else:
-        #        return_message = str(controller.get_sensor_data())
         elif message[0] == 'STRAIGHT':
             distance = int(message[1])
             id_ = message[2]
@@ -216,7 +225,7 @@ while True:
             else:
                 if not TESTING_MODE:
                     try:
-                        controller.start_command('ride_distance','(' + str(distance) + ',)')
+                        controller.start_command(controller.ride_distance,(distance,))
                         return_message = 'SUCCES'
                     except:
                         return_message = 'FAILURE'
@@ -230,7 +239,7 @@ while True:
             else:
                 if not TESTING_MODE:
                     try:
-                        controller.start_command('ride_circ','(' + str(radius) + ',)')
+                        controller.start_command(controller.ride_circ,(radius,))
                         return_message = 'SUCCES'
                     except:
                         return_message = 'FAILURE'
@@ -244,12 +253,26 @@ while True:
             else:
                 if not TESTING_MODE:
                     try:
-                        controller.start_command('drive_square','(' + str(side) + ',)')
+                        controller.start_command(controller.drive_square,(side,))
                         return_message = 'SUCCES'
                     except:
                         return_message = 'FAILURE'
                 else:
                     return_message = 'SUCCES'
+        elif message[0] == 'STOP':
+            id_ = message[1]
+            if not has_lock(id_):
+                return_message = 'NO_LOCK'
+            else:
+                if not TESTING_MODE:
+                    try:
+                        manualDrive.clear()
+                        manualDrive.run()
+                        return_message = 'SUCCES'
+                    except:
+                        return_message = 'FAILURE'
+                else:
+                        return_message = 'SUCCES'
         elif message[0] == 'FORWARD':
             id_ = message[1]
             if not has_lock(id_):
@@ -257,7 +280,8 @@ while True:
             else:
                 if not TESTING_MODE:
                     try:
-                        controller.start_command('forward',None)
+                        manualDrive.add_command('forward')
+                        manual = manualDrive.run()
                         return_message = 'SUCCES'
                     except:
                         return_message = 'FAILURE'
@@ -270,7 +294,8 @@ while True:
             else:
                 if not TESTING_MODE:
                     try:
-                        controller.start_command('left',None)
+                        manualDrive.add_command('left')
+                        manual = manualDrive.run()
                         return_message = 'SUCCES'
                     except:
                         return_message = 'FAILURE'
@@ -283,7 +308,8 @@ while True:
             else:
                 if not TESTING_MODE:
                     try:
-                        controller.start_command('right',None)
+                        manualDrive.add_command('right')
+                        manual = manualDrive.run()
                         return_message = 'SUCCES'
                     except:
                         return_message = 'FAILURE'
@@ -296,20 +322,64 @@ while True:
             else:
                 if not TESTING_MODE:
                     try:
-                        controller.start_command('backward',None)
+                        manualDrive.add_command('backward')
+                        manual = manualDrive.run()
                         return_message = 'SUCCES'
                     except:
                         return_message = 'FAILURE'
                 else:
                         return_message = 'SUCCES'
-        elif message[0] == 'STOP':
+        elif message[0] == 'FORWARDSTOP':
             id_ = message[1]
             if not has_lock(id_):
                 return_message = 'NO_LOCK'
             else:
                 if not TESTING_MODE:
                     try:
-                        controller.start_command('stop',None)
+                        manualDrive.delete_command('forward')
+                        manual = manualDrive.run()
+                        return_message = 'SUCCES'
+                    except:
+                        return_message = 'FAILURE'
+                else:
+                        return_message = 'SUCCES'
+        elif message[0] == 'BACKWARDSTOP':
+            id_ = message[1]
+            if not has_lock(id_):
+                return_message = 'NO_LOCK'
+            else:
+                if not TESTING_MODE:
+                    try:
+                        manualDrive.delete_command('backward')
+                        manual = manualDrive.run()
+                        return_message = 'SUCCES'
+                    except:
+                        return_message = 'FAILURE'
+                else:
+                        return_message = 'SUCCES'
+        elif message[0] == 'LEFTSTOP':
+            id_ = message[1]
+            if not has_lock(id_):
+                return_message = 'NO_LOCK'
+            else:
+                if not TESTING_MODE:
+                    try:
+                        manualDrive.delete_command('left')
+                        manual = manualDrive.run()
+                        return_message = 'SUCCES'
+                    except:
+                        return_message = 'FAILURE'
+                else:
+                        return_message = 'SUCCES'
+        elif message[0] == 'RIGHTSTOP':
+            id_ = message[1]
+            if not has_lock(id_):
+                return_message = 'NO_LOCK'
+            else:
+                if not TESTING_MODE:
+                    try:
+                        manualDrive.delete_command('right')
+                        manual = manualDrive.run()
                         return_message = 'SUCCES'
                     except:
                         return_message = 'FAILURE'
