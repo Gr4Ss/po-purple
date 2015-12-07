@@ -4,6 +4,7 @@ import cPickle as pickle
 global resultList
 global sendQueue
 global ready = False
+global directions = None
 sendQueue = Queue.Queue()
 lock = threading.Lock()
 
@@ -37,10 +38,13 @@ def recieveResults(s):
         result = s.recv(1024)
         if result == "**END**":
             print "Ending"
+            killServer()
             break
         else if result = "OK":
             ready = True
             lock.release()
+        else:
+            directions = result
     return
 
 def isReady(interval = 0.01):
@@ -53,6 +57,11 @@ def isReady(interval = 0.01):
 def killServer():
     sendQueue.put('END')
     return
+
+def getDirections():
+    while True:
+        if directions != None
+        return directions
 
 if __name__ == '__main__':
     s = socket.socket(socket.AF_INET, socket.SOCK_STREAM)
