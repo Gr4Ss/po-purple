@@ -224,10 +224,10 @@ class Controller:
 
     def correct_speed(self,speed,speed_diff):
         # If the speed or speed + diff is bigger then 255 a correction must happen
-        if speed > 255 or speed+speed_diff > 255:
+        if abs(speed) > 255 or abs(speed+speed_diff) > 255:
             # if speed_diff bigger is bigger then 0 the left engine must slow down
-            if speed_diff > 0:
-                return [255-abs(speed_diff),255]
+            if sign(speed)*speed_diff > 0:
+                return [255-sign(speed)*speed_diff,255]
             # if speed_diff < 0 the right engine must slow down
             else:
                 return [255,255 - abs(speed_diff)]
@@ -242,9 +242,9 @@ class Controller:
         # If the absolute value is less then the MINIMUM_SPEED its turned up
     elif abs(speed) < MINIMUM_SPEED or abs(speed+speed_diff) < MINIMUM_SPEED:
             if sign(speed)* speed_diff > 0:
-                   return [MINIMUM_SPEED,MINIMUM_SPEED+sign(speed)*speed_diff]
+                   return [sign(speed)*MINIMUM_SPEED,sign(speed)* (MINIMUM_SPEED+sign(speed)*speed_diff)]
             else:
-                   return [MINIMUM_SPEED-sign(speed)*speed_diff,MINIMUM_SPEED]
+                   return [sign(speed)*(MINIMUM_SPEED-sign(speed)*speed_diff),sign(speed)*MINIMUM_SPEED]
         return [speed,speed+speed_diff]
 
 

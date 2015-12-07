@@ -2,15 +2,16 @@ from BrickPi import *
 from utility import *
 
 BrickPiSetup()
-
-# Class concerning the LEGO-MINDSTORM Engine
+PORTS = {'A':PORT_A,'B':PORT_B,'C':PORT_C,'D':PORT_D}
+# Class concer_ning the LEGO-MINDSTORM Engine
 # It possible to let the motor run (back and forth) at a given power rate.
 class Engine:
+    global PORTS
     def __init__(self,port):
         ## A motor is connected to a given port ('A','B','C','D')
-        self.__port = port
+        self.__port = PORTS.get(port,PORT_A)
         ## BrickPi command to enable the motor
-        exec("BrickPi.MotorEnable[PORT_" + self.__port + "] = 1")
+        BrickPi.MotorEnable[self.__port] = 1
         ## speed = 0 is not running
         ## speed < 0 is running backward
         ## speed > 0 is running forward
@@ -18,7 +19,7 @@ class Engine:
         ## Set the speed of the motor to 0
         BrickPiUpdateValues()
         ## Ask the current angle of the wheel
-        exec('start_angle = BrickPi.Encoder[PORT_'+self.__port+']')
+        start_angle = BrickPi.Encoder[self.__port]
         self.__start_angle = start_angle
         self.__gloabal_angle = start_angle
     ## Returning the running speed of this Motor
@@ -37,18 +38,18 @@ class Engine:
 
     ## The motor is pulsed with the current speed
     def pulse(self):
-        exec("BrickPi.MotorSpeed[PORT_" + self.__port + "] =" + str(self.__speed))
+        BrickPi.MotorSpeed[self.__port + ] = self.__speed
     # A method returning the number of rotations (expressed in number of rotations) of the motor since the last time
     # reset_count() is executed
     def get_count(self):
-        exec('angle = BrickPi.Encoder[PORT_'+self.__port+']')
+        angle = BrickPi.Encoder[self.__port]
         return (angle-self.__start_angle)/720.
     ## A method to reset the counter
     ## @post self.__start_angle = the current encoder of the motor.
     def reset_count(self):
-        exec('angle = BrickPi.Encoder[PORT_'+self.__port+']')
+        angle = BrickPi.Encoder[self.__port]
         self.__start_angle = angle
     ## Return the total number of rotations of this motor since the motor is inited.
     def get_global_count(self):
-        exec('angle = BrickPi.Encoder[PORT_'+self.__port+']')
+        angle = BrickPi.Encoder[self.__port]
         return (angle-self.__global_angle)/720.
