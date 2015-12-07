@@ -222,14 +222,13 @@
   <div class="panel panel-default">
     <div class="panel-heading" role="tab" id="headingSeven">
       <h4 class="panel-title">
-        <a class="collapsed" role="button" data-toggle="collapse" data-parent="#accordion" href="#collapseSeven" aria-expanded="false" aria-controls="collapseSeven">
+        <a id='sevenLink' class="collapsed" role="button" data-toggle="collapse" data-parent="#accordion" href="#collapseSeven" aria-expanded="false" aria-controls="collapseSeven">
         Get data
         </a>
       </h4>
     </div>
     <div id="collapseSeven" class="panel-collapse collapse" role="tabpanel" aria-labelledby="headingSeven">
       <div class="panel-body">
-        <div id ='data_display'></div>
           <div>
             <canvas id="speedChart" width="600px" height="400px"></canvas>
             <script src="chart.js"></script>
@@ -240,7 +239,6 @@
   </div>
 
 
-</div>
 </div>
 </div>
 
@@ -323,5 +321,10 @@ $('.nextDistance').click(function(){
 });
 </script>
 
+<script>
+  $('#sevenLink').click(function(){
+    $('#speedChart').css('width':'400px','height':'600px');
+  })
+</script>
 </body>
 </html>
