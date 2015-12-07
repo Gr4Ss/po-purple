@@ -14,6 +14,8 @@ if not TESTING_MODE:
 # create controller entity
     controller = Controller.Controller()
     manualDrive = ManualDrive(controller.start_command,controller.forward,controller.backward,controller.left,controller.right,controller.stop)
+    import lupa
+    from lupa import LuaRuntime
 
 # The port to which this server will listen
 PORT = '5060'
@@ -391,7 +393,10 @@ while True:
                 return_message = 'NO_LOCK'
             else:
                 print parse_command(message[1])
-                ## Call Arno's function
+                if not TESTING_MODE:
+                    lua = LuaRuntime()
+                    func = lua.eval("require('linerecog')")
+                    func(commands,conroller.get_engine_distance,controller.start_commmand,controller.stop_commmand,controller.drive_distance)
                 return_message = 'SUCCES'
     else:
         return_message = 'ILLEGAL_MESSAGE'
