@@ -52,7 +52,7 @@ class Controller:
     # @post self.__command_thread = new thread
     def start_command(self,command,arguments = None):
         if self.__command_going:
-            self.stop_commmand()
+            self.stop_command()
         self.__command_going = True
         if arguments != None:
             thread = threading.Thread(target= command,args=arguments)
@@ -65,7 +65,7 @@ class Controller:
     # if there is a command going stop it
     # @post self.__command_going = False
     # @post self.__command_thread = None
-    def stop_commmand(self):
+    def stop_command(self):
         if self.__command_going:
             self.__command_going = False
             self.__command_thread.join()
