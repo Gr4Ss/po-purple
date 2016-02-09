@@ -1,6 +1,6 @@
 from BrickPi import *
 from utility import *
-
+import math
 BrickPiSetup()
 PORTS = {'A':PORT_A,'B':PORT_B,'C':PORT_C,'D':PORT_D}
 # Class concer_ning the LEGO-MINDSTORM Engine
@@ -18,7 +18,7 @@ class Engine:
         self.__speed = 0
         self.__previous_speed = 0
         self.__port_speed = 0
-        self.MINIMUM_PORT_SPEED = 0
+        self.__MINIMUM_PORT_SPEED = 0
         ## Set the speed of the motor to 0
         BrickPiUpdateValues()
         ## Ask the current angle of the wheel
@@ -42,14 +42,22 @@ class Engine:
     def pulse(self,dt):
         current_distance = self.get_global_count()*self.__perimeter
         dx = current_distance - self.__previous_distance
+        print 'Distance', dx
         self.__previous_distance = current_distance
         real_speed = dx/dt # old speed in cm/s
+        print 'Real Speed:', real_speed
         if (real_speed < 0.001 and self.__previous_speed > 0.001):
             self.__MINIMUM_PORT_SPEED = abs(self.__port_speed)
-        self.__port_speed = (self.__speed)*(M-self.__port_speed)/(-real_speed) + M
+        if real_speed != 0:
+            if not self.__MINIMUM_PORT_SPEED == self.__port_speed:
+                self.__port_speed = (self.__speed)*(self.__MINIMUM_PORT_SPEED-self.__port_speed)/(-real_speed) + self.__MINIMUM_PORT_SPEED
+            else:
+                self.__port_speed = self.__MINIMUM_PORT_SPEED + 5
+
         self.__previous_speed = self.__speed
-        BrickPi.MotorSpeed[self.__port] = self.__port_speed
-    def get_perimeter():
+        print 'Port Speed', self.__port_speed
+        BrickPi.MotorSpeed[self.__port] = int(self.__port_speed)
+    def get_perimeter(self):
         return self.__perimeter
 
     # A method returning the number of rotations (expressed in number of rotations) of the motor since the last time
