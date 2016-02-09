@@ -16,12 +16,17 @@ class Engine:
         ## speed < 0 is running backward
         ## speed > 0 is running forward
         self.__speed = 0
+        self.__previous_speed = 0
+        self.__port_speed = 0
+        self.MINIMUM_PORT_SPEED = 0
         ## Set the speed of the motor to 0
         BrickPiUpdateValues()
         ## Ask the current angle of the wheel
         start_angle = BrickPi.Encoder[self.__port]
         self.__start_angle = start_angle
-        self.__gloabal_angle = start_angle
+        self.__global_angle = start_angle
+        self.__previous_distance = 0
+        self.__perimeter = 2*math.pi* 2.579
     ## Returning the running speed of this Motor
     ## speed = 0 is not running
     ## speed < 0 is running backward
@@ -30,15 +35,23 @@ class Engine:
         return self.__speed
     ## Method to set the speed of this motor
     ## If the given is a float it will be round down to an int
-    ## If the absolute value of the speed bigger is then 255 the speed will be set to -/+ 255
+    ## in cm/s
     def set_speed(self,speed):
-        if abs(speed) > 255:
-            speed = sign(speed) *255
-        self.__speed = int(speed)
-
+        self.__speed = speed
     ## The motor is pulsed with the current speed
-    def pulse(self):
-        BrickPi.MotorSpeed[self.__port] = self.__speed
+    def pulse(self,dt):
+        current_distance = self.get_global_count()*self.__perimeter
+        dx = current_distance - self.__previous_distance
+        self.__previous_distance = current_distance
+        real_speed = dx/dt # old speed in cm/s
+        if (real_speed < 0.001 and self.__previous_speed > 0.001):
+            self.__MINIMUM_PORT_SPEED = abs(self.__port_speed)
+        self.__port_speed = (self.__speed)*(M-self.__port_speed)/(-real_speed) + M
+        self.__previous_speed = self.__speed
+        BrickPi.MotorSpeed[self.__port] = self.__port_speed
+    def get_perimeter():
+        return self.__perimeter
+
     # A method returning the number of rotations (expressed in number of rotations) of the motor since the last time
     # reset_count() is executed
     def get_count(self):

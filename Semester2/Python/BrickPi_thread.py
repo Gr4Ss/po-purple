@@ -37,10 +37,11 @@ class BrickPi_Thread:
             print 'No thread to turn off'
     # The actual thread that will run
     def thread(self):
+        dt = 0.01
         # WHILE the treath is running
         # update values of the engines
         while self.__going:
-            for i in self.__engines:
-                i.pulse()
+            for engine in self.__engines:
+                engine.pulse(dt)
             BrickPiUpdateValues()
-            time.sleep(0.01)
+            time.sleep(dt)
