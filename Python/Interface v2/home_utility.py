@@ -16,25 +16,36 @@ def create_hash(length):
             new = chr(97+rnd-36)
         result += str(new)
     return result
+# A parser for commands:
+# ex Left(4),Right(5),Distance(37),
 def parse_command(command):
+    # List of valid commands
     valid_commands = {'Left':'L','Right':'R','Distance':'D'}
     result = '['
     try:
+        # split commands on comma's, last empty tuple is thrown away
         splitted_command = command.split(',')[:-1]
+        # Parse each command
         for splitted in splitted_command:
+            # Split the command and the value between the brackets
             split = splitted.split('(')
+            # Command
             com = split[0]
+            # If not in the valid commands return False
             if not com in valid_commands:
                 return False
+            # Value and throw away the )
             value = int(split[1][:-1])
+            # add a new item to the list (L/4)
             result += '('+ str(valid_commands[com]) + '/' + str(value) + '),'
+        # if no valid commands are found return false
         if len(result) == 0:
             return False
-
+        # Throw away the last overbodige ',' and add a ']'
         return result[:-1] + ']'
     except:
         return False
-
+# Response parser
 def response_parser(response):
     global DIRECTORY
     result = '<h1> Ooh </h1>'

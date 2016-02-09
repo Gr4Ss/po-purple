@@ -142,13 +142,11 @@ def data_update(data):
     open('/var/www/data.json','w').close()
     # Write the new data in /var/www/data.json
     fil = open('/var/www/data.json','r+')
-    distance1 = 0 if data['Distancesensor1'] == None else data['Distancesensor1']
-    distance2 = 0 if data['Distancesensor2'] == None else data['Distancesensor2']
     speedL = 0 if data['SpeedLeft'] == None else data['SpeedLeft']
     speedR = 0 if data['SpeedRight'] == None else data['SpeedRight']
     string = ''' {
-                "distance1":%s,"distance2":%s,"speedLeft":%s,"speedRight":%s
-                } ''' % (distance1,distance2,speedL,speedR)
+                "speedLeft":%s,"speedRight":%s
+                } ''' % (speedL,speedR)
     fil.write(string)
     fil.close()
 # Every 5 seconds the data is updated

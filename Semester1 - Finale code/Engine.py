@@ -6,7 +6,7 @@ PORTS = {'A':PORT_A,'B':PORT_B,'C':PORT_C,'D':PORT_D}
 # Class concer_ning the LEGO-MINDSTORM Engine
 # It possible to let the motor run (back and forth) at a given power rate.
 class Engine:
-    global PORTS
+    global PORTS,PORT_A
     def __init__(self,port):
         ## A motor is connected to a given port ('A','B','C','D')
         self.__port = PORTS.get(port,PORT_A)
@@ -38,7 +38,7 @@ class Engine:
 
     ## The motor is pulsed with the current speed
     def pulse(self):
-        BrickPi.MotorSpeed[self.__port + ] = self.__speed
+        BrickPi.MotorSpeed[self.__port] = self.__speed
     # A method returning the number of rotations (expressed in number of rotations) of the motor since the last time
     # reset_count() is executed
     def get_count(self):

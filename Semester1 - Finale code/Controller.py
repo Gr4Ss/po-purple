@@ -4,9 +4,7 @@ import math
 from utility import *
 from Engine import *
 from BrickPi_thread import *
-from GPIO_thread import *
-from Sensor import *
-import drive_Frederik as c1
+import drive_frederik as c1
 import PID
 
 ## The minimum speed to move
@@ -25,24 +23,14 @@ class Controller:
         # Storing the engines of this car
         self.__leftengine = Engine('A')
         self.__rightengine = Engine('B')
-        self.__topengine = Engine('C')
-        self.__engines = [self.__leftengine,self.__rightengine,self.__topengine]
+        self.__engines = [self.__leftengine,self.__rightengine]
         # Storing the distance between the centers of the cars
         self.__widthcar = 2.6 + 11.1 - .2
-        # Storing the Lego MINDSTORM distance sensor
-        self.__distanceLego = MindstormSensor('4','ULTRASONIC_CONT')
-        # Storing the GPIO distance sensor
-        self.__distancePi = DistanceSensor(17,4)
-        # Storing the current gearration
         self.__gearratio = 1.
         # Storing the perimeter of the wheels (2*pi*r)
         self.__perimeter = 2*math.pi* 2.579
         # Storing a reference to a brickpi thread
-        self.__brickpi = BrickPi_Thread(self.__engines,[self.__distanceLego])
-        # Storing a reference to a gpio thread
-        self.__gpio = GPIO_Thread([self.__distancePi])
-        self.__brickpi.on()
-        self.__gpio.on()
+        self.__brickpi = BrickPi_Thread(self.__engines)
         self.__command_going = False
         self.__command_thread = None
     # Start a commands
@@ -53,6 +41,7 @@ class Controller:
     def start_command(self,command,arguments = None):
         if self.__command_going:
             self.stop_command()
+        self.__brickpi.on()
         self.__command_going = True
         if arguments != None:
             thread = threading.Thread(target= command,args=arguments)
@@ -67,17 +56,20 @@ class Controller:
     # @post self.__command_thread = None
     def stop_command(self):
         if self.__command_going:
+            self.__brickpi.off()
             self.__command_going = False
             self.__command_thread.join()
             self.__command_thread = None
+    def BrickPi_start(self):
+        self.__brickpi.on()
     # A method to set the speed of the engines
     # If the number of speeds don't equal the number of engines an error is raised
-    def set_speed_engines(self,speed):
-        if len(speed) != len(self.__engines):
-            raise Exception
-        engines = self.__engines
-        for i in range(engies):
-            engines[i].set_speed(speed[i])
+    #def set_speed_engines(self,speed):
+    #    if len(speed) != len(self.__engines):
+    #        raise Exception
+    #    engines = self.__engines
+    #    for i in range(engies):
+    #        engines[i].set_speed(speed[i])
     # A method to flush the counter values of the engines
     def flush_engines(self):
         for engine in self.__engines:
@@ -91,14 +83,12 @@ class Controller:
     # Turn the thread back off
     def kill_threads(self):
         self.__brickpi.off()
-        self.__gpio.off()
+
     ## Return the values of the sensor in a dictionary with keys
     ## Distancesensor1 -> GPIO distance sensor
     ## Distancesensor2 -> Lego MINDSTORM distance sensor
     def get_sensor_data(self):
         result = dict()
-        result['Distancesensor1'] = self.__distancePi.get_value()
-        result['Distancesensor2'] = self.__distanceLego.get_value()
         result['SpeedLeft'] = self.__leftengine.get_speed()
         result['SpeedRight'] = self.__rightengine.get_speed()
         ## result['Top angle'] = (self.__topengine.get_count()%1) *2*math.pi
@@ -118,23 +108,6 @@ class Controller:
             time.sleep(0.05)
         self.__leftengine.set_speed(0)
         self.__rightengine.set_speed(0)
-
-    def forward_bend(self,bend):
-        pid = PID.PID(15,1./2,2.,.1)
-        self.__leftengine.set_speed(200)
-        self.__rightengine.set_speed(200)
-        self.__leftengine.reset_count()
-        self.__rightengine.reset_count()
-        while self.__command_going:
-            distance1 = self.__leftengine.get_count() * self.__perimeter * self.__gearratio
-            distance2 = self.__rightengine.get_count() * self.__perimeter * self.__gearratio - bend
-            speddif = pid.new_value(distance1-distance2,0.1)
-            self.__rightengine.set_speed(200+speeddif)
-            time.sleep(0.05)
-        self.__leftengine.set_speed(0)
-        self.__rightengine.set_speed(0)
-
-
     # A mehtod to drive backward
     def backward(self):
         pid = PID.PID(15.,1/2.,2.,.1)
@@ -168,14 +141,16 @@ class Controller:
         self.__leftengine.set_speed(0)
         self.__rightengine.set_speed(0)
 
-    def follow_line1(self):
-        follow = c1.Frederik()
+    def follow_line1(self,parcours):
+        follow = c1.Frederik(parcours)
+        follow.call_server()
         self.__leftengine.reset_count()
         self.__rightengine.reset_count()
         pidleft = PID.PID2(50.,5.,10.,0.5,0)
         pidright = PID.PID2(50.,5.,10.,0.5,0)
-        goaldistanceleft,goaldistanceright = follow.get_data()[0],follow.get_data()[1]
-        while self.__going:
+        data = follow.get_data()
+        goaldistanceleft,goaldistanceright = data[0],data[1]
+        while self.__command_going:
             distanceleft = self.__leftengine.get_count()*self.__perimeter*self.__gearratio
             distanceright = self.__rightengine.get_count()*self.__perimeter*self.__gearratio
             speedleft = pidleft.new_value(goaldistanceleft-distanceleft,0.1)
@@ -184,8 +159,9 @@ class Controller:
             self.__leftengine.set_speed(speedleft)
             self.__rightengine.set_speed(speedright)
             if (abs(goaldistanceleft - distanceleft)< 1.) and (abs(goaldistanceright - distanceright) < 1.):
-                goaldistanceleft += follow.get_data()[0]
-                goaldistanceright += follow.get_data()[1]
+                data = follow.get_data()
+                goaldistanceleft += data[0]
+                goaldistanceright += data[1]
             time.sleep(0.1)
         follow.stop()
         self.__leftengine.set_speed(0)
@@ -195,7 +171,8 @@ class Controller:
         lst = [float(lspeed),float(rspeed)]
         maxipos = maxabspos(lst)
         minipos = (maxipos+1)%2
-        fraction = abs(lst[minipos]/lst[maxipos])
+
+        fraction = abs((lst[minipos]+0.01)/(lst[maxipos]+0.0001))
         if abs(lst[maxipos]) > 255:
             lst[maxipos] = sign(lst[maxipos]) * 255.0
             lst[minipos] = sign(lst[minipos]) * max(MINIMUM_SPEED,255.0 * fraction)
@@ -220,7 +197,7 @@ class Controller:
             print speed
         self.__leftengine.set_speed(speed)
         self.__rightengine.set_speed(speed)
-        while (speed !=0 and (self.__going or going)):
+        while (speed !=0 and (self.__command_going or going)):
             distance1 = self.__leftengine.get_count()*self.__perimeter*self.__gearratio
             distance2 = self.__rightengine.get_count()*self.__perimeter*self.__gearratio
             if DEBUG:
@@ -237,7 +214,20 @@ class Controller:
             time.sleep(0.01)
         self.__leftengine.set_speed(0)
         self.__rightengine.set_speed(0)
-
+    def forward_bend(self,bend):
+        pid = PID.PID(15,1./2,2.,.1)
+        self.__leftengine.set_speed(200)
+        self.__rightengine.set_speed(200)
+        self.__leftengine.reset_count()
+        self.__rightengine.reset_count()
+        while self.__command_going:
+            distance1 = self.__leftengine.get_count() * self.__perimeter * self.__gearratio
+            distance2 = self.__rightengine.get_count() * self.__perimeter * self.__gearratio - bend
+            speddif = pid.new_value(distance1-distance2,0.1)
+            self.__rightengine.set_speed(200+speeddif)
+            time.sleep(0.05)
+        self.__leftengine.set_speed(0)
+        self.__rightengine.set_speed(0)
     def correct_speed(self,speed,speed_diff):
         # If the speed or speed + diff is bigger then 255 a correction must happen
         if abs(speed) > 255 or abs(speed+speed_diff) > 255:
@@ -264,7 +254,7 @@ class Controller:
         self.__leftengine.reset_count()
         self.__rightengine.reset_count()
         ## Determine which is the inner most wheel
-        if degree > 0:
+        if radial > 0:
             inner_engine = self.__rightengine
             outer_engine = self.__leftengine
         else:
@@ -293,19 +283,19 @@ class Controller:
             inner_engine.set_speed(speed2)
             time.sleep(0.1)
     # Only one wheel rotate in stead of two
-    def rotate2(self,radial):
+    def rotate2(self,radial,going):
         ## reset the counters of the engiense
         self.__leftengine.reset_count()
         self.__rightengine.reset_count()
-        if degree < 0:
+        if radial < 0:
             inner_engine = self.__leftengine
         else:
             inner_engine = self.__rightengine
         distance = abs(radial) * self.__widthcar
-        pid = PID.PID2(20.,1./2.,5.,0.7,distance)
+        pid = PID.PID2(20.,1./2.,7.5,0.7,distance)
         speed = MINIMUM_SPEED
         inner_engine.set_speed(MINIMUM_SPEED)
-        while speed != 0 and self.__command_going:
+        while speed != 0 and (self.__command_going or going):
             distance = inner_engine.get_count() * self.__gearratio * self.__perimeter
             speed = pid.new_value(distance,0.1)
             if DEBUG:
