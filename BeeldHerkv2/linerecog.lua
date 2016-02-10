@@ -24,11 +24,14 @@ local os = os;
 local print = print;
 local table = table;
 
-local width, height;
+-- Program vars
+local width, height = 480, 256;
+local setPixel;
 
+-- Generate a list of pixels to iterate over
 local pixelList = {};
-local function setupPixelList()
-	local interval = 2;
+do
+	local interval = 4;
 	local distFromTop = 10;
 	local distFromBottom = 20;
 	for i = 1, (width / interval) - 1 do
@@ -38,79 +41,39 @@ local function setupPixelList()
 	end;
 end;
 
-function getTargetPoint(image)
-	if (BM >= 1) then
-		bmTbl.total = os.clock();
-	end;
-
-	--[[
-		Load in the image
-	]]
-	if (BM >= 1) then
-		bmTbl.load = os.clock();
-	end;
-
-	local image = libjpeg.load({path = image});
-	local getPixel, setPixel = bitmap.pixel_interface(image);
-	if (not width) then
-		width = image.w;
-		height = image.h;
-		setupPixelList();
-	end;
-
-	if (bmTbl.load) then
-		print("---- Load time:", os.clock() - bmTbl.load);
-	end;
-
-	--[[
-		Get diff threshold
-	]]
-	if (BM >= 1) then
-		bmTbl.threshold = os.clock();
-	end;
-
-	local diffThreshold = 0;
-	do
-		local previous = pixelList[1];
-		local previousLuma = getPixel(previous[1], previous[2]);
-		local lumaDiffList = {};
-		for i, current in ipairs(pixelList) do
-			local luma = getPixel(current[1], current[2]);
-			local diff = previousLuma - luma;
-			if (diff < -10 or diff > 10) then
-				current[3] = diff;
-				lumaDiffList[#lumaDiffList + 1] = math.abs(diff);
-			end;
-
-			previous = current;
-			previousLuma = luma;
+local function calcDiffs(getPixel)
+	local previous = pixelList[1];
+	local previousLuma = getPixel(previous[1], previous[2]);
+	local lumaDiffList = {};
+	for i, current in ipairs(pixelList) do
+		local luma = getPixel(current[1], current[2]);
+		local diff = previousLuma - luma;
+		if (diff < -10 or diff > 10) then
+			current[3] = diff;
+			lumaDiffList[#lumaDiffList + 1] = math.abs(diff);
 		end;
 
-		table.sort(lumaDiffList);
-		for i = 1, #lumaDiffList do
-			if (lumaDiffList[i + 1] - lumaDiffList[i] > 2) then
-				diffThreshold = lumaDiffList[i + 1];
-				if (DEBUG >= 1) then
-					print("Threshold:", diffThreshold);
-				end;
-				break;
+		previous = current;
+		previousLuma = luma;
+	end;
+
+	table.sort(lumaDiffList);
+
+	for i = 1, #lumaDiffList do
+		if (lumaDiffList[i + 1] - lumaDiffList[i] > 2) then
+			if (DEBUG >= 1) then
+				print("Threshold:", lumaDiffList[i + 1]);
 			end;
+			return lumaDiffList[i + 1];
 		end;
 	end;
 
-	if (bmTbl.threshold) then
-		print("---- Thres time:", os.clock() - bmTbl.threshold);
-	end;
+	return 0;
+end;
 
-	--[[
-		Find line points along pixelList
-	]]
-	if (BM >= 1) then
-		bmTbl.points = os.clock();
-	end;
-
-	local inLine;
+local function getIntersectPoints(diffThreshold)
 	local pointList = {};
+	local inLine;
 	for i, current in ipairs(pixelList) do
 		if (current[3]) then
 			if (current[3] < -diffThreshold and (not inLine or inLine + 3 < i)) then
@@ -143,10 +106,59 @@ function getTargetPoint(image)
 			elseif (DEBUG >= 1) then
 				setPixel(current[1], current[2], 128, 255, 0);
 			end;
-		else
+		elseif (DEBUG >= 1) then
 			setPixel(current[1], current[2], 0, 128, 128);
 		end;
+
+		current[3] = false;
 	end;
+
+	return pointList;
+end;
+
+function getTargetPoint(imagePath)
+	if (BM >= 1) then
+		bmTbl.total = os.clock();
+	end;
+
+	--[[
+		Load in the image and setup get/setPixel functions
+	]]
+	if (BM >= 1) then
+		bmTbl.load = os.clock();
+	end;
+
+	local image = libjpeg.load({path = imagePath});
+	local getPixel, setPxl = bitmap.pixel_interface(image);
+	if (DEBUG >= 1) then
+		setPixel = setPxl;
+	end;
+
+	if (bmTbl.load) then
+		print("---- Load time:", os.clock() - bmTbl.load);
+	end;
+
+	--[[
+		Get diff threshold
+	]]
+	if (BM >= 1) then
+		bmTbl.threshold = os.clock();
+	end;
+
+	local diffThreshold = calcDiffs(getPixel);
+
+	if (bmTbl.threshold) then
+		print("---- Thres time:", os.clock() - bmTbl.threshold);
+	end;
+
+	--[[
+		Find line points along pixelList
+	]]
+	if (BM >= 1) then
+		bmTbl.points = os.clock();
+	end;
+
+	local pointList = getIntersectPoints(diffThreshold);
 
 	if (bmTbl.points) then
 		print("---- Points time:", os.clock() - bmTbl.points);
@@ -180,7 +192,7 @@ end;
 --[[
 	TEST STUFF
 ]]
-local amount = arg[2] or 1;
+local amount = tonumber(arg[2]) or 1;
 if (amount ~= 1) then
 	DEBUG = 0;
 	BM = 0;
