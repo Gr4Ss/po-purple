@@ -1,5 +1,5 @@
 
-local DEBUG = 1;
+local DEBUG = 2;
 local BM = 1;
 local bmTbl = {};
 
@@ -19,6 +19,7 @@ local bitmap = require("bitmap");
 local libjpeg = require("libjpeg");
 
 -- Localize global libraries
+local ipairs = ipairs;
 local math = math;
 local os = os;
 local print = print;
@@ -26,7 +27,7 @@ local table = table;
 
 -- Program vars
 local width, height = 480, 256;
-local setPixel;
+local getPixel, setPixel;
 
 -- Generate a list of pixels to iterate over
 local pixelList = {};
@@ -129,9 +130,9 @@ function getTargetPoint(imagePath)
 	end;
 
 	local image = libjpeg.load({path = imagePath});
-	local getPixel, setPxl = bitmap.pixel_interface(image);
+	local getPxl, setPxl = bitmap.pixel_interface(image);
 	if (DEBUG >= 1) then
-		setPixel = setPxl;
+		getPixel, setPixel = getPxl, setPxl;
 	end;
 
 	if (bmTbl.load) then
@@ -145,7 +146,7 @@ function getTargetPoint(imagePath)
 		bmTbl.threshold = os.clock();
 	end;
 
-	local diffThreshold = calcDiffs(getPixel);
+	local diffThreshold = calcDiffs(getPxl);
 
 	if (bmTbl.threshold) then
 		print("---- Thres time:", os.clock() - bmTbl.threshold);
