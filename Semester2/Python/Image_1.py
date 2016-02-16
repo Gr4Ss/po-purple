@@ -47,7 +47,7 @@ def fast_check_column(column,start,end,image):
         else:
             i+=1
     # Adding 1 because of +
-    return [(t[i]+1,column) for i in range(t.shape[0])]
+    return [(t[i]+start+1,column) for i in range(t.shape[0])]
 # Method to fast check for big black-white gradient shift
 # Returns 1 point for every black-white pass
 # Only vertical changes are detected
@@ -65,7 +65,7 @@ def fast_check_row(row,start,end,image):
                 i+=1
         else:
             i+=1
-    return [(row,t[i]+1) for i in range(t.shape[0])]
+    return [(row,t[i]+start+1) for i in range(t.shape[0])]
 # A method that calculate the d between a list of points
 # returns a list in the form [((p1,p2),d(p1,p2)),((p1,p3),d(p1,p3)), ...]
 def calculate_distance(points):

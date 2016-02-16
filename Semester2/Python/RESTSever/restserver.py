@@ -1,5 +1,6 @@
 from bottle import Bottle,run,request,post,get,delete,put
 import json
+import helper
 app = Bottle()
 DEBUG = True
 TEAMS = dict()
@@ -7,7 +8,7 @@ MAP = json.dumps({"vertices": [[1, {"origin": 3, "straight": 2}],[2, {"origin": 
 PARCELS = {"available-parcels": [[142, 1, 2],[145, 2, 3],[147, 2, 1]],"on-the-road-parcels": [],"delivered-parcels": []}
 @app.post('/robots/<team>')
 def register(team):
-    global TEAMS,DEBUQ
+    global TEAMS,DEBUG
     try:
         value = request.forms.get('key',False)
         if not value:
@@ -20,11 +21,10 @@ def register(team):
         return 'SORRY'
 
 @app.delete('/robots/<team>/<secretkey>')
-def delete():
+def delete(team,secretkey):
     global TEAMS,DEBUG
     try:
-        key = TEAMS.get(team,False)
-        result = (secretkey == key)
+        result = helper.check_key(TEAMS,team,secretkey)
         if not result:
             return 'SORRY'
         del TEAMS[team]
@@ -42,5 +42,19 @@ def return_parcels():
     return json.dumps(PARCELS)
 @app.put('/robots/<team>/claim/<parcel_nb>')
 def claim_parcel(team,parcel_nb):
+    global PARCELS,TEAMS
+    try:
+        value = request.forms.get('key',False)
+        result = helper.check_key(TEAMS,team,value)
+        if not result:
+            return 'SORRY'
+        ok = helper.claimmer(PARCELS,parcel_nb,team)
+        if DEBUG:
+            print PARCELS
+        return  'OK' if ok else 'SORRY'
+    except:
+        return 'SORRY'
+
+
 
 app.run(host='localhost',port='8080',debug=True)
