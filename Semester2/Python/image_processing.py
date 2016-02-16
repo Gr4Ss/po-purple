@@ -175,12 +175,15 @@ def to_left_bottom_origin(row,col,image_size):
     return col,image_size[0] - row
 
 def main():
-    img = mpimg.imread('Test1.png')
-    show_image(img)
-    gray = rgb2gray(img)
+    start = time.time()
+    img = mpimg.imread('cam.jpg')
+    #show_image(img)
+    #gray = rgb2gray(img)
+    gray = img[:,:,3]
+    print gray
     show_image(gray)
     IMAGE_SIZE = gray.shape
-    print IMAGE_SIZE
+    #print IMAGE_SIZE
     a = int(0.1*IMAGE_SIZE[0])
     b = int(0.6*IMAGE_SIZE[1])
     c = int(0.5*IMAGE_SIZE[0])
@@ -188,14 +191,14 @@ def main():
     r = int(b**2/(8.*h) + h/2.)
     d1 = int((IMAGE_SIZE[1]-b)/2)
     d2 = IMAGE_SIZE[1]-d1
-    print a,d1,d2,c,r
-    r1,c1 = generate_mask(a,d1,d2,c,r,h,IMAGE_SIZE[0])
-    start = time.time()
-    r2,c2,G,theta = check_mask(a,d1,d2,c,r,h,IMAGE_SIZE[0],gray)
-    print r2,c2
-    end = time.time()
-    print end-start
-    start = time.time()
+    #print a,d1,d2,c,r
+    #r1,c1 = generate_mask(a,d1,d2,c,r,h,IMAGE_SIZE[0])
+    #start = time.time()
+    #r2,c2,G,theta = check_mask(a,d1,d2,c,r,h,IMAGE_SIZE[0],gray)
+    #print r2,c2
+    #end = time.time()
+    #print end-start
+    #start = time.time()
     r4,c4 = fast_check_row(IMAGE_SIZE[0]-a,gray)
     rt1,ct1 = fast_check_row(IMAGE_SIZE[0]-a-30,gray)
     r4,c4 = np.append(r4,rt1),np.append(c4,ct1)
@@ -204,20 +207,20 @@ def main():
     rt3,ct3 = fast_check_collom(d2,gray)
     r4,c4 = np.append(r4,rt3),np.append(c4,ct3)
     end = time.time()
-    print end - start
-    plt.plot(c1,r1,'go')
-    plt.hold(True)
-    plt.plot(c2,r2,'ro')
+    print 'row collom check', end - start
+    #plt.plot(c1,r1,'go')
+    #plt.hold(True)
+    #plt.plot(c2,r2,'ro')
     #plt.plot([50],[150],'go')
-    plt.hold(True)
+    #plt.hold(True)
     plt.plot(c4,r4,'bo')
     plt.hold(True)
     plt.imshow(gray,cmap='gray')
     plt.show()
-    x3,y3 = canny(gray)
-    plt.plot(x3,y3,'go')
-    plt.hold(True)
-    plt.imshow(gray,cmap='gray')
-    plt.show()
+    #x3,y3 = canny(gray)
+    #plt.plot(x3,y3,'go')
+    #plt.hold(True)
+    #plt.imshow(gray,cmap='gray')
+    #plt.show()
 if __name__ == '__main__':
     main()

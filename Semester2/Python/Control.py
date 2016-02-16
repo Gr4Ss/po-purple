@@ -42,7 +42,7 @@ class Control:
         self.__engine_right.reset_count()
         value_left = self.__pidleft.value(error_left,time_to_previous)
         value_right = self.__pidright.value(error_right,time_to_previous)
-        speedL, speedR = rescale_speed_ms(left/dt+value_left,right/dt+value_right)
+        speedL, speedR = self.rescale_speed_ms(left/dt+value_left,right/dt+value_right)
         self.__previous_cms_left,self.__previous_cms_right = speedL, speedR
         if DEBUG:
             print 'Output PID: ', value_left,value_right

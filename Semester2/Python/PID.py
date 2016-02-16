@@ -21,8 +21,8 @@ class PID:
     def value(self,error,dt):
         if abs(error) < self.__precision:
              return 0
-        self.__integral += self.__integral*19/21. + 2/21. * error *dt
-        integral = self.__integral * 20
+        self.__integral = self.__integral*19/21. + 2/21. * error *dt
+        integral = self.__integral * 20.
         differential = (error - self.__previous_error)/dt
         proportional = error
         self.__previous_error = error
