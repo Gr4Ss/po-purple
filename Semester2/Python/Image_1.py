@@ -34,7 +34,7 @@ def fast_check_column(column,start,end,image):
     Gy = np.abs(sig.convolve2d(image[:,column-1:column+2],sobelY,'same'))
     # Check where in the colom the gradient is bigger than the threshhold
     # + The +1 comes from here !!!!
-    t = np.where(Gy[1:-2,1]>TRESHHOLD)[0]
+    t = np.where(Gy[start+1:end-1,1]>TRESHHOLD)[0]
     # Thinning the convolution creates 4/5 point for each shift
     # Hold only the biggest one
     i = 0
@@ -55,7 +55,7 @@ def fast_check_row(row,start,end,image):
     global sobelX
     TRESHHOLD = 35
     Gx = np.abs(sig.convolve2d(image[row-1:row+2,:],sobelX,'same'))
-    t = np.where(Gx[1,1:-2]>TRESHHOLD)[0]
+    t = np.where(Gx[1,start+1:end-1]>TRESHHOLD)[0]
     i = 0
     while i < t.shape[0]:
         if t[i]+1 < Gx.shape[1] and t[i]-1>0:
