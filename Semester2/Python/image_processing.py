@@ -2,7 +2,9 @@ import matplotlib.pyplot as plt
 import matplotlib.image as mpimg
 import numpy as np
 import scipy.signal as sig
+import matplotlib
 import time
+import Image
 sobelX = 1/2.*np.array([[-1,0,1],[-2,0,2],[-1,0,1]])
 sobelY = 1/2.*np.array([[-1,-2,-1],[0,0,0],[1,2,1]])
 
@@ -177,20 +179,21 @@ def to_left_bottom_origin(row,col,image_size):
 def main():
     start = time.time()
     img = mpimg.imread('cam.jpg')
+    #gray = Image.open('cam.jpg').convert('LA')
     #show_image(img)
-    #gray = rgb2gray(img)
-    gray = img[:,:,3]
-    print gray
-    show_image(gray)
+    #gray = matplotlib.colors.rgb_to_hsv(img)
+    gray = rgb2gray(img)
+    #gray = img[:,:,3]
+    #show_image(gray)
     IMAGE_SIZE = gray.shape
     #print IMAGE_SIZE
-    a = int(0.1*IMAGE_SIZE[0])
-    b = int(0.6*IMAGE_SIZE[1])
-    c = int(0.5*IMAGE_SIZE[0])
-    h = int(0.3*IMAGE_SIZE[0])
-    r = int(b**2/(8.*h) + h/2.)
-    d1 = int((IMAGE_SIZE[1]-b)/2)
-    d2 = IMAGE_SIZE[1]-d1
+    #a = int(0.1*IMAGE_SIZE[0])
+    #b = int(0.6*IMAGE_SIZE[1])
+    #c = int(0.5*IMAGE_SIZE[0])
+    #h = int(0.3*IMAGE_SIZE[0])
+    #r = int(b**2/(8.*h) + h/2.)
+    #d1 = int((IMAGE_SIZE[1]-b)/2)
+    #d2 = IMAGE_SIZE[1]-d1
     #print a,d1,d2,c,r
     #r1,c1 = generate_mask(a,d1,d2,c,r,h,IMAGE_SIZE[0])
     #start = time.time()
@@ -199,12 +202,12 @@ def main():
     #end = time.time()
     #print end-start
     #start = time.time()
-    r4,c4 = fast_check_row(IMAGE_SIZE[0]-a,gray)
-    rt1,ct1 = fast_check_row(IMAGE_SIZE[0]-a-30,gray)
+    r4,c4 = fast_check_row(IMAGE_SIZE[0]*0.9,gray)
+    rt1,ct1 = fast_check_row(IMAGE_SIZE[0]*0.8,gray)
     r4,c4 = np.append(r4,rt1),np.append(c4,ct1)
-    rt2,ct2 = fast_check_collom(d1,gray)
+    rt2,ct2 = fast_check_collom(IMAGE_SIZE[1]*0.2,gray)
     r4,c4 = np.append(r4,rt2),np.append(c4,ct2)
-    rt3,ct3 = fast_check_collom(d2,gray)
+    rt3,ct3 = fast_check_collom(IMAGE_SIZE[1]*0.8,gray)
     r4,c4 = np.append(r4,rt3),np.append(c4,ct3)
     end = time.time()
     print 'row collom check', end - start

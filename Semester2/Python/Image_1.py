@@ -27,11 +27,11 @@ def show_image(image):
 # Method to fast check for big black-white gradient shift
 # Returns 1 point for every black-white pass
 # Only passes in horizontal direction are detected
-def fast_check_collom(collom,image):
+def fast_check_column(column,start,end,image):
     global sobelY
     TRESHHOLD = 35
-    # Convoluting the collom + colloms to the left and the right  with the sobel mask
-    Gy = np.abs(sig.convolve2d(image[:,collom-1:collom+2],sobelY,'same'))
+    # Convoluting the column + columns to the left and the right  with the sobel mask
+    Gy = np.abs(sig.convolve2d(image[:,column-1:column+2],sobelY,'same'))
     # Check where in the colom the gradient is bigger than the threshhold
     # + The +1 comes from here !!!!
     t = np.where(Gy[1:-2,1]>TRESHHOLD)[0]
@@ -47,11 +47,11 @@ def fast_check_collom(collom,image):
         else:
             i+=1
     # Adding 1 because of +
-    return [(t[i]+1,collom) for i in range(t.shape[0])]
+    return [(t[i]+1,column) for i in range(t.shape[0])]
 # Method to fast check for big black-white gradient shift
 # Returns 1 point for every black-white pass
 # Only vertical changes are detected
-def fast_check_row(row,image):
+def fast_check_row(row,start,end,image):
     global sobelX
     TRESHHOLD = 35
     Gx = np.abs(sig.convolve2d(image[row-1:row+2,:],sobelX,'same'))
@@ -65,7 +65,7 @@ def fast_check_row(row,image):
                 i+=1
         else:
             i+=1
-    return [(row,t[i]+1)]
+    return [(row,t[i]+1) for i in range(t.shape[0])]
 # A method that calculate the d between a list of points
 # returns a list in the form [((p1,p2),d(p1,p2)),((p1,p3),d(p1,p3)), ...]
 def calculate_distance(points):
