@@ -7,18 +7,23 @@
     <title>P&O Purple</title>
 
     <meta name="viewport" content="width=device-width, initial-scale=1">
+    <script src="https://ajax.googleapis.com/ajax/libs/angularjs/1.4.5/angular.min.js"></script>
+    <script src='https://ajax.googleapis.com/ajax/libs/angularjs/X.Y.Z/angular-route.js'></script>
     <script src="https://ajax.googleapis.com/ajax/libs/jquery/1.11.3/jquery.min.js"></script>
     <script src="https://maxcdn.bootstrapcdn.com/bootstrap/3.3.5/js/bootstrap.min.js"></script>
-    <script src="https://ajax.googleapis.com/ajax/libs/angularjs/1.4.5/angular.min.js"></script>
-    <script src="js/raspimjpeg.js"></script>
-    <script scr='static/angular_controller.js'></script>
     <link rel="stylesheet" href="https://maxcdn.bootstrapcdn.com/bootstrap/3.3.5/css/bootstrap.min.css">
     <link rel="stylesheet" href="https://maxcdn.bootstrapcdn.com/bootstrap/3.3.5/css/bootstrap-theme.min.css" >
+    <script src="angular_controller.js"></script>
+    <!--
+    <script src="chart.js"></script>
+    <script src="keyspress.js"></script>
+    <script src="js/raspimjpeg.js"></script>
     <link rel="stylesheet" href="/static/cssv2.css">
+  -->
 </head>
 
-<body data-spy="scroll" data-target=".navbar" data-offset="50" onload="setTimeout('init();', 100);" ng-app="purpleApp">
-  <div ng-controller="purpleController">
+<body  data-spy="scroll" data-target=".navbar" data-offset="50" onload="setTimeout('init();', 100);" >
+  <div ng-app='purpleApp' ng-controller='purpleController'>
     <nav class="navbar navbar-inverse navbar-fixed-top">
       <div class="container">
         <div class="navbar-header">
@@ -66,8 +71,8 @@
           <div class="jumbotron">
             <h1>Get lock!</h1>
             <form name = "lock" novalidate>
-              <input type = "submit" ng-submit="getLock()"  name ='lock'>
-              <input type = "submit" ng-submit="getUnlock()"  name = 'unlock'>
+              <input type = "submit" ng-submit="getLock()"  value ='Lock' name ='lock'>
+              <input type = "submit" ng-submit="getUnlock()"  value ='Unlock'name = 'unlock'>
             </form>
           </div>
 
@@ -278,7 +283,7 @@
               </div>
               <div class="keyboard-keys">
               Or press the keyboard arrow keys to control the vehicle!
-              <script src="keyspress.js"></script>
+
               </div>
               </div>
           </div>
@@ -296,7 +301,7 @@
             <div class="panel-body">
                 <div>
                   <canvas id="speedChart" width="600px" height="400px"></canvas>
-                  <script src="chart.js"></script>
+
                 </div>
               </div>
             </div>

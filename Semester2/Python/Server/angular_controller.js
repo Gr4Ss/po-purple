@@ -18,8 +18,8 @@ app.controller('purpleController',function($scope,lockClaimerService,formSenderS
   }
   $scope.getLock = function(){
     hide_all_messages();
-    lockClaimerService.claimLock(){
-      promise.success(function(data,status){
+    var promise = lockClaimerService.claimLock()
+    promise.success(function(data,status){
           if (data.lock == 'OK'){
             $scope.lock = true;
           }
@@ -27,15 +27,15 @@ app.controller('purpleController',function($scope,lockClaimerService,formSenderS
             $scope.noLock = true;
           }
       });
-      promise.error(function(data,status){
+    promise.error(function(data,status){
         $scope.failure = true;
       });
-    }
   };
   $scope.getUnlock = function(){
     hide_all_messages();
-    lockClaimerService.claimUnlock(){
-      promise.success(function(data,status){
+    var promise = lockClaimerService.claimUnlock()
+
+    promise.success(function(data,status){
           if (data.unlock == 'OK'){
             $scope.unlock = true;
           }
@@ -43,12 +43,12 @@ app.controller('purpleController',function($scope,lockClaimerService,formSenderS
             $scope.noLock = true;
           }
       });
-      promise.error(function(data,status){
+    promise.error(function(data,status){
         $scope.failure = true;
       });
-    }
-  }
-  $scope.sendData = function('formName'){
+
+  };
+  $scope.sendData = function(formName){
     if ('formName' == 'straight'){
       formSenderService.sendData()
     }
@@ -68,7 +68,7 @@ app.factory('lockClaimerService',function($http){
 });
 app.factory('formSenderService',function($http){
   var formSender = {};
-  formSender.sendData(theData){
+  formSender.sendData = function(theData){
     var promise = $http({method:'GET',url:'/data',data:theData});
     return promise;
   };
