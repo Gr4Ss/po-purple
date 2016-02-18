@@ -1,5 +1,4 @@
-import matplotlib.pyplot as plt
-import matplotlib.image as mpimg
+from PIL import Image
 import numpy as np
 import scipy.signal as sig
 import time
@@ -10,10 +9,13 @@ import time
 sobelX = 1/2.*np.array([[-1,0,1],[-2,0,2],[-1,0,1]])
 sobelY = 1/2.*np.array([[-1,-2,-1],[0,0,0],[1,2,1]])
 
+pieterX = 1/18.*np.array([[-3,-6,0,6,3],[-6,-12,0,12,6],[-3,-6,0,6,3]])
+pieterY = 1/18.*np.array([[-3,-6,-3],[-6,-12,-6],[0,0,0],[6,12,6],[3,6,3]])
 # Loads the image at the given adres
 def load_image(adres):
-    img = mpimg.imread(adres)
-    return rgb2gray(img)
+    img = Image.open(adres).convert('LA')
+    gray = np.array(img)
+    return gray
 # Convert image to rgb
 def rgb2gray(rgb):
     r, g, b = rgb[:,:,0], rgb[:,:,1], rgb[:,:,2]
@@ -31,16 +33,16 @@ def fast_check_column(column,start,end,image):
     global sobelY
     TRESHHOLD = 35
     # Convoluting the column + columns to the left and the right  with the sobel mask
-    Gy = np.abs(sig.convolve2d(image[:,column-1:column+2],sobelY,'same'))
+    Gy = np.abs(sig.convolve2d(image[:,column-1:column+2],pieterY,'same'))
     # Check where in the colom the gradient is bigger than the threshhold
     # + The +1 comes from here !!!!
-    t = np.where(Gy[start+1:end-1,1]>TRESHHOLD)[0]
+    t = np.where(Gy[start+3:end-3,1]>TRESHHOLD)[0]+start+3
     # Thinning the convolution creates 4/5 point for each shift
     # Hold only the biggest one
     i = 0
     while i < t.shape[0]:
         if t[i]+1 < Gy.shape[0] and t[i]-1>0:
-            if Gy[t[i]+1,1] <= Gy[t[i],1]  or Gy[t[i]+1,1] <  Gy[t[i]+2,1]:
+            if Gy[t[i],1] <= Gy[t[i]+1,1]  or Gy[t[i],1] <  Gy[t[i]+1,1]:
                 t = np.delete(t,i)
             else:
                 i+=1
@@ -54,18 +56,18 @@ def fast_check_column(column,start,end,image):
 def fast_check_row(row,start,end,image):
     global sobelX
     TRESHHOLD = 35
-    Gx = np.abs(sig.convolve2d(image[row-1:row+2,:],sobelX,'same'))
-    t = np.where(Gx[1,start+1:end-1]>TRESHHOLD)[0]
+    Gx = np.abs(sig.convolve2d(image[row-1:row+2,:],pieterX,'same'))
+    t = np.where(Gx[1,start+3:end-3]>TRESHHOLD)[0]+3+start
     i = 0
     while i < t.shape[0]:
         if t[i]+1 < Gx.shape[1] and t[i]-1>0:
-            if Gx[1,t[i]+1] <= Gx[1,t[i]]  or Gx[1,t[i]+1] <  Gx[1,t[i]+2]:
+            if Gx[1,t[i]] <= Gx[1,t[i]+1]  or Gx[1,t[i]] <  Gx[1,t[i]+1]:
                 t = np.delete(t,i)
             else:
                 i+=1
         else:
             i+=1
-    return [(row,t[i]+start+1) for i in range(t.shape[0])]
+    return [(row,t[i]) for i in range(t.shape[0])]
 # A method that calculate the d between a list of points
 # returns a list in the form [((p1,p2),d(p1,p2)),((p1,p3),d(p1,p3)), ...]
 def calculate_distance(points):

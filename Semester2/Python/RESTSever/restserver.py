@@ -1,60 +1,127 @@
-from bottle import Bottle,run,request,post,get,delete,put
-import json
+from bottle import Bottle,run,request,post,get,delete,put,error
 import helper
 app = Bottle()
-DEBUG = True
-TEAMS = dict()
-MAP = json.dumps({"vertices": [[1, {"origin": 3, "straight": 2}],[2, {"origin": 1, "straight": 3}],[3, {"origin": 2, "straight": 1, "left": 4}],[4, {"origin": 3, "straight": 1, "left": 2}]],"edges": [[1, 2, 0.3],[1, 3, 0.5],[3, 1, 0.5],[2, 3, 0.1],[3, 2, 0.1],[3, 4, 0.7],[4, 2, 0.3],[4, 1, 0.8]]})
-PARCELS = {"available-parcels": [[142, 1, 2],[145, 2, 3],[147, 2, 1]],"on-the-road-parcels": [],"delivered-parcels": []}
+##|----------------------------------------------------------|
+##|TO DO:                                                    |
+##|      - TESTING ALL THE FUNCTIONS using testrequest.py    |
+##|      - To do check helper                                |
+##|----------------------------------------------------------|
+
+JBase = helper.JsonBase()
+# Method to register a team
 @app.post('/robots/<team>')
 def register(team):
-    global TEAMS,DEBUG
     try:
+        # Try to get the post value
         value = request.forms.get('key',False)
+        # If no key posted, send SORRY
         if not value:
             return 'SORRY'
-        TEAMS[team] = value
-        if DEBUG:
-            print TEAMS
-        return 'OK'
+        else:
+            # Else try to add the team to the JBase
+            ok = JBase.add_team(team,value)
+            return 'OK' if ok else 'SORRY'
     except:
+        # If anything goes wrong send a SORRY
         return 'SORRY'
-
+# Method to delete a team, the team name and secret key must be specified
 @app.delete('/robots/<team>/<secretkey>')
 def delete(team,secretkey):
-    global TEAMS,DEBUG
     try:
-        result = helper.check_key(TEAMS,team,secretkey)
-        if not result:
-            return 'SORRY'
-        del TEAMS[team]
-        if DEBUG:
-            print TEAMS
+        # try to delete the team
+        ok = JBase.delete_team(team,secretkey)
+        # return OK if succes, else return SORRY
+        return 'OK' if ok else 'SORRY'
     except:
+        # If anything goes wrong send a SORRY
         return 'SORRY'
+# A method that returns the map in JSON format
 @app.get('/map')
 def return_map():
-    global MAP
-    return MAP
+    try:
+        return JBase.get_map()
+    except:
+        return 'SORRY'
+# A method that returns the parcels in JSON format
 @app.get('/parcels')
 def return_parcels():
-    global PARCELS
-    return json.dumps(PARCELS)
-@app.put('/robots/<team>/claim/<parcel_nb>')
-def claim_parcel(team,parcel_nb):
-    global PARCELS,TEAMS
     try:
-        value = request.forms.get('key',False)
-        result = helper.check_key(TEAMS,team,value)
-        if not result:
+        return JBase.get_parcels()
+    except:
+        return 'SORRY'
+# A method for the orders of parcels, only available for secretKey users
+@app.put('/parcels/add')
+def add_parcels():
+    try:
+        secretKey = request.forms.get('secretKey',False)
+        if not secretKey:
+            parcels = request.forms.get('newParcels',False)
+            if not parcels:
+                ok = JBase.add_parcels(secretKey,parcels)
+                return  'OK' if ok else 'SORRY'
             return 'SORRY'
-        ok = helper.claimmer(PARCELS,parcel_nb,team)
-        if DEBUG:
-            print PARCELS
+        return 'SORRY'
+    except:
+        return 'SORRY'
+# A method with which a team can claim a parcel
+@app.put('/robots/<team>/claim/<parcel_nb:int>')
+def claim_parcel(team,parcel_nb):
+    try:
+        # Try to get the post value
+        value = request.forms.get('key',False)
+        # If there is no key specified return SORRY
+        if not value:
+            return 'SORRY'
+        else:
+            # Try to claim the parcel given the given key
+            ok = JBase.claimmer(parcel_nb,team,value)
         return  'OK' if ok else 'SORRY'
     except:
         return 'SORRY'
-
-
-
-app.run(host='localhost',port='8080',debug=True)
+# A method with which a team can signal that it has delivered a parcel
+@app.put('/robots/<team>/delivered/<parcel-nb:int>')
+def deliver_parcel(team):
+    try:
+        # Try to get the post value
+        value = request.forms.get('key',False)
+        # If there is no key specified return SORRY
+        if not value:
+            return 'SORRY'
+        else:
+            # Try to deliver the parcel
+            ok = JBase.deliver(parcel_nb,team,value)
+            return  'OK' if ok else 'SORRY'
+    except:
+        return 'SORRY'
+# A method with wich a team can set their current position
+@app.put('/positions/<team>/<from_node>/<to_node>')
+def set_position(team,from_node,to_node):
+    try:
+        # Try to get the post value
+        value = request.forms.get('key',False)
+        # If there is no key specified return SORRY
+        if not value:
+            return 'SORRY'
+        else:
+            # Try to update the position
+            ok = JBase.update_position(from_node,to_node,team,value)
+            return  'OK' if ok else 'SORRY'
+    except:
+        return 'SORRY'
+# A method that returns the positions of the team at this moment
+@app.get('/positions')
+def get_positions():
+    try:
+        return JBase.get_positions()
+    except:
+        return 'SORRY'
+# If a 404 error occures return SORRY
+@app.error(404)
+def error404(error):
+    return 'SORRY'
+# If a 500 error occures return SORRY
+@app.error(500)
+def error500(error):
+    return 'OK'
+# RUN THE PACKETSERVER on 0.0.0.0/488
+app.run(host='0.0.0.0',port='488',debug=True)

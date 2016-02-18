@@ -5,8 +5,8 @@ import scipy.signal as sig
 import matplotlib
 import time
 import Image
-sobelX = 1/2.*np.array([[-1,0,1],[-2,0,2],[-1,0,1]])
-sobelY = 1/2.*np.array([[-1,-2,-1],[0,0,0],[1,2,1]])
+sobelX = 1/18.*np.array([[-3,-6,0,6,3],[-6,-12,0,12,6],[-3,-6,0,6,3]])
+sobelY = 1/10.*np.array([[-3,-10,-3],[0,0,0],[3,10,3]])
 
 def show_image(image):
     plt.imshow(image,cmap='gray')
@@ -39,12 +39,12 @@ def fast_check_collom(collom,image):
 
 def fast_check_row(row,image):
     global sobelX
-    TRESHHOLD = 35
+    TRESHHOLD = 30
     result_row = np.empty(0)
     result_collom = np.empty(0)
     temp = image[row-1:row+2,:]
     Gx = np.abs(sig.convolve2d(temp,sobelX,'same'))
-    t = np.where(Gx[1,1:-2]>TRESHHOLD)[0]
+    t = np.where(Gx[1,3:-2]>TRESHHOLD)[0]
     i = 0
     while i < t.shape[0]:
         if t[i]+1 < Gx.shape[1] and t[i]-1>0:
@@ -55,7 +55,7 @@ def fast_check_row(row,image):
         else:
             i+=1
     result_row = np.append(result_row,np.ones(t.shape)*row)
-    result_collom = np.append(result_collom,t+1)
+    result_collom = np.append(result_collom,t+2)
     return result_row,result_collom
 
 def check_mask(a,d1,d2,c,r,h,image_size,image):
@@ -178,14 +178,19 @@ def to_left_bottom_origin(row,col,image_size):
 
 def main():
     start = time.time()
-    img = mpimg.imread('cam.jpg')
+    im = Image.open('cam2.jpg')
+    print time.time()-start
+    img = np.array(im)
+    print time.time()-start
     #gray = Image.open('cam.jpg').convert('LA')
     #show_image(img)
     #gray = matplotlib.colors.rgb_to_hsv(img)
     gray = rgb2gray(img)
+    print time.time()-start
     #gray = img[:,:,3]
     #show_image(gray)
     IMAGE_SIZE = gray.shape
+    #print IMAGE_SIZE
     #print IMAGE_SIZE
     #a = int(0.1*IMAGE_SIZE[0])
     #b = int(0.6*IMAGE_SIZE[1])
@@ -205,10 +210,9 @@ def main():
     r4,c4 = fast_check_row(IMAGE_SIZE[0]*0.9,gray)
     rt1,ct1 = fast_check_row(IMAGE_SIZE[0]*0.8,gray)
     r4,c4 = np.append(r4,rt1),np.append(c4,ct1)
-    rt2,ct2 = fast_check_collom(IMAGE_SIZE[1]*0.2,gray)
-    r4,c4 = np.append(r4,rt2),np.append(c4,ct2)
+    r5,c5 = fast_check_collom(IMAGE_SIZE[1]*0.2,gray)
     rt3,ct3 = fast_check_collom(IMAGE_SIZE[1]*0.8,gray)
-    r4,c4 = np.append(r4,rt3),np.append(c4,ct3)
+    r5,c5 = np.append(r5,rt3),np.append(c5,ct3)
     end = time.time()
     print 'row collom check', end - start
     #plt.plot(c1,r1,'go')
@@ -216,10 +220,10 @@ def main():
     #plt.plot(c2,r2,'ro')
     #plt.plot([50],[150],'go')
     #plt.hold(True)
-    plt.plot(c4,r4,'bo')
-    plt.hold(True)
-    plt.imshow(gray,cmap='gray')
-    plt.show()
+    #plt.plot(c4,r4,'bo',c5,r5,'go')
+    #plt.hold(True)
+    #plt.imshow(gray,cmap='gray')
+    #plt.show()
     #x3,y3 = canny(gray)
     #plt.plot(x3,y3,'go')
     #plt.hold(True)

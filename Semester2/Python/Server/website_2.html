@@ -11,12 +11,14 @@
     <script src="https://maxcdn.bootstrapcdn.com/bootstrap/3.3.5/js/bootstrap.min.js"></script>
     <script src="https://ajax.googleapis.com/ajax/libs/angularjs/1.4.5/angular.min.js"></script>
     <script src="js/raspimjpeg.js"></script>
+    <script scr='static/angular_controller.js'></script>
     <link rel="stylesheet" href="https://maxcdn.bootstrapcdn.com/bootstrap/3.3.5/css/bootstrap.min.css">
     <link rel="stylesheet" href="https://maxcdn.bootstrapcdn.com/bootstrap/3.3.5/css/bootstrap-theme.min.css" >
     <link rel="stylesheet" href="/static/cssv2.css">
 </head>
 
-<body data-spy="scroll" data-target=".navbar" data-offset="50" onload="setTimeout('init();', 100);">
+<body data-spy="scroll" data-target=".navbar" data-offset="50" onload="setTimeout('init();', 100);" ng-app="purpleApp">
+  <div ng-controller="purpleController">
     <nav class="navbar navbar-inverse navbar-fixed-top">
       <div class="container">
         <div class="navbar-header">
@@ -39,16 +41,37 @@
     </nav>
 
     <div class="container" id='home'>
-		<div class="starter-template">
-      rap<div class="jumbotron">
-        <h1>Get lock!</h1>
-        <form>
-          <input type = "submit" value = "Lock" name ='lock'>
-          <input type = "submit" value = "Unlock" name = 'unlock'>
-        </form>
+      <div class="alert alert-danger" role="alert" ng-show="failure">
+        <p>Sorry something went wrong.</p>
       </div>
+      <div class="alert alert-danger" role="alert" ng-show="noLock">
+        <p><strong>D'oh!</strong>, someone else has already a lock. Please try later again. </p>
+      </div>
+      <div class="alert alert-danger" role="alert" ng-show="invalidMessage">
+        <p> <strong>Invalid<strong> message</p>
+      </div>
+      <div class="alert alert-success" role="alert" ng-show="lock">
+        <p>You <strong> successfully </strong> acquired a lock </p>
+      </div>
+      <div class="alert alert-danger" role="alert" ng-show="claimLock">
+        <p> You must have a lock to control the robot, please try to claim a lock.</p>
+      </div>
+      <div class="alert alert-success" role="alert" ng-show="succes">
+        <p> The command is successfully started </p>
+      </div>
+      <div class="alert alert-success" role="alert" ng-show="unlock">
+        <p>You are <strong> successfully </strong> unlocked </p>
+      </div>
+		    <div class="starter-template">
+          <div class="jumbotron">
+            <h1>Get lock!</h1>
+            <form name = "lock" novalidate>
+              <input type = "submit" ng-submit="getLock()"  name ='lock'>
+              <input type = "submit" ng-submit="getUnlock()"  name = 'unlock'>
+            </form>
+          </div>
 
-      <div class="panel-group" id="accordion" role="tablist" aria-multiselectable="true">
+          <div class="panel-group" id="accordion" role="tablist" aria-multiselectable="false">
 
         <div class="panel panel-default">
           <div class="panel-heading" role="tab" id="headingOne">
@@ -72,7 +95,7 @@
                 <form class="form-horizontal">
                   <div class="form-group">
                     <label for="distance">Distance</label>
-                    <input type="number"  id="distance" placeholder="in cm" name='straight'>
+                    <input type="number"  id="distance" placeholder="in cm" name='straight' ng-model='straight'>
                   </div>
                   <button type="submit" class="btn btn-default btn-lg btn-block">Drive straight</button>
                 </form>
@@ -305,19 +328,19 @@
         <!-- Wrapper for slides -->
         <div class="carousel-inner" role="listbox">
           <div class="item active">
-            <img src="Images/Rear_view.jpg" alt="Couldn't load image">
+            <!-- <img src="Images/Rear_view.jpg" alt="Couldn't load image"> -->
             <div class="carousel-caption">
               <p> Rear view </p>
             </div>
           </div>
           <div class="item">
-            <img src="Images/Side_view.jpg" alt="Couldn't load image">
+            <!--<img src="Images/Side_view.jpg" alt="Couldn't load image">-->
             <div class="carousel-caption">
               <p> Side view </p>
             </div>
           </div>
           <div class="item">
-            <img src="Images/Front_view.jpg" alt="Couldn't load image">
+            <!--<img src="Images/Front_view.jpg" alt="Couldn't load image">-->
             <div class="carousel-caption">
               <p> Front view </p>
             </div>
@@ -369,5 +392,6 @@
           $('#speedChart').css('width:400px,height:600px');
         });
       </script>
-      </body>
-      </html>
+    </div>
+  </body>
+</html>
