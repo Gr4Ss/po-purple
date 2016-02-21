@@ -2,7 +2,7 @@ import zmq
 import time
 import constraints as c
 import threading
-
+import cPickle
 
 
 # In testing mode no drive commands are executed
@@ -45,11 +45,11 @@ commands = {'LOCK':{'nb_of_arguments':1},'UNLOCK':{'nb_of_arguments':1},
 ,'CIRC':{'nb_of_arguments':2,'constraint':c.constraint_circ},
 'SQUARE':{'nb_of_arguments':2,'constraint':c.constraint_square},
 'SUPERLOCK':{'nb_of_arguments':2},
-'SUPERUNLOCK':{'nb_of_arguments':2},'FORWARD':{'nb_of_arguments':1},
-'FORWARDSTOP':{'nb_of_arguments':1},'RIGHT':{'nb_of_arguments':1},
-'RIGHTSTOP':{'nb_of_arguments':1},'LEFT':{'nb_of_arguments':1},
-'LEFTSTOP':{'nb_of_arguments':1}, 'BACKWARDSTOP':{'nb_of_arguments':1},
-'BACKWARD':{'nb_of_arguments':1}, 'STOP':{'nb_of_arguments':1},
+'SUPERUNLOCK':{'nb_of_arguments':2},'FStart':{'nb_of_arguments':1},
+'FStop':{'nb_of_arguments':1},'RStart':{'nb_of_arguments':1},
+'RStop':{'nb_of_arguments':1},'LStart':{'nb_of_arguments':1},
+'LStop':{'nb_of_arguments':1}, 'BStop':{'nb_of_arguments':1},
+'BStart':{'nb_of_arguments':1}, 'STOP':{'nb_of_arguments':1},
 'COMMAND':{'nb_of_arguments':2,'constraint':c.constraint_command}}
 
 # A method to parse the message
@@ -57,7 +57,7 @@ commands = {'LOCK':{'nb_of_arguments':1},'UNLOCK':{'nb_of_arguments':1},
 # else a tupple is returned  with as elements, each element in the message seperated by underscores.
 def parse_message(message):
     global commands
-    if len(message.keys()) == 1:
+    if isinstance(message,dict) and len(message.keys()) == 1:
         key = message.keys()[0]
         if (key not in commands.keys()):
             return False
@@ -74,11 +74,11 @@ def parse_message(message):
                     to_be_checked = arguments[0]
                     temp = constraint(to_be_checked)
                     if temp:
-                        return [KEY] + arguments
+                        return [key] + arguments
                     else:
                         return False
                 else:
-                    return [KEY] + arguments
+                    return [key] + arguments
 
     else:
         return False
@@ -176,6 +176,7 @@ def parse_command(commands):
         result += comm + valu+ ','
     # Throw away the last ,
     return result[:-1]
+
 if __name__ == '__main__':
     if not TESTING_MODE:
         thread = threading.Thread(target=data_updater)
@@ -184,6 +185,7 @@ if __name__ == '__main__':
     while True:
             global LOCK_ID
             message = socket.recv()
+            message = cPickle.loads(message)
             print "Received request: ", message
             message = parse_message(message)
             return_message = 'SORRY'
@@ -398,8 +400,8 @@ if __name__ == '__main__':
                                 func = lua.eval("require('linerecog')")
                                 func(commands,conroller.get_engine_distance,controller.start_commmand,controller.stop_commmand,controller.drive_distance)
                                 return_message = 'SUCCES'
-                            else:
-                                return_message = 'ILLEGAL_MESSAGE'
+                else:
+                    return_message = 'ILLEGAL_MESSAGE'
 
-    print 'Return message: ', return_message
-    socket.send(return_message)
+            print 'Return message: ', return_message
+            socket.send(return_message)

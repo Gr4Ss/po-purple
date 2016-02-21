@@ -1,4 +1,5 @@
 from bottle import Bottle,run,static_file, request,post,error,response,abort
+import datetime
 from webserver_utility import *
 import Communicate
 
@@ -6,7 +7,8 @@ DriverCom = Communicate.DriverCommincator()
 
 app = Bottle()
 
-static_root = '/home/pieter/Documenten/Ku Leuven/PenO/po-purple/Semester2/Python/Server'
+#static_root = '/home/pieter/Documenten/Ku Leuven/PenO/po-purple/Semester2/Python/Server'
+static_root = 'C:\Users\Ict\Documents\JS'
 # Returning the home page
 @app.route('/')
 def home():
@@ -15,7 +17,7 @@ def home():
     # Check if the user has already a cookie
     if not request.get_cookie('ID'):
         # When not, create one
-        response.set_cookie('ID',create_hash(16), path='/',expires=(datetime.datetime.now() + datetime.timedelta(days=366).strftime("%a, %d-%b-%Y %H:%M:%S PST")))
+        response.set_cookie('ID',create_hash(16), path='/')
     # return the webpage
     return html
 
@@ -37,10 +39,10 @@ def lock():
         t = DriverCom.send_message(dictionnary)
         # if the answer is positive answer OK
         if t:
-            return "{'lock':'OK'}"
+            return "OK"
         # else send SORRY
         else:
-            return "{'lock':'SORRY'}"
+            return "SORRY"
     except:
     	abort(500,'Socket timeout')
 
@@ -56,11 +58,32 @@ def unlock():
     try:
         t = DriverCom.send_message(dictionnary)
         if t:
-            return "{'unlock':'OK'}"
+            return "OK"
         else:
-            return "{'unlock':'SORRY'}"
+            return "SORRY"
     except:
     	abort(500,'Socket timeout')
+key_commands = ['LStart','RStart','FStart','BStart','LStop','RStop','FStop','BStop']
+@app.get('/keys')
+def keys():
+    ID = request.get_cookie('ID')
+    # If not abort with a 404 error
+    if not ID:
+        abort(404, "No cookie found.")
+    value = request.forms.get('command',False)
+    if not value or value not in key_commands:
+        return 'SORRY'
+    else:
+        dictionnary = {value:[ID]}
+        try:
+            t = DriverCom.send_message(dictionnary)
+            if t:
+                return "OK"
+            else:
+                return "SORRY"
+        except:
+        	abort(500,'Socket timeout')
+    
 @app.error(404)
 def error404(error):
     return '<h1>Oops!</h1>'

@@ -3,7 +3,7 @@ app.controller('purpleController',function($scope,lockClaimerService,formSenderS
   $scope.failure = false;
   $scope.noLock = false;
   $scope.invalidMessage = false;
-  $scope.lock = false;
+  $scope.locker = false;
   $scope.claimLock = false;
   $scope.succes = false;
   $scope.unlock = false;
@@ -11,7 +11,7 @@ app.controller('purpleController',function($scope,lockClaimerService,formSenderS
     $scope.failure = false;
     $scope.noLock = false;
     $scope.invalidMessage = false;
-    $scope.lock = false;
+    $scope.locker = false;
     $scope.claimLock = false;
     $scope.succes = false;
     $scope.unlock = false;
@@ -20,8 +20,8 @@ app.controller('purpleController',function($scope,lockClaimerService,formSenderS
     hide_all_messages();
     var promise = lockClaimerService.claimLock()
     promise.success(function(data,status){
-          if (data.lock == 'OK'){
-            $scope.lock = true;
+          if (data == 'OK'){
+            $scope.locker = true;
           }
           else{
             $scope.noLock = true;
@@ -36,7 +36,7 @@ app.controller('purpleController',function($scope,lockClaimerService,formSenderS
     var promise = lockClaimerService.claimUnlock()
 
     promise.success(function(data,status){
-          if (data.unlock == 'OK'){
+          if (data == 'OK'){
             $scope.unlock = true;
           }
           else{
@@ -48,10 +48,7 @@ app.controller('purpleController',function($scope,lockClaimerService,formSenderS
       });
 
   };
-  $scope.sendData = function(formName){
-    if ('formName' == 'straight'){
-      formSenderService.sendData()
-    }
+  
   };
 });
 app.factory('lockClaimerService',function($http){

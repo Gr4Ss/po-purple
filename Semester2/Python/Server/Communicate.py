@@ -19,8 +19,8 @@ class DriverCommincator:
     def send_message(self,dictionnary):
         message = cPickle.dumps(dictionnary)
         try:
-            socket.send(message)
-            response = socket.recv()
+            self.__socket.send(message)
+            response = self.__socket.recv()
             if response == 'OK':
                 return True
             elif response == 'FAILURE':
@@ -28,5 +28,5 @@ class DriverCommincator:
             else:
                 return False
         except:
-            socket.close()
+            self.__socket.close()
             raise Error('Socket server don\'t respond')

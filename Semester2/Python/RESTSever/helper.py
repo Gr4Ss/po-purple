@@ -20,22 +20,26 @@ class JsonBase:
     # Eg; [[parcelnb,from,end],[parcelnb2,from2,end2]]
     # TODO: check if parcelnumber, from en end valid zijn
     def is_valid_parcels(self,parcels):
-        if isinstance(parcels,list):
-            result = True
-            for parcel in parcels:
-                if isinstance(parcel,list) and len(parcel)==3:
-                    for i in parcel:
-                        if not isinstance(i,int):
-                            result = False
-                else:
-                    result = False
-            return result
-        else:
+        try:
+            parcels = list(parcels)
+        except:
             return False
+        result = True
+        for parcel in parcels:
+            print parcel
+            if isinstance(parcel,list) and len(parcel)==3:
+                for i in parcel:
+                    print i
+                    if not isinstance(i,int):
+                        result = False
+            else:
+                result = False
+        return result
     def add_parcels(self,key,parcels):
         # TODO: check if there is not already a parcel with the given parcel number, and if the from en end node valid zijn
         if (self.__secret_key == key):
-            if is_valid_parcels(parcels):
+            print key
+            if self.is_valid_parcels(parcels):
                 for parcel in parcels:
                     self.__parcels["available-parcels"].append(parcel)
                 return True
@@ -54,10 +58,11 @@ class JsonBase:
     # The key may not be False
     def add_team(self,team,key):
         if not key:
+            return False
+        else:
             self.__teams[team]= key
             return True
-        else:
-            return False
+
     def delete_team(self,team,key):
         try:
             if not self.check_key(team,key):

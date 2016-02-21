@@ -1,5 +1,6 @@
 from bottle import Bottle,run,request,post,get,delete,put,error
 import helper
+import json
 app = Bottle()
 ##|----------------------------------------------------------|
 ##|TO DO:                                                    |
@@ -52,17 +53,21 @@ def return_parcels():
 # A method for the orders of parcels, only available for secretKey users
 @app.put('/parcels/add')
 def add_parcels():
-    try:
-        secretKey = request.forms.get('secretKey',False)
+    #try:
+        secretKey = request.forms.get('secretkey',False)
         if not secretKey:
+            return 'SORRY'
+        else:
+            # Convert to json
             parcels = request.forms.get('newParcels',False)
+            print parcels
             if not parcels:
+                return 'SORRY'
+            else:
                 ok = JBase.add_parcels(secretKey,parcels)
                 return  'OK' if ok else 'SORRY'
-            return 'SORRY'
-        return 'SORRY'
-    except:
-        return 'SORRY'
+    #except:
+        #return 'SORRY'
 # A method with which a team can claim a parcel
 @app.put('/robots/<team>/claim/<parcel_nb:int>')
 def claim_parcel(team,parcel_nb):
@@ -123,5 +128,5 @@ def error404(error):
 @app.error(500)
 def error500(error):
     return 'OK'
-# RUN THE PACKETSERVER on 0.0.0.0/488
-app.run(host='0.0.0.0',port='488',debug=True)
+# RUN THE PACKETSERVER on 0.0.0.0/8080
+app.run(host='0.0.0.0',port='8080',debug=True)

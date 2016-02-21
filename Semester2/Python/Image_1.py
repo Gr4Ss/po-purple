@@ -1,4 +1,4 @@
-from PIL import Image
+import PIL.Image as Image
 import numpy as np
 import scipy.signal as sig
 import time
@@ -13,9 +13,9 @@ pieterX = 1/18.*np.array([[-3,-6,0,6,3],[-6,-12,0,12,6],[-3,-6,0,6,3]])
 pieterY = 1/18.*np.array([[-3,-6,-3],[-6,-12,-6],[0,0,0],[6,12,6],[3,6,3]])
 # Loads the image at the given adres
 def load_image(adres):
-    img = Image.open(adres).convert('LA')
-    gray = np.array(img)
-    return gray
+    img = Image.open(adres)
+    array = np.array(img)
+    return array
 # Convert image to rgb
 def rgb2gray(rgb):
     r, g, b = rgb[:,:,0], rgb[:,:,1], rgb[:,:,2]
@@ -30,10 +30,11 @@ def show_image(image):
 # Returns 1 point for every black-white pass
 # Only passes in horizontal direction are detected
 def fast_check_column(column,start,end,image):
-    global sobelY
-    TRESHHOLD = 35
+    global pieterY
+    TRESHHOLD = 25
+    gray = rgb2gray(image)
     # Convoluting the column + columns to the left and the right  with the sobel mask
-    Gy = np.abs(sig.convolve2d(image[:,column-1:column+2],pieterY,'same'))
+    Gy = np.abs(sig.convolve2d(gray[start:end,column-1:column+2],pieterY,'same'))
     # Check where in the colom the gradient is bigger than the threshhold
     # + The +1 comes from here !!!!
     t = np.where(Gy[start+3:end-3,1]>TRESHHOLD)[0]+start+3
@@ -54,9 +55,10 @@ def fast_check_column(column,start,end,image):
 # Returns 1 point for every black-white pass
 # Only vertical changes are detected
 def fast_check_row(row,start,end,image):
-    global sobelX
-    TRESHHOLD = 35
-    Gx = np.abs(sig.convolve2d(image[row-1:row+2,:],pieterX,'same'))
+    global pieterX
+    TRESHHOLD = 25
+    gray = rgb2gray(image)
+    Gx = np.abs(sig.convolve2d(gray[row-1:row+2,start:end],pieterX,'same'))
     t = np.where(Gx[1,start+3:end-3]>TRESHHOLD)[0]+3+start
     i = 0
     while i < t.shape[0]:

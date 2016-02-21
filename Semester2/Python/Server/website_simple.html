@@ -1,0 +1,22 @@
+<!DOCTYPE html>
+<html>
+<head>
+  <script src="https://ajax.googleapis.com/ajax/libs/angularjs/1.4.5/angular.min.js"></script>
+  <script src="/static/angular_controller.js"></script>
+</head>
+<body>
+  <div ng-app='purpleApp' ng-controller='purpleController'>
+    <div class="alert alert-success" role="alert" ng-show="locker">
+      <p>You <strong> successfully </strong> acquired a lock </p>
+    </div>
+    <div class="alert alert-danger" role="alert" ng-show="noLock">
+      <p><strong>D'oh!</strong>, someone else has already a lock. Please try later again. </p>
+    </div>
+    <div class="alert alert-danger" role="alert" ng-show="failure">
+      <p>Sorry something went wrong.</p>
+    </div>
+      <input type = "submit" ng-click="getLock()"  value ='Lock' name ='lock'>
+      <input type = "submit" ng-click="getUnlock()"  value ='Unlock'name = 'unlock'>
+    </form>
+  </div>
+</body>
