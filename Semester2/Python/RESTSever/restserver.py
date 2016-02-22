@@ -15,6 +15,7 @@ def register(team):
     try:
         # Try to get the post value
         value = request.forms.get('key',False)
+        print value
         # If no key posted, send SORRY
         if not value:
             return 'SORRY'
@@ -53,41 +54,40 @@ def return_parcels():
 # A method for the orders of parcels, only available for secretKey users
 @app.put('/parcels/add')
 def add_parcels():
-    #try:
-        secretKey = request.forms.get('secretkey',False)
+    try:
+        inp = json.loads(request.json)
+        secretKey = inp.get('secretkey',False)
         if not secretKey:
             return 'SORRY'
         else:
-            # Convert to json
-            parcels = request.forms.get('newParcels',False)
-            print parcels
+            parcels = inp.get('newParcels',False)
             if not parcels:
                 return 'SORRY'
             else:
                 ok = JBase.add_parcels(secretKey,parcels)
                 return  'OK' if ok else 'SORRY'
-    #except:
-        #return 'SORRY'
+    except:
+        return 'SORRY'
 # A method with which a team can claim a parcel
 @app.put('/robots/<team>/claim/<parcel_nb:int>')
 def claim_parcel(team,parcel_nb):
     try:
-        # Try to get the post value
+
         value = request.forms.get('key',False)
         # If there is no key specified return SORRY
         if not value:
             return 'SORRY'
         else:
+            print 'Check'
             # Try to claim the parcel given the given key
             ok = JBase.claimmer(parcel_nb,team,value)
         return  'OK' if ok else 'SORRY'
     except:
         return 'SORRY'
 # A method with which a team can signal that it has delivered a parcel
-@app.put('/robots/<team>/delivered/<parcel-nb:int>')
-def deliver_parcel(team):
+@app.put('/robots/<team>/delivered/<parcel_nb:int>')
+def deliver_parcel(team,parcel_nb):
     try:
-        # Try to get the post value
         value = request.forms.get('key',False)
         # If there is no key specified return SORRY
         if not value:
@@ -99,9 +99,11 @@ def deliver_parcel(team):
     except:
         return 'SORRY'
 # A method with wich a team can set their current position
-@app.put('/positions/<team>/<from_node>/<to_node>')
+@app.put('/positions/<team>/<from_node:int>/<to_node:int>')
 def set_position(team,from_node,to_node):
+    print team
     try:
+
         # Try to get the post value
         value = request.forms.get('key',False)
         # If there is no key specified return SORRY
@@ -127,6 +129,6 @@ def error404(error):
 # If a 500 error occures return SORRY
 @app.error(500)
 def error500(error):
-    return 'OK'
+    return 'SORRY'
 # RUN THE PACKETSERVER on 0.0.0.0/8080
 app.run(host='0.0.0.0',port='8080',debug=True)

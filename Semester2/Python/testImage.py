@@ -7,15 +7,14 @@ if __name__ == '__main__':
     for image in images:
         start = time.time()
         im = load_image(image)
-        r4,c4 = fast_check_row(IMAGE_SIZE[0]*0.9,gray)
-        rt1,ct1 = fast_check_row(IMAGE_SIZE[0]*0.8,gray)
-        r4,c4 = np.append(r4,rt1),np.append(c4,ct1)
-        r5,c5 = fast_check_collom(IMAGE_SIZE[1]*0.2,gray)
-        rt3,ct3 = fast_check_collom(IMAGE_SIZE[1]*0.8,gray)
-        r5,c5 = np.append(r5,rt3),np.append(c5,ct3)
+        IMAGE_SIZE = im.shape
+        a = fast_check_row(IMAGE_SIZE[0]*0.9,im)
+        b= fast_check_row(IMAGE_SIZE[0]*0.8,im)
+        c = fast_check_column(IMAGE_SIZE[1]*0.2,im)
+        d = fast_check_column(IMAGE_SIZE[1]*0.8,im)
         end = time.time()
         print 'Check', end - start
-        plt.plot(c4,r4,'bo',c5,r5,'go')
+        plt.plot([x[1] for x in a ],[x[0] for x in a ],'bo',[x[1] for x in b ],[x[0] for x in b ],'bo',[x[1] for x in c ],[x[0] for x in c ],'go',[x[1] for x in d ],[x[0] for x in d ],'go')
         plt.hold(True)
         plt.imshow(im,cmap='gray')
         plt.show()

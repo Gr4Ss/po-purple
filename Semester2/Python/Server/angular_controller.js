@@ -33,7 +33,7 @@ app.controller('purpleController',function($scope,lockClaimerService,formSenderS
   };
   $scope.getUnlock = function(){
     hide_all_messages();
-    var promise = lockClaimerService.claimUnlock()
+    var promise = lockClaimerService.claimUnlock();
 
     promise.success(function(data,status){
           if (data == 'OK'){
@@ -48,8 +48,7 @@ app.controller('purpleController',function($scope,lockClaimerService,formSenderS
       });
 
   };
-  
-  };
+
 });
 app.factory('lockClaimerService',function($http){
   var lockClaimer = {};

@@ -7,8 +7,8 @@ DriverCom = Communicate.DriverCommincator()
 
 app = Bottle()
 
-#static_root = '/home/pieter/Documenten/Ku Leuven/PenO/po-purple/Semester2/Python/Server'
-static_root = 'C:\Users\Ict\Documents\JS'
+static_root = '/home/pieter/Documenten/Ku Leuven/PenO/po-purple/Semester2/Python/Server'
+#static_root = 'C:\Users\Ict\Documents\JS'
 # Returning the home page
 @app.route('/')
 def home():
@@ -63,9 +63,10 @@ def unlock():
             return "SORRY"
     except:
     	abort(500,'Socket timeout')
-key_commands = ['LStart','RStart','FStart','BStart','LStop','RStop','FStop','BStop']
-@app.get('/keys')
+
+@app.post('/keys')
 def keys():
+    key_commands = ['LStart','RStart','FStart','BStart','LStop','RStop','FStop','BStop']
     ID = request.get_cookie('ID')
     # If not abort with a 404 error
     if not ID:
@@ -83,7 +84,7 @@ def keys():
                 return "SORRY"
         except:
         	abort(500,'Socket timeout')
-    
+
 @app.error(404)
 def error404(error):
     return '<h1>Oops!</h1>'

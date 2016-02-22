@@ -20,25 +20,21 @@ class JsonBase:
     # Eg; [[parcelnb,from,end],[parcelnb2,from2,end2]]
     # TODO: check if parcelnumber, from en end valid zijn
     def is_valid_parcels(self,parcels):
-        try:
-            parcels = list(parcels)
-        except:
+        if isinstance(parcels,list):
+            result = True
+            for parcel in parcels:
+                if isinstance(parcel,list) and len(parcel)==3:
+                    for i in parcel:
+                        if not isinstance(i,int):
+                            result = False
+                else:
+                    result = False
+            return result
+        else:
             return False
-        result = True
-        for parcel in parcels:
-            print parcel
-            if isinstance(parcel,list) and len(parcel)==3:
-                for i in parcel:
-                    print i
-                    if not isinstance(i,int):
-                        result = False
-            else:
-                result = False
-        return result
     def add_parcels(self,key,parcels):
         # TODO: check if there is not already a parcel with the given parcel number, and if the from en end node valid zijn
         if (self.__secret_key == key):
-            print key
             if self.is_valid_parcels(parcels):
                 for parcel in parcels:
                     self.__parcels["available-parcels"].append(parcel)
@@ -49,7 +45,11 @@ class JsonBase:
             return False
     def check_key(self,team,secretkey):
         if not secretkey:
+            return False
+
+        else:
             key = self.__teams.get(team,False)
+            print 'Check key',key
             if not key:
                 return False
             return (secretkey == key)
@@ -68,10 +68,12 @@ class JsonBase:
             if not self.check_key(team,key):
                 return False
             del self.__teams[team]
+            return True
         except:
             return False
-    def claimmer(parcel_nb,team,key):
+    def claimmer(self,parcel_nb,team,key):
         ## TODO CHECK if the team has already a parcel
+        print isinstance(parcel_nb,int)
         if not self.check_key(team,key):
             return False
         available = self.__parcels["available-parcels"]
@@ -79,28 +81,31 @@ class JsonBase:
             if available[i][0] == parcel_nb:
                 t = available[i]
                 t.append(team)
-                parcels["on-the-road-parcels"].append(t)
-                del parcels["available-parcels"][i]
+                self.__parcels["on-the-road-parcels"].append(t)
+                del self.__parcels["available-parcels"][i]
                 return True
         return False
-    def deliver(parcel_nb,team,key):
+    def deliver(self,parcel_nb,team,key):
         if not self.check_key(team,key):
             return False
         ontheroute = self.__parcels["on-the-road-parcels"]
         for i in range(len(ontheroute)):
             if (ontheroute[i][0] == parcel_nb) and (ontheroute[i][-1] == team):
+                print 'OK'
                 t = ontheroute[i]
-                del parcels["on-the-road-parcels"][i]
-                parcels["delivered-parcels"].append(t)
+                del self.__parcels["on-the-road-parcels"][i]
+                self.__parcels["delivered-parcels"].append(t)
                 return True
         return False
-    def update_position(team,from_node,end_node,key):
+    def update_position(self,from_node,end_node,team,key):
         # TODO: check if from en end node valid zijn
         if not self.check_key(team,key):
             return False
-        positions = positions["positions"]
+        positions = self.__positions["positions"]
+        print positions
         for i in range(len(positions)):
             if positions[i][0] == team:
                 del positions[i]
-        positions["positions"].append([team,from_node,end_node ])
+
+        self.__positions["positions"].append([team,from_node,end_node ])
         return True

@@ -32,7 +32,7 @@ $("body").keyup(function(e) {
 }
 });
 $("body").keydown(function(e) {
-  if ($("#collapseSix").attr('aria-expanded') == 'true'){
+  if ($("#collapseTwo").attr('aria-expanded') == 'true'){
 switch (e.which) {
     case 37:
       keyLeftPressed();

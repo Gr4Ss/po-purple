@@ -14,12 +14,13 @@
     <link rel="stylesheet" href="https://maxcdn.bootstrapcdn.com/bootstrap/3.3.5/css/bootstrap.min.css">
     <link rel="stylesheet" href="https://maxcdn.bootstrapcdn.com/bootstrap/3.3.5/css/bootstrap-theme.min.css" >
     <script src="/static/angular_controller.js"></script>
-    <script src="/static/keyspress.js"></script>
+    <script src="/static/keypress.js"></script>
+    <link rel="stylesheet" href="/static/cssv2.css">
     <!--
     <script src="chart.js"></script>
 
     <script src="js/raspimjpeg.js"></script>
-    <link rel="stylesheet" href="/static/cssv2.css">
+
   -->
 </head>
 
@@ -64,7 +65,7 @@
             <p><strong>D'oh!</strong>, someone else has already a lock. Please try later again. </p>
           </div>
           <div class="alert alert-danger" role="alert" ng-show="invalidMessage">
-            <p> <strong>Invalid<strong> message</p>
+            <p> <strong>Invalid</strong> message</p>
           </div>
           <div class="alert alert-success" role="alert" ng-show="locker">
             <p>You <strong> successfully </strong> acquired a lock </p>
