@@ -16,11 +16,11 @@ class Vehicle(RestClient):
 
     def get_edges(self):
         roadMap = self.get_map()
-        return edges.get('edges')
+        return roadMap.get('edges')
 	
     def get_vertices(self):
         roadMap = self.get_map()
-        return edges.get('vertices')
+        return roadMap.get('vertices')
 
     def generate_position(self):
         edges = self.get_edges()
