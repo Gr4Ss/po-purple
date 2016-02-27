@@ -18,7 +18,7 @@ class Vehicle(RestClient):
         roadMap = self.get_map()
         return edges.get('edges')
 	
-    def get_edges(self):
+    def get_vertices(self):
         roadMap = self.get_map()
         return edges.get('vertices')
 
