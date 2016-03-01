@@ -2,7 +2,7 @@ import numpy as np
 import Image_1 as im
 import Image
 import time
-import os
+
 x_wheel_left = 0
 y_wheel_left = 0
 x_wheel_right = 0
@@ -55,14 +55,10 @@ def get_ratio(image,
                         a.putpixel((intersection[elem][1], intersection[elem][0]+1), (0,0,255))
                         a.putpixel((intersection[elem][1], intersection[elem][0]-1), (0,0,255))
                 a.show()
-            #print 'exit on fail'
+
+
             return last_ratio 
-        for elem in intersection:
-            x,y = elem[1],elem[0]
-            new_elem = (x,y)
-            new_intersection.append(new_elem)
-        new_intersections.append(new_intersection)
-    intersections = new_intersections
+
     left_white_lines = []
     for i in xrange(0,len(intersections[0])/2):
         new_point = (intersections[0][2*i], intersections[0][2*i+1])

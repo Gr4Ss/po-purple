@@ -17,7 +17,8 @@ def get_ratio(image,
     
     intersections = convert_to_pairs(image, height, width, column_factor, row_factor)
     lengths = []
-    intersection_points = []    
+    intersection_points = []
+    alt = 0
     for intersection in intersections:
         lengths.append(len(intersection))
     nb_of_odds = 0
@@ -30,7 +31,7 @@ def get_ratio(image,
         else:
             nb_of_non_zero_evens += 1
     if nb_of_odds > 1:
-        return last_ratio
+        alt = 1
     for intersection in intersections:
         if not is_odd(len(intersection)):
             white_line_points = merge_pairs(intersection)
@@ -46,13 +47,16 @@ def get_ratio(image,
                 # a) ignore odd number of points greater than 3
                 # intersection_points.append([])
                 # b) throw foto away
-                return last_ratio
+                # c) alternative
+                alt = 1
 
 
-    
-    white_lines = intersection_points[0] + intersection_points[1] + intersection_points[2]
-    ## + intersection_points[3] # if top_row_intersections is needed
-    destination = choose_path(white_lines)
+    if alt == 0:
+        white_lines = intersection_points[0] + intersection_points[1] + intersection_points[2]
+        ## + intersection_points[3] # if top_row_intersections is needed
+        destination = choose_path(white_lines)
+    else:
+        destination = alternative(intersections, width)
     x_des = destination[0]
     y_des = destination[1]
     left_distance = sqrt((x_des - x_wheel_left)**2 + (y_des - y_wheel_left)**2)
@@ -60,6 +64,27 @@ def get_ratio(image,
     ratio = right_distance/left_distance
     last_ratio = correction*ratio
     return correction*ratio
+
+def alternative(intersections, width):
+    nb_left = len(intersections[0])
+    nb_right = len(intersections[2])
+    if nb_right<nb_left and not nb_left == nb_right:
+        destination = (2,2)
+        return destination
+    else:
+        destination = (width-2,2)
+        return destination
+    for elem in intersections[1]:
+        if elem[0] < width/2:
+            nb_left += 1
+        else:
+            nb_right += 1
+    if nb_right<nb_left:
+        destination = (2,2)
+        return destination
+    else:
+        destination = (width-2,2)
+        return destination
 
 def is_odd(number):
     return number%2 == 1
