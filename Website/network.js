@@ -1,4 +1,4 @@
-var Dataset = {
+/*var Dataset = {
 	"vertices": [
 		[1, {"origin": 3, "straight": 2, "left": 4}],
 		[2, {"origin": 1, "straight": 3, "left": 4}],
@@ -15,7 +15,44 @@ var Dataset = {
 		[4, 2, 0.3],
 		[4, 1, 0.8]
 	]
-};
+};*/
+
+var Dataset = {
+	"vertices": [
+		[1, {"origin": 6, "straight": 2}],
+		[2, {"origin": 1, "straight": 3, "left": 4}],
+		[3, {"origin": 2, "straight": 7, "left": 9}],
+		[4, {"origin": 2, "straight": 5}],
+		[5, {"origin": 4, "left": 6, "right": 10}],
+		[6, {"origin": 5, "straight": 1}],
+		[7, {"origin": 3, "straight": 8}],
+		[8, {"origin": 7, "straight": 9}],
+		[9, {"origin": 8, "left": 3, "right": 10}],
+		[10, {"origin": 9, "straight": 5}],
+	],
+	"edges": [
+		[1, 2, 0.3],
+		[2, 1, 0.3],
+		[2, 3, 0.2],
+		[3, 2, 0.2],
+		[6, 1, 0.6],
+		[2, 4, 0.3],
+		[4, 5, 0.3],
+		[3, 9, 0.5],
+		[9, 3, 0.5],
+		[3, 7, 0.4],
+		[7, 3, 0.4],
+		[7, 8, 0.5],
+		[8, 9, 0.3],
+		[9, 8, 0.3],
+		[9, 10, 0.3],
+		[10, 9, 0.3],
+		[5, 10, 0.3],
+		[10, 5, 0.3],
+		[5, 6, 0.3],
+		[6, 5, 0.3],
+	]
+}
 
 function checkDependencies(edgeset) {
 	console.log(edgeset);
@@ -85,7 +122,6 @@ var options = {
 		enabled: true
 	},
 	layout:{
-		randomSeed: 21
 	}
 };
 
@@ -154,6 +190,7 @@ var carPos = 1;
 var prevIterator = 1;
 var iterator = 1;
 
+/**
 setInterval(function(){ 
 	prevPos = carPos;
 	while (carPos == prevPos) {
@@ -170,6 +207,7 @@ setInterval(function() {
 	changeEdgeColor(Dataset.edges[iterator][0],Dataset.edges[iterator][1], '#ab78ab');
 	changeEdgeColor(Dataset.edges[prevIterator][0],Dataset.edges[prevIterator][1], '#3399ff');
 }, 3000);
+**/
 	
 
 
