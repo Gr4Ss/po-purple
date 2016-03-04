@@ -2,6 +2,7 @@ from bottle import Bottle,run,static_file, request,post,error,response,abort
 import datetime
 from webserver_utility import *
 import Communicate
+import json
 
 DriverCom = Communicate.DriverCommincator()
 
@@ -71,7 +72,8 @@ def keys():
     # If not abort with a 404 error
     if not ID:
         abort(404, "No cookie found.")
-    value = request.forms.get('command',False)
+    inp = request.json
+    value = inp.get('command',False)
     if not value or value not in key_commands:
         return 'SORRY'
     else:

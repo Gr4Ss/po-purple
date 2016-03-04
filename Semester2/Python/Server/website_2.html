@@ -8,7 +8,6 @@
 
     <meta name="viewport" content="width=device-width, initial-scale=1">
     <script src="https://ajax.googleapis.com/ajax/libs/angularjs/1.4.5/angular.min.js"></script>
-    <script src='https://ajax.googleapis.com/ajax/libs/angularjs/X.Y.Z/angular-route.js'></script>
     <script src="https://ajax.googleapis.com/ajax/libs/jquery/1.11.3/jquery.min.js"></script>
     <script src="https://maxcdn.bootstrapcdn.com/bootstrap/3.3.5/js/bootstrap.min.js"></script>
     <link rel="stylesheet" href="https://maxcdn.bootstrapcdn.com/bootstrap/3.3.5/css/bootstrap.min.css">
@@ -91,7 +90,7 @@
               <div id="collapseOne" class="panel-collapse collapse" role="tabpanel" aria-labelledby="headingOne">
                 <div class="panel-body">
                   <div class="form1">
-                    <form class="form-horizontal">
+                    <form class="form-horizontal" ng-submit="">
                       <p>
                         <textarea  rows="3" class="form-control commandList" placeholder="Send list of commands" method='POST' name='commands'></textarea>
                       </p>
@@ -142,24 +141,24 @@
               <div class="touch-keys" >
                 <div class="row">
                   <div class="col-xs-4 col-xs-offset-4">
-                    <button class="btn btn-default btn-block driveForward not_pressed" onmouseup="keyUpReleased()" onmousedown="keyUpPressed()">
+                    <button class="btn btn-default btn-block driveForward not_pressed" ng-mouseup="keyUpReleased()" ng-mousedown="keyUpPressed()">
                     F
                     </button>
                   </div>
                 </div>
                 <div class="row">
                   <div class="col-xs-4">
-                    <button class="btn btn-default btn-block driveLeft not_pressed" onmouseup="keyLeftReleased()" onmousedown="keyLeftPressed()">
+                    <button class="btn btn-default btn-block driveLeft not_pressed" ng-mouseup="keyLeftReleased()" ng-mousedown="keyLeftPressed()">
                     L
                     </button>
                   </div>
                   <div class="col-xs-4">
-                    <button class="btn btn-default btn-block driveReverse not_pressed" onmouseup="keyDownReleased()" onmousedown="keyDownPressed()">
+                    <button class="btn btn-default btn-block driveReverse not_pressed" ng-mouseup="keyDownReleased()" ng-mousedown="keyDownPressed()">
                     B
                     </button>
                   </div>
                   <div class="col-xs-4">
-                    <button class="btn btn-default btn-block driveRight not_pressed" onmouseup="keyRightReleased()" onmousedown="keyRightPressed()">
+                    <button class="btn btn-default btn-block driveRight not_pressed" ng-mouseup="keyRightReleased()" ng-mousedown="keyRightPressed()">
                     R
                     </button>
                   </div>
@@ -170,25 +169,6 @@
 
               </div>
               </div>
-          </div>
-        </div>
-
-        <div class="panel panel-default">
-          <div class="panel-heading" role="tab" id="headingSeven">
-            <h4 class="panel-title">
-              <a id='sevenLink' class="collapsed" role="button" data-toggle="collapse" data-parent="#accordion" href="#collapseSeven" aria-expanded="false" aria-controls="collapseSeven">
-              Get data
-              </a>
-            </h4>
-          </div>
-          <div id="collapseSeven" class="panel-collapse collapse" role="tabpanel" aria-labelledby="headingSeven">
-            <div class="panel-body">
-                <div>
-                  <canvas id="speedChart" width="600px" height="400px"></canvas>
-
-                </div>
-              </div>
-            </div>
           </div>
         </div>
 

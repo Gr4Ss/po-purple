@@ -33,7 +33,9 @@ class Engine:
     ## If the absolute value of the speed bigger is then 255 the speed will be set to -/+ 255
     def set_speed(self,speed):
         if abs(speed) > 255:
-            speed = sign(speed) *255
+            speed = sign(speed) * 255
+        if abs(speed)< 80:
+            speed = sign(speed)* 0
         self.__speed = int(speed)
 
     ## The motor is pulsed with the current speed

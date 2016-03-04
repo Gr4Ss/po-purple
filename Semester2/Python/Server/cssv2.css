@@ -33,7 +33,11 @@ input {
     color: black;
     background-image: none;
 }
-.pressed{
-  background-color:grey;
+.succesfulpressed{
+  background-color:green;
+  color:white;
+}
+.failurepressed{
+  background-color:red;
   color:white;
 }

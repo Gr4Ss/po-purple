@@ -48,6 +48,7 @@ class RestClient(object):
         else:
             raise Error('Please add your team first.')
     def get_postions(self):
-	pass
+	    resp = requests.get(self.__root + "/positions")
+        return json.loads(resp)
     def get_teamname(self):
-	return self.__name
+	    return self.__name

@@ -11,6 +11,7 @@ sobelY = 1/2.*np.array([[-1,-2,-1],[0,0,0],[1,2,1]])
 
 pieterX = 1/18.*np.array([[-3,-6,0,6,3],[-6,-12,0,12,6],[-3,-6,0,6,3]])
 pieterY = 1/18.*np.array([[-3,-6,-3],[-6,-12,-6],[0,0,0],[6,12,6],[3,6,3]])
+pieterYF = 1/18.*np.array([[-3,-6,-3],[-6,-12,-6],[0,0,0],[6,12,6],[3,6,3]],order='F')
 # Loads the image at the given adres
 def load_image(adres):
     img = Image.open(adres)
@@ -24,6 +25,12 @@ def rgb2gray(rgb):
     r, g, b = rgb[:,:,0], rgb[:,:,1], rgb[:,:,2]
     gray = 0.2989 * r + 0.5870 * g + 0.1140 * b
     return gray
+# Convert image to rgb
+def rgb2gray2(rgb):
+    r, g, b = rgb[:,:,0], rgb[:,:,1], rgb[:,:,2]
+    gray = np.float32(0.2989) * r + np.float32(0.5870) * g + np.float32(0.1140) * b
+    return gray
+
 # Method to show the image using matplotlib
 def show_image(image):
     plt.imshow(image,cmap='gray')
@@ -70,12 +77,23 @@ def fast_check_column2(column,image,start=0,end=-1):
     t = np.where(Gy[3:-3,0]>TRESHHOLD)[0]+3
     # Thinning the convolution creates 4/5 point for each shift
     # Hold only the biggest one
+    return [(column,t[i]+start) for i in xrange(t.shape[0]) if not check_neighbours_y(Gy,t,i)]
+def fast_check_column3(column,image,start=0,end=-1):
+    if end == -1:
+        end = image.size[1]
+    img = image.crop((column-1,start,column+2,end))
+    npimg = np.array(img,order='F')[::2]
 
-    q= [t[i]+start for i in xrange(t.shape[0]) if not check_neighbours_y(Gy,t,i)]
-
-
-    # Adding 1 because of +
-    return zip(np.ones(len(q))*column,q)
+    TRESHHOLD = 25.0
+    gray = rgb2gray(npimg)
+    # Convoluting the column + columns to the left and the right  with the sobel mask
+    Gy = np.abs(sig.convolve2d(gray,pieterY,'valid'))
+    # Check where in the colom the gradient is bigger than the threshhold
+    # + The +1 comes from here !!!!
+    t = np.where(Gy[:,0]>TRESHHOLD)[0]
+    # Thinning the convolution creates 4/5 point for each shift
+    # Hold only the biggest one
+    return [(column,(t[i]+start)*2) for i in xrange(t.shape[0]) if not check_neighbours_y(Gy,t,i)]
 def check_neighbours_y(Gy,t,i):
     return Gy[t[i],0] <= Gy[t[i]-1,0]  or Gy[t[i],0] <  Gy[t[i]+1,0]
 def fast_check_row2(row,image,start=0,end=-1):
@@ -88,11 +106,19 @@ def fast_check_row2(row,image,start=0,end=-1):
     gray = rgb2gray(npimg)
     Gx = np.abs(sig.convolve2d(gray,pieterX,'valid'))
     t = np.where(Gx[0,3:-3]>TRESHHOLD)[0]+3
-    q= [t[i]+start for i in xrange(t.shape[0]) if not check_neighbours(Gx,t,i)]
-    #for i in xrange(t.shape[0]-1,-1,-1):
-    #    if Gx[1,t[i]] <= Gx[1,t[i]-1]  or Gx[1,t[i]] <  Gx[1,t[i]+1]:
-    #        t = np.delete(t,i)
-    return zip(q,np.ones(len(q))*row)
+    return [(t[i]+start,row) for i in xrange(t.shape[0]) if not check_neighbours(Gx,t,i)]
+def fast_check_row3(row,image,start=0,end=-1):
+    global pieterX
+    if end == -1:
+        end = image.size[0]
+    TRESHHOLD = 25
+    img = image.crop((start,row-1,end,row+2))
+    npimg = np.array(img)[:,1::2]
+    gray = rgb2gray(npimg)
+    Gx = np.abs(sig.convolve2d(gray,pieterX,'valid'))
+    t = np.where(Gx[0,:]>TRESHHOLD)[0]
+    return [((t[i]+start)*2,row) for i in xrange(t.shape[0]) if not check_neighbours(Gx,t,i)]
+
 def check_neighbours(Gx,t,i):
     return Gx[0,t[i]] <= Gx[0,t[i]-1]  or Gx[0,t[i]] <  Gx[0,t[i]+1]
 # Method to fast check for big black-white gradient shift
