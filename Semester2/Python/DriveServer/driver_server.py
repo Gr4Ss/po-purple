@@ -12,31 +12,37 @@ socket = context.socket(zmq.REP)
 socket.bind("tcp://0.0.0.0:%s" % PORT)
 
 
-lock = Locker.lock(300)
+lock = Locker.Lock(300)
 # In testing mode no drive commands are executed
 TESTING_MODE = True
-
-if not TESTING_MODE:
-# Import the controller
-    import Controller
-    from Manual_Drive import *
+import Controller
+from Manual_Drive import *
 # create controller entity
-    controller = Controller.Controller()
-    manualDrive = ManualDrive(controller.start_command,controller.forward,controller.backward,controller.left,controller.right,controller.stop)
+controller = Controller.Controller()
+manualDrive = ManualDrive(controller.start_command,controller.forward,controller.backward,controller.left,controller.right,controller.stop)
 
 
 
 # A dictionnary containing the possible commands (keys)
 # Correct formated command : {'command':'NameCommand',ID:{}}
-commands = {'LOCK':{'function':None},'UNLOCK':None,
-'STRAIGHT':{'nb_of_arguments':1,'constraint':c.constraint_strait}
-,'CIRC':{'nb_of_arguments':1,'constraint':c.constraint_circ},
+commands = {
+'LOCK':{'nb_of_arguments':0,'function':func_lock},
+'UNLOCK':{'nb_of_arguments':0,'function':func_unlock},
+'STRAIGHT':{'nb_of_arguments':1,'constraint':c.constraint_strait},
+'CIRC':{'nb_of_arguments':1,'constraint':c.constraint_circ},
 'SQUARE':{'nb_of_arguments':1,'constraint':c.constraint_square},
-'SUPERLOCK':{'nb_of_arguments':1},
-'SUPERUNLOCK':{'nb_of_arguments':1},'FStart':{function},
-'FStop':None,'RStart':None,'RStop':None,'LStart':None,
-'LStop':None, 'BStop':None,'BStart':None, 'STOP':None,
-'COMMAND':{'nb_of_arguments':1,'constraint':c.constraint_command}}
+'SUPERLOCK':{'nb_of_arguments':1,'function':func_superlock},
+'SUPERUNLOCK':{'nb_of_arguments':1,'function':func_superunlock},
+'FStart':{'nb_of_arguments':0,'function':func_add_direction,'optional_arguments':[manualDrive,'forward']},
+'FStop':{'nb_of_arguments':0,'function':func_delete_direction,'optional_arguments':[manualDrive,'forward']},
+'RStart':{'nb_of_arguments':0,'function':func_add_direction,'optional_arguments':[manualDrive,'right']},
+'RStop':{'nb_of_arguments':0,'function':func_delete_direction,'optional_arguments':[manualDrive,'right']},
+'LStart':{'nb_of_arguments':0,'function':func_add_direction,'optional_arguments':[manualDrive,'left']},
+'LStop':{'nb_of_arguments':0,'function':func_delete_direction,'optional_arguments':[manualDrive,'left']},
+'BStart':{'nb_of_arguments':0,'function':func_add_direction,'optional_arguments':[manualDrive,'backward']},
+'BStop':{'nb_of_arguments':0,'function':func_delete_direction,'optional_arguments':[manualDrive,'backward']},
+'STOP':{'nb_of_arguments':0,'function':func_stop,'optional_arguments':[manualDrive]},
+'PARCOURS':{'nb_of_arguments':1,'constraint':c.constraint_parcours}}
 
 # A method to parse the message
 # If the message isn't valid, False will be returned
@@ -44,26 +50,28 @@ commands = {'LOCK':{'function':None},'UNLOCK':None,
 def check_message(message):
     global commands
     if isinstance(message,dict):
-        command = message.get('command',None)[0]
-        if (key not in commands.keys()):
+        command = message.get('command',None)
+        print command
+        if (command not in commands.keys()):
             return False
         ID = message.get('ID',None)
         if not ID:
             return False
-        arguments = message.get('argument',None)
-        if not arguments:
+        arguments = message.get('arguments',None)
+        nb_of_arguments = commands[command].get('nb_of_arguments',0)
+        if not arguments and nb_of_arguments == 0:
             return True
+        elif not arguments and nb_of_arguments != 0:
+            return False
         else:
-            nb_of_arguments = commands[key].get('nb_of_arguments',0)
             # Check if the message has the valid number of arguments
             if len(arguments) != nb_of_arguments:
                 return False
             # Check if there is any constraint
-            constraint = commands[key].get('constraint',False)
+            constraint = commands[command].get('constraint',False)
             if constraint != False:
-                to_be_checked = arguments[0]
-                temp = constraint(to_be_checked)
-                if temp:
+                print constraint(arguments)
+                if constraint(arguments):
                     return True
                 else:
                     return False
@@ -83,10 +91,10 @@ if __name__ == '__main__':
         if (messageOK):
             command = message['command']
             id_ = message['ID']
-            argument = message.get('argument',None)
+            argument = message.get('arguments',[])
             opt_arguments = commands[command].get('optional_arguments',None)
             if opt_arguments != None:
-                argument = opt_arguments + [argument]
+                argument = opt_arguments + argument
             f = commands[command][function]
             return_message = f(identifier,argument,lock)
         else:

@@ -58,7 +58,7 @@ class Lock:
     def has_lock(self,identifier):
         return self.__lock and self.__lock_id == identifier
     def has_super_lock(self,identifier):
-        return self.__superlock and self.__lock_id = identifier
+        return self.__superlock and self.__lock_id == identifier
     # A method to check whether or not a lock is expired
     def check_expire(self):
         if (not self.__superlock) and self.__lock and (time.time() - self.__lock_time >= self.__max_lock_time):

@@ -1,17 +1,17 @@
-def func_lock(identifier,argument=None,lock):
-    lock_acquired =lock.claim_lock(identifier)
+def func_lock(identifier,argument,lock):
+    lock_acquired = lock.claim_lock(identifier)
     return 'OK' if lock.has_lock(identifier) else 'SORRY'
 
-def func_unlock(identifier,argument=None,lock):
+def func_unlock(identifier,argument,lock):
     unlock_aquired = lock.free_lock(identifier)
     return 'OK' if unlock_aquired else 'SORRY'
 
 def func_superlock(identifier,passw,lock):
-    lock_acquired = lock.claim_super_lock(passw,identifier)
+    lock_acquired = lock.claim_super_lock(passw[0],identifier)
     return 'OK' if has_super_lock(identifier) else 'SORRY'
 
 def func_superunlock(identifier,passw,lock):
-    unlock_acquired = lock.free_super_lock(passw,identifier)
+    unlock_acquired = lock.free_super_lock(passw[0],identifier)
     return 'OK' if unlock_acquired else 'SORRY'
 
 def func_add_direction(identifier,argument,lock):
@@ -38,7 +38,7 @@ def func_delete_direction(identifier,argument,lock):
             return 'OK'
         except:
             return 'FAILURE'
-def func_stop(identifier,argument,lock)):
+def func_stop(identifier,argument,lock):
     manualDrive = argument[0]
     if not lock.has_lock(identifier):
         return 'SORRY'

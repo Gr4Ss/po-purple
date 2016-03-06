@@ -11,7 +11,6 @@ app.controller('purpleController',function($scope,lockClaimerService,formSenderS
   $scope.moveRight = 0;
   $scope.moveDown = 0;
   $scope.moveUp = 0;
-
   hide_all_messages = function(){
     $scope.failure = false;
     $scope.noLock = false;
@@ -152,8 +151,39 @@ app.controller('purpleController',function($scope,lockClaimerService,formSenderS
     $(".driveForward").addClass('not_pressed');
     var promise = keySenderService.sendData('FStop');
   }
-  $scope.commandSubmit = function(){
-    
+  $scope.parcoursSubmit = function(){
+    hide_all_messages();
+    var valid_commands = ['Left','Right','Distance'];
+    var str = $scope.parcours;
+    /*
+    var steps = str.split(',');
+    var parsed_steps = []
+    for (var i = 0; i < steps.length-1; i++){
+      console.log(steps[i]);
+      var number = steps[i].match(/\(([^)]+)\)/)[1];
+      var command = steps[i].match(/(.*)\(/)[1];
+      if ($.inArray(command, valid_commands) && !isNaN(number)){
+        console.log('Idioot')
+        parsed_steps.push([command[0],parseInt(number)]);
+      }
+      console.log(arrayObj.join('\n'));
+    }
+    */
+    var promise = formSenderService.sendData({'parcours':str});
+    promise.success(function(data,status){
+        if (data == 'OK'){
+          $scope.succes = true;
+        }
+        if (data == 'FAILURE'){
+          $scope.failure = true;
+        }
+        else{
+          $scope.claimLock = true;
+        }
+    });
+    promise.error(function(data,status){
+      $scope.failure = true;
+    });
   }
 });
 app.factory('lockClaimerService',function($http){
@@ -171,7 +201,10 @@ app.factory('lockClaimerService',function($http){
 app.factory('formSenderService',function($http){
   var formSender = {};
   formSender.sendData = function(theData){
-    var promise = $http({method:'POST',url:'/data',data:theData});
+    var promise = $http({method:'POST',url:'/parcours',
+      data:JSON.stringify(theData),
+      headers: {'Content-Type': 'application/json'}
+      });
     return promise;
   };
   return formSender;

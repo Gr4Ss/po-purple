@@ -20,28 +20,22 @@ def constraint_square(side):
          return side >= 20 and side <= 200
     except:
         return False
-# input form is [(L/2),(R/5),(D/100)]
-# the only valid commands are L,R,D followed by an int
-def constraint_command(commands):
-    valid_commands = ['L','R','D']
-    # Throw away the [] and split on commas
-    cleaned_commands = commands[1:-1].split(',')
-    for command in cleaned_commands:
-        #Throw away the () and split on /
-        splitting = command[1:-1].split('/')
-        # first part is the command
-        comm = splitting[0]
-        # second part is value
-        valu = splitting[1]
-        # the command must be in the valid commands
-        if not comm in valid_commands:
-            return False
-        # The value must cast in an int elsewise not a valid command
-        try:
-            int(valu)
-        except:
-            return False
-    return True
+
+valid_parcours_steps = ['L','R','D']
+def constraint_parcours(arguments):
+    global valid_parcours_steps
+    parcours = arguments[0]
+    if isinstance(parcours,list):
+        for step in parcours:
+            if isinstance(step,list):
+                if len(step) ==2 and step[0] in valid_parcours_steps and isinstance(step[1],int) :
+                    return True
+                else:
+                    return False
+            else:
+                return False
+    else:
+        return False
 
 # some tests
 if __name__ == '__main__':
@@ -55,5 +49,4 @@ if __name__ == '__main__':
     assert constraint_square(50)
     assert not constraint_square(10)
     assert not constraint_square(300)
-    assert constraint_command('[(L/2),(R/5),(D/100)]')
     print 'Testing done'

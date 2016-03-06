@@ -4,15 +4,9 @@ import math
 from utility import *
 from Engine import *
 from BrickPi_thread import *
-import PID
+import ControllerCommands
 
-## The minimum speed to move
-MINIMUM_SPEED = 155
-## Variable indicating how good batteries are working
-## 1. -> full speed
-## |
-## 0.1 -> Nearly Empty
-BATTERY = 1.
+
 ## 1 -> ON
 ## 0 -> OFF
 DEBUG = True
@@ -32,16 +26,17 @@ class Controller:
         self.__brickpi = BrickPi_Thread(self.__engines)
         self.__command_going = False
         self.__command_thread = None
+        self.__parcours = None
     # Start a commands
     # If there is already a command going, stop that first
     # Start thread
     # @post self.__command_going = True
     # @post self.__command_thread = new thread
     def start_command(self,command,arguments = None):
-        if self.__command_going:
+        if Controller.Going:
             self.stop_command()
         self.__brickpi.on()
-        self.__command_going = True
+        Controller.Going = True
         if arguments != None:
             thread = threading.Thread(target= command,args=arguments)
         else:
@@ -54,8 +49,8 @@ class Controller:
     # @post self.__command_going = False
     # @post self.__command_thread = None
     def stop_command(self):
-        if self.__command_going:
-            self.__command_going = False
+        if Controller.Going:
+            Controller.Going = False
             self.__command_thread.join()
             self.__brickpi.off()
             self.__command_thread = None
