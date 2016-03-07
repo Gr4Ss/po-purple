@@ -1,7 +1,7 @@
-from restclient.py import all
+from restclient import *
 from time import sleep
 import random
-from pathFinding.py import all
+from pathFinding import *
 #root = serveradres
 
 def generate_vehicle(teamname, speed):
