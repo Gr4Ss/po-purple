@@ -17,7 +17,7 @@
 	]
 };*/
 
-var Dataset = {
+/**var Dataset = {
 	"vertices": [
 		[1, {"origin": 6, "straight": 2}],
 		[2, {"origin": 1, "straight": 3, "left": 4}],
@@ -33,16 +33,16 @@ var Dataset = {
 	"edges": [
 		[1, 2, 0.3],
 		[2, 1, 0.3],
-		[2, 3, 0.2],
-		[3, 2, 0.2],
+		[2, 3, 0.3],
+		[3, 2, 0.3],
 		[6, 1, 0.6],
 		[2, 4, 0.3],
 		[4, 5, 0.3],
-		[3, 9, 0.5],
-		[9, 3, 0.5],
-		[3, 7, 0.4],
-		[7, 3, 0.4],
-		[7, 8, 0.5],
+		[3, 9, 0.3],
+		[9, 3, 0.3],
+		[3, 7, 0.3],
+		[7, 3, 0.3],
+		[7, 8, 0.3],
 		[8, 9, 0.3],
 		[9, 8, 0.3],
 		[9, 10, 0.3],
@@ -52,8 +52,54 @@ var Dataset = {
 		[5, 6, 0.3],
 		[6, 5, 0.3],
 	]
-}
+}**/
 
+
+var Dataset = {
+	"vertices": [
+		[1, {"origin": 1, "straight": 2}],
+		[2, {"origin": 1, "straight": 3}],
+		[3, {"origin": 2, "straight": 11, "right": 4}],
+		[4, {"origin": 3, "straight": 5, "left": 10}],
+		[5, {"origin": 4, "straight": 15, "right": 6}],
+		[6, {"origin": 5, "straight": 7, "left": 15}],
+		[7, {"origin": 6, "straight": 8, "left": 15}],
+		[8, {"origin": 7, "straight": 9, "left": 15, "right": 12}],
+		[9, {"origin": 8, "straight": 10, "left": 5, "right": 14}],
+		[10, {"origin": 9, "straight": 11, "left": 4, "right": 14}],
+		[11, {"origin": 10, "straight": 13, "left": 3, "right": 12}],
+		[12, {"origin": 11, "left": 13, "right": 8}],
+		[13, {"origin": 12, "straight": 11}],
+		[14, {"origin": 9, "straight": 10}],
+		[15, {"origin": 5, "straight": 7, "left": 8, "right": 6}],
+	],
+	"edges": [
+		[1, 2, 0.3],
+		[2, 3, 0.3],
+		[3, 4, 0.3],
+		[4, 5, 0.3],
+		[5, 6, 0.4],
+		[6, 7, 0.4],
+		[7, 8, 0.4],
+		[8, 9, 0.3],
+		[9, 10, 0.1],
+		[10, 11, 0.4],
+		[11, 12, 0.3],
+		[12, 13, 0.3],
+		[13, 11, 0.4],
+		[4, 10, 0.4],
+		[5, 9, 0.4],
+		[5, 10, 0.3],
+		[5, 15, 0.3],
+		[6, 15, 0.3],
+		[7, 15, 0.3],
+		[8, 15, 0.3],
+		[8, 12, 1],
+		[10, 14, 0.2],
+		[9, 14, 0.2],
+		[11, 3, 0.3],
+	]
+}
 function checkDependencies(edgeset) {
 	console.log(edgeset);
 	for (i=0; i<edgeset.length; i++) {
@@ -78,7 +124,7 @@ function convertDataSet() {
 	}
 	for (i in Dataset["edges"]) {
 		var localset = new Set();
-		localset = {from: Dataset["edges"][i][0], to: Dataset["edges"][i][1], label: Dataset["edges"][i][2], length: 1000*(Dataset["edges"][i][2])*(Dataset["edges"][i][2]), id: (7*Dataset["edges"][i][0] +11*Dataset["edges"][i][1])};
+		localset = {from: Dataset["edges"][i][0], to: Dataset["edges"][i][1], label: Dataset["edges"][i][2], length: 600*(Dataset["edges"][i][2])*(Dataset["edges"][i][2]), id: (7*Dataset["edges"][i][0] +11*Dataset["edges"][i][1])};
 		if (visSetEdges.get({filter: function (item) {return (item.from == localset.to && item.to ==localset.from);}}).length != 0) {
 			console.log('from: ', localset.from, ', to: ', localset.to);
 			console.log(localset.to);
@@ -108,20 +154,33 @@ var options = {
 			to:	{enabled: true, scaleFactor:1}
 		},
 		color: {
-			border: "#3399ff",
 			color: "#3399ff"
-		}
+		},
+		physics: true
 	},
 	nodes: {
 		color: {
 			border: "#3399ff",
 			background: "#3399ff"
-		}
+		},
+		physics: true
 	},
 	physics:{
-		enabled: true
+		enabled: true,
+		barnesHut: {
+			gravitationalConstant: -2000,
+			springConstant: 0.09,
+			damping: .09,
+			avoidOverlap: .3
+		},
+		stabilization: {
+			enabled: true,
+			iterations: 100,
+			updateInterval: 5,
+		}
 	},
-	layout:{
+	layout: {
+		randomSeed: 370342
 	}
 };
 
@@ -190,16 +249,51 @@ var carPos = 1;
 var prevIterator = 1;
 var iterator = 1;
 
-/**
+setInterval(function() {
+	network.fit()
+}, 10);
+
+network.on("stabilizationProgress", function(params) {
+	console.log("progress: ", params);
+});
+
+network.on("stabilizationIterationsDone", function() {
+	console.log("true");
+});
+
+network.on("startStabilizing", function() {
+	network.on("stabilizationProgress", function(params) {
+		console.log("progress: ", params);
+	})
+	console.log("Starting stabilization");
+});
+
+network.on("stabilized", function(params) {
+	
+	console.log("stabilized", params);
+});
+
+
 setInterval(function(){ 
 	prevPos = carPos;
-	while (carPos == prevPos) {
-	carPos = Math.round(3*Math.random()+1);
+	randVar = Math.random();
+	if (carPos == 1) {
+		carPos = 2;
+	} else if (carPos == 15) {
+		carPos = 14;
+	} else {
+		if (randVar <= 0.5) {
+			carPos -= 1;
+		} else {
+			carPos += 1;
+		}
 	}
+	console.log(carPos);
 	changeNodeColor(carPos, '#ab78ab');
 	changeNodeColor(prevPos, '#3399ff');
 }, 3000);
-	
+
+/**	
 setInterval(function() {
 	prevIterator = iterator;
 	iterator = Math.floor(Math.random()*Dataset.edges.length);
