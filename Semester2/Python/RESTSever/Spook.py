@@ -3,7 +3,7 @@ from time import sleep
 import random
 from pathFinding import *
 from parcelSelection import *
-#root = serveradres
+root = 'http://localhost:9000'
 
 def generate_vehicle(teamname, speed):
     vehicle = Vehicle(root, teamname, speed)
@@ -17,7 +17,7 @@ class Vehicle(RestClient):
     def __init__(self, root, teamname, speed):
         super(Vehicle, self).__init__(root, teamname)
 	self.__speed = speed
-	self.__parcelStatus == False
+	self.__parcelStatus = False
 
     def get_edges(self):
         roadMap = self.get_map()
@@ -28,7 +28,7 @@ class Vehicle(RestClient):
         return roadMap.get('vertices')
 
     def get_speed(self):
-	return self.__speed    
+	return self.__speed
 
     def generate_position(self):
         edges = self.get_edges()
@@ -47,10 +47,10 @@ class Vehicle(RestClient):
         for x in parcels.get('on-the-road-parcels'):
             if x[3] == self.get_teamname():
 	        return x
-	parcel = select_parcel(self.get_edges(), self.get_vertices(), position, parcels.get('available-parcels'))
-	self.claim_parcel(parcel)
-	return parcel
-    
+        parcel = select_parcel(self.get_edges(), self.get_vertices(), position, parcels.get('available-parcels'))
+        self.claim_parcel(parcel[0])
+        return parcel
+
     def get_edge_length(self, edge):
 	edges = self.get_edges
 	for x in edges:
@@ -72,7 +72,7 @@ class Vehicle(RestClient):
 	    self.__lastVertices = list()
 	    return x == 'OK'
     '''
-    
+
     def confirm_delivery(self):
 	parcel = self.choose_parcel()
 	self.deliver_parcel(parcel[0])
@@ -109,9 +109,9 @@ class Vehicle(RestClient):
 		    edge[2] = edge[2]*2
 		    edges.insert(i, edge)
 	return edges
-    
+
     def drive(self):
-	while True
+	while True:
     	    parcel = self.choose_parcel()
 	    position = self.get_position()
 	    length = self.get_edge_length(position)
@@ -125,11 +125,12 @@ class Vehicle(RestClient):
     	        if self.get_parcel_status():
 	            self.inv_parcel_status()
 	            self.confirm_delivery()
-	        else if not self.get_parcel_status():
+	        elif not self.get_parcel_status():
 		    self.inv_parcel_status()
 	        continue
 	    path = find_path(self.get_vertices(), self.update_edges_traffic(), position[1], target)
 	    self.pushposition(path[0],path[1])
+'''
 {
 "available-parcels": [
 [142, 1, 2],
@@ -152,5 +153,3 @@ class Vehicle(RestClient):
 ]
 }
 '''
-
-

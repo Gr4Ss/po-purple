@@ -4,22 +4,22 @@ from webserver_utility import *
 import Communicate
 import json
 
+# Interface hiding away problems with the Raspberry Pi
 DriverCom = Communicate.DriverCommincator()
-
+# Create a new Bottle app
 app = Bottle()
-
-static_root = '/home/pieter/Documenten/Ku Leuven/PenO/po-purple/Semester2-Tussentijdse Demo'
+# Storing a refence to the location of the static files
+static_root = '/home/pieter/Documenten/Ku Leuven/PenO/po-purple/Semester2-Tussentijdse Demo/Static'
 #static_root = 'C:\Users\Ict\Documents\JS'
 # Returning the home page
 @app.route('/')
 def home():
     # Open the file
     html = open('website_2.html','r')
-    # Check if the user has already a cookie
+    # Check if the user has already a cookie, if not create one
     if not request.get_cookie('ID'):
+        # Cookie expires over 1 year
         expire_time = datetime.datetime.now() + datetime.timedelta(days=366)
-        # When not, create one
-        print expire_time.strftime("%a, %d-%b-%Y %H:%M:%S PST")
         response.set_cookie('ID',create_hash(16), path='/',expires=expire_time)
     # return the webpage
     return html
@@ -36,7 +36,7 @@ def lock():
     # If not abort with a 404 error
     if not ID:
         abort(404, "No cookie found.")
-    # Else prepare to send the lockrequest
+    # Else prepare to send the lockrequest to drive server
     dictionnary = {'command':'LOCK','ID':ID}
     try:
         t = DriverCom.send_message(dictionnary)
@@ -61,15 +61,22 @@ def unlock():
 
 @app.post('/keys')
 def keys():
+    # List with valid key commands
     key_commands = ['LStart','RStart','FStart','BStart','LStop','RStop','FStop','BStop']
+    # Try to get ID
     ID = request.get_cookie('ID')
     # If not abort with a 404 error
     if not ID:
         abort(404, "No cookie found.")
+    # Process the requested key
     inp = request.json
+    if inp == None:
+        return 'SORRY'
     value = inp.get('command',False)
+    # If no valid key found return sorry
     if not value or value not in key_commands:
         return 'SORRY'
+    # Else prepare to send data to Driverserver
     else:
         dictionnary = {'command':value,'ID':ID}
         try:
@@ -77,6 +84,7 @@ def keys():
             return "OK" if t else "SORRY"
         except:
         	abort(500,'Socket timeout')
+
 @app.post('/parcours')
 def parcours():
     ID = request.get_cookie('ID')
@@ -95,8 +103,9 @@ def parcours():
             return "OK" if t else "SORRY"
         except:
             abort(500,"Socket timeout")
+
 @app.error(404)
 def error404(error):
     return '<h1>Oops!</h1>'
-
-app.run(host='localhost',port='8080',debug=True)
+# Run the application on port 8080
+app.run(host='0.0.0.0',port='8080',debug=True)

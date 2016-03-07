@@ -44,7 +44,7 @@ app.controller('purpleController',function($scope,lockClaimerService,formSenderS
             $scope.unlock = true;
           }
           else{
-            $scope.noLock = true;
+            $scope.claimLock = true;
           }
       });
     promise.error(function(data,status){
@@ -52,8 +52,45 @@ app.controller('purpleController',function($scope,lockClaimerService,formSenderS
       });
 
   };
+  $scope.keyDown = function(e){
+    if ($("#collapseTwo").attr('aria-expanded') == 'true'){
+      switch (e.which) {
+        case 37:
+          $scope.keyLeftPressed();
+          break;
+        case 38:
+          $scope.keyUpPressed();
+          break;
+        case 39:
+          $scope.keyRightPressed();
+          break;
+        case 40:
+          $scope.keyDownPressed();
+          break;
+      }
+    }
+  }
+  $scope.keyUp = function(e){
+    if ($("#collapseTwo").attr('aria-expanded')){
+      switch (e.which) {
+        case 37:
+          $scope.keyLeftReleased();
+          break;
+        case 38:
+          $scope.keyUpReleased();
+          break;
+        case 39:
+          $scope.keyRightReleased();
+          break;
+        case 40:
+          $scope.keyDownReleased();
+          break;
+      }
+    e.preventDefault();
+    }
+  }
   $scope.keyLeftPressed = function() {
-    if (moveLeft == 0){
+    if ($scope.moveLeft == 0){
       $(".driveLeft").removeClass('not_pressed');
       var promise = keySenderService.sendData('LStart');
       promise.success(function(data,status){
@@ -67,11 +104,11 @@ app.controller('purpleController',function($scope,lockClaimerService,formSenderS
       promise.error(function(data,status){
         $(".driveLeft").addClass('failurepressed');
       });
-    moveLeft = 1;
+    $scope.moveLeft = 1;
     }
   }
   $scope.keyRightPressed = function (){
-    if (moveRight == 0){
+    if ($scope.moveRight == 0){
       $(".driveRight").removeClass('not_pressed');
       var promise = keySenderService.sendData('RStart');
       promise.success(function(data,status){
@@ -85,11 +122,11 @@ app.controller('purpleController',function($scope,lockClaimerService,formSenderS
       promise.error(function(data,status){
         $(".driveRight").addClass('failurepressed');
       });
-    moveRight = 1;
+    $scope.moveRight = 1;
     }
   }
   $scope.keyDownPressed = function(){
-    if (moveDown == 0){
+    if ($scope.moveDown == 0){
       $(".driveReverse").removeClass('not_pressed');
       var promise = keySenderService.sendData('BStart');
       promise.success(function(data,status){
@@ -103,11 +140,13 @@ app.controller('purpleController',function($scope,lockClaimerService,formSenderS
       promise.error(function(data,status){
         $(".driveReverse").addClass('failurepressed');
       });
+      $scope.moveDown = 1;
     }
+
   }
 
   $scope.keyUpPressed = function(){
-    if (moveUp == 0){
+    if ($scope.moveUp == 0){
       $(".driveForward").removeClass('not_pressed');
       var promise = keySenderService.sendData('FStart');
       promise.success(function(data,status){
@@ -121,31 +160,33 @@ app.controller('purpleController',function($scope,lockClaimerService,formSenderS
       promise.error(function(data,status){
         $(".driveForward").addClass('failurepressed');
       });
+      $scope.moveUp = 1;
     }
+
   }
   $scope.keyLeftReleased = function(){
-    moveLeft = 0;
+    $scope.moveLeft = 0;
     $(".driveLeft").removeClass('succesfulpressed');
     $(".driveLeft").removeClass('failurepressed');
     $(".driveLeft").addClass('not_pressed');
     var promise = keySenderService.sendData('LStop');
   }
   $scope.keyRightReleased = function(){
-    moveRight = 0;
+    $scope.moveRight = 0;
     $(".driveRight").removeClass('succesfulpressed');
     $(".driveRight").removeClass('failurepressed');
     $(".driveRight").addClass('not_pressed');
     var promise = keySenderService.sendData('RStop');
   }
   $scope.keyDownReleased = function (){
-    moveDown = 0;
+    $scope.moveDown = 0;
     $(".driveReverse").removeClass('succesfulpressed');
     $(".driveReverse").removeClass('failurepressed');
     $(".driveReverse").addClass('not_pressed');
     var promise = keySenderService.sendData('BStop');
   }
   $scope.keyUpReleased = function(){
-    moveUp = 0;
+    $scope.moveUp = 0;
     $(".driveForward").removeClass('succesfulpressed');
     $(".driveForward").removeClass('failurepressed');
     $(".driveForward").addClass('not_pressed');

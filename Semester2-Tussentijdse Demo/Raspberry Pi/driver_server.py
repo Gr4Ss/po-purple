@@ -1,35 +1,35 @@
-#import zmq
 import sockets_server
 import Locker
 import constraints as c
 import cPickle
 from commands import *
 
-# The port to which this server will listen
-#PORT = '5060'
-# Setting up 0mq to work as socket server
-#context = zmq.Context()
-#socket = context.socket(zmq.REP)
-#socket.bind("tcp://0.0.0.0:%s" % PORT)
+# Setting up a new a new socket server
 socket = sockets_server.CustomSocketServer(5064)
-
-
-lock = Locker.Lock(300)
-# In testing mode no drive commands are executed
-TESTING_MODE = True
+# Create a lock entity with a lock time of 20 minutes
+lock = Locker.Lock(1200)
+# Import controller, entity responsible for starting and stopping controller commands
 import Controller
+# Import commands that the controller can start
 import ControllerCommands
+# Import manual drive is entity to select the right controller command given the chosen keys
 from ManualDrive import *
 # create controller entity
 controller = Controller.Controller()
 manualDrive = ManualDrive(controller.start_command,ControllerCommands.forward,
-ControllerCommands.backward,ControllerCommands.left,ControllerCommands.right,ControllerCommands.stop,
-ControllerCommands.stop,ControllerCommands.stop,ControllerCommands.stop,ControllerCommands.stop)
+ControllerCommands.backward,ControllerCommands.left,ControllerCommands.right,
+ControllerCommands.forward_leftforward_left,ControllerCommands.forward_right,
+ControllerCommands.backward_left,ControllerCommands.backward_right,
+ControllerCommands.stop)
 
 
 
 # A dictionnary containing the possible commands (keys)
-# Correct formated command : {'command':'NameCommand',ID:{}}
+# Correct formated command : {'command':'NameCommand','ID':ID,'arguments':[list of arguments]}
+# nb_of_arguments reflects the number of arguments expected
+# function contain the func that must be started when a given command is Received
+# optional arguments contain a list of optional arguments to give to the function
+# constraint contain a function that checks if the given arguments are valid
 commands = {
 'LOCK':{'nb_of_arguments':0,'function':func_lock},
 'UNLOCK':{'nb_of_arguments':0,'function':func_unlock},
@@ -49,9 +49,14 @@ commands = {
 'STOP':{'nb_of_arguments':0,'function':func_stop,'optional_arguments':[manualDrive]},
 'PARCOURS':{'nb_of_arguments':1,'constraint':c.constraint_parcours}}
 
-# A method to parse the message
+# A method to chek the message
 # If the message isn't valid, False will be returned
-# else a tupple is returned  with as elements, each element in the message seperated by underscores.
+# a valid message is a dictionnary with keys command,ID, arguments
+# The value of command must be in commands.keys()
+# The value of ID has no constraints
+# The value of arguments must be null if commands[command][nb_of_arguments] == 0
+# else it must be an array with lenght nb_of_arguments and it must fullify it constraints if
+# any given by commands[command][constraint]
 def check_message(message):
     global commands
     if isinstance(message,dict):
@@ -87,9 +92,12 @@ def check_message(message):
 
 if __name__ == '__main__':
     while True:
+        # check if any new data is available
         conn,message = socket.get_data()
+        # Check if the current lock has expired
         lock.check_expire()
         print "Received request: ", message
+        # Check if the incomming message is valid
         messageOK = check_message(message)
         return_message = 'SORRY'
         if (messageOK):

@@ -20,7 +20,6 @@ class CustomSocketServer:
         while True:
             try:
                 conn, addr = self.socket.accept()
-                print 'New connection from ', addr
                 t = threading.Thread(target=self.receive(conn,addr))
                 t.setDaemon(True)
                 t.start()
@@ -29,6 +28,7 @@ class CustomSocketServer:
                 sys.exit()
     def receive(self,conn,addr):
         try:
+            print 'New connection from ', addr
             data = conn.recv(1024)
             data = pickle.loads(data)
             print data
@@ -41,7 +41,7 @@ class CustomSocketServer:
                 message = conn.recv(data)
                 message = pickle.loads(message)
                 self.receivequeue.append((conn,message))
-        except Exception:
+        except:
             print 'Error occured, connection closed'
             conn.close()
     def send(self,conn,data):

@@ -1,7 +1,6 @@
 import sockets_client
 import zmq
-PORT = 5074
-
+PORT = 5075
 
 
 # A class that communicate with the drive server
@@ -17,6 +16,8 @@ class DriverCommincator:
                 return True
             elif response == 'FAILURE':
                 raise Exception('The car is not working')
+            elif response == 'ILLEGAL_MESSAGE':
+                raise Exception('An illegal message is sended.')
             else:
                 return False
         except:

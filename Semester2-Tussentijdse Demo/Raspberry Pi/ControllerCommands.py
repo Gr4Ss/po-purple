@@ -37,12 +37,12 @@ def manual_straight(direction):
         global_speed = min(global_speed+5,255)
         distance1 = Leftengine.get_count()*Perimeter*Gearratio
         distance2 = Rightengine.get_count()*Perimeter*Gearratio
-        speed_diff = pid.new_value(abs(distance1)-abs(distance2),0.1)
+        speed_diff = pid.value(abs(distance1)-abs(distance2),0.1)
         if speed_diff < 0:
             Leftengine.set_speed(direction*global_speed)
-            Rightengine.set_speed(direction*(global_speed + speeddif))
+            Rightengine.set_speed(direction*(global_speed + speed_diff))
         else:
-            Leftengine.set_speed(direction*(global_speed-speeddif))
+            Leftengine.set_speed(direction*(global_speed-speed_diff))
             Rightengine.set_speed(direction*global_speed)
         time.sleep(0.05)
     Leftengine.set_speed(0)
@@ -51,17 +51,32 @@ def forward():
     manual_straight(1)
 def backward():
     manual_straight(-1)
-def forward_bend(leftengine,rightengine,perimeter,gearratio,going,direction):
-    ##TODO
-    pass
+def manual_bend(directionx,directiony):
+    if not Init:
+        return False
+    global_speed = 140
+    diff = 10
+    if directionx <0:
+        inner_engine = Leftengine
+        outer_engine = Rightengine
+    else:
+        inner_engine = Rightengine
+        outer_engine = Leftengine
+    while Going:
+        global_speed = min(global_speed+5,255)
+        diff = min(diff+5,50)
+        outer_engine.set_speed(directiony*global_speed)
+        inner_engine.set_speed(directiony*(global_speed-diff))
+    Rightengine.set_speed(0)
+    Leftengine.set_speed(0)
 def forward_left():
-    pass
+    manual_bend(-1,1)
 def forward_right():
-    pass
+    manual_bend(1,1)
 def backward_left():
-    pass
+    manual_bend(-1,-1)
 def backward_right():
-    pass
+    manual_bend(-1,1)
 # if direction = 1 : left
 # if direction = -1 : right
 def manual_rotate(direction):
@@ -119,8 +134,8 @@ def ride_distance(distance):
         distance2 = Rightengine.get_count()*Perimeter*Gearratio
         if DEBUG:
             print 'Distance:', distance1, distance2
-        speed = pid1.new_value(distance-distance1,0.01)
-        speed_diff = pid2.new_value(distance1-distance2,0.01)
+        speed = pid1.value(distance-distance1,0.01)
+        speed_diff = pid2.value(distance1-distance2,0.01)
         if DEBUG:
             print 'Speed + Speed diff: ', speed, speed_diff
         lspeed,rspeed = correct_speed(speed,speed_diff)
@@ -168,15 +183,15 @@ def rotate(radial):
     distance = Widthcar/2. * abs(radial)
     pid1 = PID.PID(10.,1./2.,10/2.,.6)
     pid2 = PID.PID(10.,1./2.,10/2.,.6)
-    speed1 = pid1.new_value(distance,0.1)
-    speed2 = pid2.new_value(-distance,0.1)
+    speed1 = pid1.value(distance,0.1)
+    speed2 = pid2.value(-distance,0.1)
     outer_engine.set_speed(speed1)
     inner_engine.set_speed(speed2)
     while (not (speed1 == 0 and speed2 == 0)) and (Going):
         distance1 = outer_engine.get_count()*Perimeter*Gearratio
         distance2 = inner_engine.get_count()*Perimeter*Gearratio
-        speed1 = pid1.new_value(distance - distance1,0.1)
-        speed2 = pid2.new_value(-distance - distance2,0.1)
+        speed1 = pid1.value(distance - distance1,0.1)
+        speed2 = pid2.value(-distance - distance2,0.1)
         outer_engine.set_speed(speed1)
         inner_engine.set_speed(speed2)
         time.sleep(0.1)
@@ -217,8 +232,8 @@ def ride_circ(radius):
     outer_engine.reset_count()
     angle_per_loop = 1.5/(float(radius))
     angle = angle_per_loop
-    speed1 = pid1.new_value(angle*(2*math.pi*abs(radius))-0,0.1)
-    speed2 = pid2.new_value(angle*(2*math.pi*(abs(radius)+ 0))-0,0.1)
+    speed1 = pid1.value(angle*(2*math.pi*abs(radius))-0,0.1)
+    speed2 = pid2.value(angle*(2*math.pi*(abs(radius)+ 0))-0,0.1)
     inner_engine.set_speed(speed1)
     outer_engine.set_speed(speed2)
     while (not (speed1==0 and speed2==0)) and Going:
@@ -226,8 +241,8 @@ def ride_circ(radius):
         distance2 = outer_engine.get_count()*Perimeter*Gearratio
         if DEBUG:
             print 'Distance: ', distance1, distance2
-        speed1 = pid1.new_value(angle*abs(radius)-distance1,0.1)
-        speed2 = pid2.new_value(angle*(abs(radius)+ Widthcar)-distance2,0.1)
+        speed1 = pid1.value(angle*abs(radius)-distance1,0.1)
+        speed2 = pid2.value(angle*(abs(radius)+ Widthcar)-distance2,0.1)
         if DEBUG:
             print 'Speed: ',speed1,speed2
         ## Wat volgt is misschien nuttig

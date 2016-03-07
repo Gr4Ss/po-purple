@@ -6,7 +6,8 @@ import json
 class JsonBase:
     def __init__(self):
         self.__teams = dict()
-        self.__map = {"vertices": [[1, {"origin": 3, "straight": 2}],[2, {"origin": 1, "straight": 3}],[3, {"origin": 2, "straight": 1, "left": 4}],[4, {"origin": 3, "straight": 1, "left": 2}]],"edges": [[1, 2, 0.3],[1, 3, 0.5],[3, 1, 0.5],[2, 3, 0.1],[3, 2, 0.1],[3, 4, 0.7],[4, 2, 0.3],[4, 1, 0.8]]}
+        self.__map = {"vertices": [[1, {"origin": 3, "straight": 2}],[2, {"origin": 1, "straight": 3}],[3, {"origin": 2, "straight": 1, "left": 4}],
+        [4, {"origin": 3, "straight": 1, "left": 2}]],"edges": [[1, 2, 0.3],[1, 3, 0.5],[3, 1, 0.5],[2, 3, 0.1],[3, 2, 0.1],[3, 4, 0.7],[4, 2, 0.3],[4, 1, 0.8]]}
         self.__parcels = {"available-parcels": [[142, 1, 2],[145, 2, 3],[147, 2, 1]],"on-the-road-parcels": [],"delivered-parcels": []}
         self.__positions = {"positions":[]}
         self.__secret_key = 'SecretKey'
@@ -73,7 +74,6 @@ class JsonBase:
             return False
     def claimmer(self,parcel_nb,team,key):
         ## TODO CHECK if the team has already a parcel
-        print isinstance(parcel_nb,int)
         if not self.check_key(team,key):
             return False
         available = self.__parcels["available-parcels"]
@@ -102,7 +102,6 @@ class JsonBase:
         if not self.check_key(team,key):
             return False
         positions = self.__positions["positions"]
-        print positions
         for i in range(len(positions)):
             if positions[i][0] == team:
                 del positions[i]

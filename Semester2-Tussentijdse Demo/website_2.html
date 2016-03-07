@@ -13,7 +13,7 @@
     <link rel="stylesheet" href="static/bootstrap.min.css">
     <link rel="stylesheet" href="static/bootstrap-theme.min.css" >
     <script src="/static/angular_controller.js"></script>
-    <script src="/static/keypress.js"></script>
+    <!--<script src="/static/keypress.js"></script> -->
     <link rel="stylesheet" href="/static/cssv2.css">
     <!--
     <script src="chart.js"></script>
@@ -21,10 +21,17 @@
     <script src="js/raspimjpeg.js"></script>
 
   -->
+  <script>window.addEventListener("keydown", function(e) {
+  // space and arrow keys
+  if([32, 37, 38, 39, 40].indexOf(e.keyCode) > -1) {
+              e.preventDefault();
+            }
+          }, false);
+  </script>
 </head>
 
 <body  data-spy="scroll" data-target=".navbar" data-offset="50" onload="setTimeout('init();', 100);" >
-  <div ng-app='purpleApp' ng-controller='purpleController'>
+  <div ng-app='purpleApp' ng-controller='purpleController' ng-keydown = "keyDown($event)" ng-keyup ="keyUp($event)">
     <nav class="navbar navbar-inverse navbar-fixed-top">
       <div class="container">
         <div class="navbar-header">

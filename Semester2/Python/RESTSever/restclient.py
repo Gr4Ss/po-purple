@@ -6,7 +6,7 @@ def generate_secret_key(length):
     for i in range(length):
         rand = random.randint(97,122)
         charac = chr(rand)
-        result.append(charac)
+        result += charac
     return result
 
 class RestClient(object):
@@ -25,30 +25,35 @@ class RestClient(object):
             return False
     def get_map(self):
         resp = requests.get(self.__root + "/map")
-        return json.loads(resp)
+        return resp.json()
     def get_parcels(self):
         resp = requests.get(self.__root + "/parcels")
-        return json.loads(resp)
+
+        return resp.json()
     def claim_parcel(self, parcel_nb):
+        if not isinstance(parcel_nb,int):
+            raise Exception('Parcel number must be int')
         if self.__registed:
-            resp = requests.put(self.__root + "/robots/"+self.__name+"/claim/" + str(parcel_nb),data={"key":self.__key})
+            resp = requests.put(self.__root + "/robots/"+self.__name+"/claim/" + str(parcel_nb),data={"key":self.__secret_key})
             return resp.text == 'OK'
         else:
             raise Error('Please add your team first.')
     def deliver_parcel(self, parcel_nb):
+        if not isinstance(parcel_nb,int):
+            raise Exception('Parcel number must be int')
         if self.__registed:
-            resp = requests.put(self.__root + "/robots/"+self.__name+"/delivered/" + str(parcel_nb),data={"key":self.__key})
+            resp = requests.put(self.__root + "/robots/"+self.__name+"/delivered/" + str(parcel_nb),data={"key":self.__secret_key})
             return resp.text == 'OK'
         else:
             raise Error('Please add your team first.')
     def update_position(self, from_node,to_node):
         if self.__registed:
-            resp = requests.put(self.__root + "/positions/"+self.__name+"/"+ str(from_node)"/"+str(to_node),data={"key":self.__key})
+            resp = requests.put(self.__root + "/positions/"+self.__name+"/"+ str(from_node)+"/"+str(to_node),data={"key":self.__secret_key})
             return resp.text == 'OK'
         else:
             raise Error('Please add your team first.')
-    def get_postions(self):
-	    resp = requests.get(self.__root + "/positions")
-        return json.loads(resp)
+    def get_positions(self):
+		resp = requests.get(self.__root + "/positions")
+		return resp.json()
     def get_teamname(self):
 	    return self.__name
