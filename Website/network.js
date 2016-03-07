@@ -54,7 +54,7 @@
 	]
 }**/
 
-
+/*Dataset for the demo*/
 var Dataset = {
 	"vertices": [
 		[1, {"origin": 1, "straight": 2}],
@@ -100,6 +100,8 @@ var Dataset = {
 		[11, 3, 0.3],
 	]
 }
+
+/** Checks whether there are two-way streets **/
 function checkDependencies(edgeset) {
 	console.log(edgeset);
 	for (i=0; i<edgeset.length; i++) {
@@ -109,25 +111,25 @@ function checkDependencies(edgeset) {
 	}
 };
 
-console.log(Dataset["vertices"]);
-
+/* Variable for the nodes of the dataset */
 var visSetNodes = new vis.DataSet();
 
+/* Variable for the edges of the dataset */
 var visSetEdges = new vis.DataSet();
 
-
+/* Converts the dataset from the given assignment, to a dataset usable in the JavaScript Library Vis.js */
 function convertDataSet() {
+	/* First add the nodes */
 	for (i in Dataset["vertices"]) {
 		var localset = new Set();
 		localset = {id: Dataset["vertices"][i][0], label: Dataset["vertices"][i][0]};
 		visSetNodes.add(localset);
 	}
+	/* Then add the edges */
 	for (i in Dataset["edges"]) {
 		var localset = new Set();
 		localset = {from: Dataset["edges"][i][0], to: Dataset["edges"][i][1], label: Dataset["edges"][i][2], length: 600*(Dataset["edges"][i][2])*(Dataset["edges"][i][2]), id: (7*Dataset["edges"][i][0] +11*Dataset["edges"][i][1])};
 		if (visSetEdges.get({filter: function (item) {return (item.from == localset.to && item.to ==localset.from);}}).length != 0) {
-			console.log('from: ', localset.from, ', to: ', localset.to);
-			console.log(localset.to);
 			visSetEdges.update({id: 7*localset.to+11*localset.from, arrows: { from: {enabled: true, scaleFactor: 1}}});
 			visSetEdges.remove({from: localset.to, to: localset.from, label: localset.label, length: localset.length, arrows: { from: {enabled: true, scaleFactor: 1}}});
 		} else {
@@ -136,13 +138,16 @@ function convertDataSet() {
 	}
 };
 
+/* Get the HTML-container */
 var container = document.getElementById('mynetwork');
 
+/* Requirement for Vis.js*/
 var data = {
 	nodes: visSetNodes,
 	edges: visSetEdges
 };
 
+/* Set the options for the canvas and the physics simulation */
 var options = {
 	edges:{
 		smooth: {
@@ -184,40 +189,45 @@ var options = {
 	}
 };
 
+/* Change a node's color to the given color */
 function changeNodeColor(nodeid, newColor) {
     data.nodes.update([{id: nodeid, color:{background:newColor}}]);
 };
 
+/* Change an edge color to the given color */
 function changeEdgeColor(fromid, toid, newColor) {
 	data.edges.update([{id: (7*fromid + 11*toid), color:{color:newColor}}]);
 };
 
-var network = new vis.Network(container, data, options);
-
-convertDataSet();
-
-setTimeout(network.fit(), 1000);
-
+/* Adds the team name to a give node */
 function addTeamNameNode(teamname, nodeId) {
 	data.nodes.update([{id: nodeId, label: nodeId + " (" + (teamname) + ")"}]);
 };
-
+ /* Adds the team name to a given edge*/
 function addTeamNameEdge(teamname, fromNode, toNode, labelDist) {
 	data.edges.update([{id: (7*fromNode + 11*toNode), label: labelDist + " (" + (teamname) + ")"}]);
 };
-
+ /* Deletes the team name from a given node */
 function deleteTeamNameNode(nodeId) {
 	data.nodes.update([{id: nodeId, label: nodeId}])
 };
-
-function addTeamNameEdge(teamname, fromNode, toNode, labelDist) {
+ /* Deletes the team  name from a given edge */
+function removeTeamNameEdge(teamname, fromNode, toNode, labelDist) {
 	data.edges.update([{id: (7*fromNode + 11*toNode), label: labelDist}])
 };
 
+/* Change the position of a team */
 function changePositionTeam(prevPosition, newPosition, teamName) {
 	pass;
 };
 
+/* Converts the dataset to a new one usable in vis */
+convertDataSet();
+
+/* Setup a new network */
+var network = new vis.Network(container, data, options);
+
+/* */
 function showRouteTeam(teamname, nodeList, edgeList) {
 	var newColor = '#3399ff';
 	switch(teamname) {
@@ -249,9 +259,8 @@ var carPos = 1;
 var prevIterator = 1;
 var iterator = 1;
 
-setInterval(function() {
-	network.fit()
-}, 10);
+/* Dynamically lets the network fit to the canvas */
+setInterval(function() {network.fit()}, 10);
 
 network.on("stabilizationProgress", function(params) {
 	console.log("progress: ", params);
@@ -273,7 +282,7 @@ network.on("stabilized", function(params) {
 	console.log("stabilized", params);
 });
 
-
+/**
 setInterval(function(){ 
 	prevPos = carPos;
 	randVar = Math.random();
@@ -291,7 +300,7 @@ setInterval(function(){
 	console.log(carPos);
 	changeNodeColor(carPos, '#ab78ab');
 	changeNodeColor(prevPos, '#3399ff');
-}, 3000);
+}, 3000);**/
 
 /**	
 setInterval(function() {
