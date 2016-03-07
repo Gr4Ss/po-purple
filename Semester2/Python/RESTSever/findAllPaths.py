@@ -6,15 +6,15 @@ def find_all_paths(edges, vertices, current):
     visited = {}
     currentDistance = 0
     unvisited[current] = currentDistance
-    while True:
+    while True:        
         for x in range(len(edges) - 1, -1, -1):
-	    if edges[x][0] == current:
+            if edges[x][0] == current:
                 neighbour = edges[x][1]
                 distance = edges[x][2]
-	        if neighbour not in unvisited: continue
-	        newDistance = currentDistance + distance
-	        if unvisited[neighbour] is None or unvisited[neighbour] > newDistance:
-	            unvisited[neighbour] = newDistance
+                if neighbour not in unvisited: continue
+                newDistance = currentDistance + distance
+                if unvisited[neighbour] is None or unvisited[neighbour] > newDistance:
+                    unvisited[neighbour] = newDistance
         visited[current] = currentDistance
         del unvisited[current]
         if not unvisited: break
@@ -26,7 +26,7 @@ map = {"vertices": [[1, {"origin": 3, "straight": 2, "left": 4}],[2, {"origin": 
 
 def get_edges():
         return map.get('edges')
-	
+    
 def get_vertices():
         return map.get('vertices')
 

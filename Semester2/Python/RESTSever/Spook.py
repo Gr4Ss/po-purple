@@ -2,6 +2,7 @@ from restclient import *
 from time import sleep
 import random
 from pathFinding import *
+from parcelSelection import *
 #root = serveradres
 
 def generate_vehicle(teamname, speed):
@@ -46,13 +47,9 @@ class Vehicle(RestClient):
         for x in parcels.get('on-the-road-parcels'):
             if x[3] == self.get_teamname():
 	        return x
-	for x in parcels.get('available-parcels'):
-	    if x[2] == position[1]:
-	        self.claim_parcel(x[0])
-	        return x
-	target = (parcels.get('available-parcels'))[-1]
-	self.claim_parcel(target[0])
-	return target
+	parcel = select_parcel(self.get_edges(), self.get_vertices(), position, parcels.get('available-parcels'))
+	self.claim_parcel(parcel)
+	return parcel
     
     def get_edge_length(self, edge):
 	edges = self.get_edges
