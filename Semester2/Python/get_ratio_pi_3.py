@@ -121,19 +121,26 @@ def choose_path(ratio_queue, layout_queue, direction_list, args, layout, x_wheel
     return_ratio = (weight_of_guess) * ratio_guess + (1.0 - weight_of_guess) * ratio_new
     ratio_queue = add_to_queue(ratio_queue, return_ratio)
     new_ratio_queue, new_layout_queue, new_direction_list = update_direction_list_and_queues(ratio_queue, layout_queue, direction_list)
-    return return_ratio, new_layout_queue, new_ratio_queue, new_direction_list
+    return inverse_ratio(return_ratio), new_layout_queue, new_ratio_queue, new_direction_list
 
    
 def to_ratio(point, x_wheel_left, y_wheel_left, x_wheel_right, y_wheel_right):
     left_distance = sqrt((point[0] - x_wheel_left)**2 + (point[1] - y_wheel_left)**2)
     right_distance= sqrt((point[0] - x_wheel_right)**2 + (point[1] - y_wheel_right)**2)
     ratio = right_distance/left_distance
+
     if ratio > 1:
         ratio = (-1)*(1.0 - 1.0/ratio)
     else:
-        ratio = 1.0 - ratio
+        ratio = (1.0 - ratio)
     return ratio
 
+def inverse_ratio(ratio):
+    if ratio < 0:
+        return 1.0-ratio
+    else:
+        return (1.0/(ratio))-1.0
+    
 def guess_ratio(queue):
     if queue == []:
         return 1.0
