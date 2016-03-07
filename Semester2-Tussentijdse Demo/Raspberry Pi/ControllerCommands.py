@@ -1,6 +1,7 @@
 import time
 import PID
 import Engine
+from utility import *
 Leftengine = None
 Rightengine = None
 Perimeter = None
@@ -36,22 +37,30 @@ def manual_straight(direction):
         global_speed = min(global_speed+5,255)
         distance1 = Leftengine.get_count()*Perimeter*Gearratio
         distance2 = Rightengine.get_count()*Perimeter*Gearratio
-        speeddif = pid.new_value(abs(distance1)-abs(distance2),0.1)
+        speed_diff = pid.new_value(abs(distance1)-abs(distance2),0.1)
         if speed_diff < 0:
             Leftengine.set_speed(direction*global_speed)
             Rightengine.set_speed(direction*(global_speed + speeddif))
         else:
-            leftengine.set_speed(direction*(global_speed-speeddif))
-            rightengine.set_speed(direction*global_speed)
+            Leftengine.set_speed(direction*(global_speed-speeddif))
+            Rightengine.set_speed(direction*global_speed)
         time.sleep(0.05)
-    leftengine.set_speed(0)
-    rightengine.set_speed(0)
+    Leftengine.set_speed(0)
+    Rightengine.set_speed(0)
 def forward():
     manual_straight(1)
 def backward():
     manual_straight(-1)
 def forward_bend(leftengine,rightengine,perimeter,gearratio,going,direction):
     ##TODO
+    pass
+def forward_left():
+    pass
+def forward_right():
+    pass
+def backward_left():
+    pass
+def backward_right():
     pass
 # if direction = 1 : left
 # if direction = -1 : right
@@ -63,6 +72,7 @@ def manual_rotate(direction):
         global_speed = min(global_speed+5,255)
         Rightengine.set_speed(direction*global_speed)
         Leftengine.set_speed(-direction*global_speed)
+        time.sleep(0.05)
     Rightengine.set_speed(0)
     Leftengine.set_speed(0)
 def left():

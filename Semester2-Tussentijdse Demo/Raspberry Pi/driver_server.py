@@ -1,26 +1,30 @@
-import zmq
+#import zmq
+import sockets_server
 import Locker
 import constraints as c
 import cPickle
-import commands
+from commands import *
 
 # The port to which this server will listen
-PORT = '5060'
+#PORT = '5060'
 # Setting up 0mq to work as socket server
-context = zmq.Context()
-socket = context.socket(zmq.REP)
-socket.bind("tcp://0.0.0.0:%s" % PORT)
+#context = zmq.Context()
+#socket = context.socket(zmq.REP)
+#socket.bind("tcp://0.0.0.0:%s" % PORT)
+socket = sockets_server.CustomSocketServer(5064)
 
 
 lock = Locker.Lock(300)
 # In testing mode no drive commands are executed
 TESTING_MODE = True
-#import Controller
-#from Manual_Drive import *
+import Controller
+import ControllerCommands
+from ManualDrive import *
 # create controller entity
-#controller = Controller.Controller()
-
-#manualDrive = ManualDrive(controller.start_command,controller.forward,controller.backward,controller.left,controller.right,controller.stop)
+controller = Controller.Controller()
+manualDrive = ManualDrive(controller.start_command,ControllerCommands.forward,
+ControllerCommands.backward,ControllerCommands.left,ControllerCommands.right,ControllerCommands.stop,
+ControllerCommands.stop,ControllerCommands.stop,ControllerCommands.stop,ControllerCommands.stop)
 
 
 
@@ -34,15 +38,15 @@ commands = {
 'SQUARE':{'nb_of_arguments':1,'constraint':c.constraint_square},
 'SUPERLOCK':{'nb_of_arguments':1,'function':func_superlock},
 'SUPERUNLOCK':{'nb_of_arguments':1,'function':func_superunlock},
-#'FStart':{'nb_of_arguments':0,'function':func_add_direction,'optional_arguments':[manualDrive,'forward']},
-#'FStop':{'nb_of_arguments':0,'function':func_delete_direction,'optional_arguments':[manualDrive,'forward']},
-#'RStart':{'nb_of_arguments':0,'function':func_add_direction,'optional_arguments':[manualDrive,'right']},
-#'RStop':{'nb_of_arguments':0,'function':func_delete_direction,'optional_arguments':[manualDrive,'right']},
-#'LStart':{'nb_of_arguments':0,'function':func_add_direction,'optional_arguments':[manualDrive,'left']},
-#'LStop':{'nb_of_arguments':0,'function':func_delete_direction,'optional_arguments':[manualDrive,'left']},
-#'BStart':{'nb_of_arguments':0,'function':func_add_direction,'optional_arguments':[manualDrive,'backward']},
-#'BStop':{'nb_of_arguments':0,'function':func_delete_direction,'optional_arguments':[manualDrive,'backward']},
-#'STOP':{'nb_of_arguments':0,'function':func_stop,'optional_arguments':[manualDrive]},
+'FStart':{'nb_of_arguments':0,'function':func_add_direction,'optional_arguments':[manualDrive,'forward']},
+'FStop':{'nb_of_arguments':0,'function':func_delete_direction,'optional_arguments':[manualDrive,'forward']},
+'RStart':{'nb_of_arguments':0,'function':func_add_direction,'optional_arguments':[manualDrive,'right']},
+'RStop':{'nb_of_arguments':0,'function':func_delete_direction,'optional_arguments':[manualDrive,'right']},
+'LStart':{'nb_of_arguments':0,'function':func_add_direction,'optional_arguments':[manualDrive,'left']},
+'LStop':{'nb_of_arguments':0,'function':func_delete_direction,'optional_arguments':[manualDrive,'left']},
+'BStart':{'nb_of_arguments':0,'function':func_add_direction,'optional_arguments':[manualDrive,'backward']},
+'BStop':{'nb_of_arguments':0,'function':func_delete_direction,'optional_arguments':[manualDrive,'backward']},
+'STOP':{'nb_of_arguments':0,'function':func_stop,'optional_arguments':[manualDrive]},
 'PARCOURS':{'nb_of_arguments':1,'constraint':c.constraint_parcours}}
 
 # A method to parse the message
@@ -83,22 +87,21 @@ def check_message(message):
 
 if __name__ == '__main__':
     while True:
-        message = socket.recv()
-        message = cPickle.loads(message)
+        conn,message = socket.get_data()
         lock.check_expire()
         print "Received request: ", message
         messageOK = check_message(message)
         return_message = 'SORRY'
         if (messageOK):
-            command = message['command']
-            id_ = message['ID']
+            command = str(message['command'])
+            identifier = message['ID']
             argument = message.get('arguments',[])
             opt_arguments = commands[command].get('optional_arguments',None)
             if opt_arguments != None:
                 argument = opt_arguments + argument
-            f = commands[command][function]
+            f = commands[command]['function']
             return_message = f(identifier,argument,lock)
         else:
             return_message = 'ILLEGAL_MESSAGE'
         print 'Return message: ', return_message
-        socket.send(return_message)
+        socket.send(conn,return_message)

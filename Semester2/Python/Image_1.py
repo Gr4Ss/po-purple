@@ -113,7 +113,7 @@ def fast_check_row3(row,image,start=0,end=-1):
         end = image.size[0]
     TRESHHOLD = 25
     img = image.crop((start,row-1,end,row+2))
-    npimg = np.array(img)[:,1::2]
+    npimg = np.array(img)[:,::2]
     gray = rgb2gray(npimg)
     Gx = np.abs(sig.convolve2d(gray,pieterX,'valid'))
     t = np.where(Gx[0,:]>TRESHHOLD)[0]

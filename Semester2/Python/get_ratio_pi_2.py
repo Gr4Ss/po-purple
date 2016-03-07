@@ -8,13 +8,13 @@ def merge_pairs(array):
         new_point = ( int((array[-2*i-1][0] + array[-2*i][0])/2.0), int((array[-2*i-1][1] + array[-2*i][1])/2.0) )
         return_array.append(new_point)
     return return_array
-        
+
 def get_ratio(image,
               x_wheel_left, y_wheel_left, x_wheel_right, y_wheel_right,
               last_ratio,
               column_factor, row_factor,
               correction, a):
-    
+
     intersections = convert_to_pairs(image, height, width, column_factor, row_factor)
     lengths = []
     intersection_points = []
@@ -105,5 +105,3 @@ def convert_to_pairs(image, height, width, column_factor, row_factor):
 
 def choose_path(white_lines):
     return white_lines[0]
-
-

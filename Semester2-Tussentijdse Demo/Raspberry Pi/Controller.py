@@ -1,8 +1,7 @@
 import threading
 import time
 import math
-from utility import *
-#from Engine import *
+from Engine import *
 from BrickPi_thread import *
 import ControllerCommands
 
@@ -22,6 +21,7 @@ class Controller:
         self.__gearratio = 1.
         # Storing the perimeter of the wheels (2*pi*r)
         self.__perimeter = 2*math.pi* 2.579
+        ControllerCommands.init(self.__leftengine,self.__rightengine,self.__perimeter,self.__gearratio,self.__widthcar)
         # Storing a reference to a brickpi thread
         self.__brickpi = BrickPi_Thread(self.__engines)
         self.__command_going = False
@@ -33,10 +33,10 @@ class Controller:
     # @post self.__command_going = True
     # @post self.__command_thread = new thread
     def start_command(self,command,arguments = None):
-        if Controller.Going:
+        if ControllerCommands.Going:
             self.stop_command()
         self.__brickpi.on()
-        Controller.Going = True
+        ControllerCommands.Going = True
         if arguments != None:
             thread = threading.Thread(target= command,args=arguments)
         else:
@@ -49,8 +49,8 @@ class Controller:
     # @post self.__command_going = False
     # @post self.__command_thread = None
     def stop_command(self):
-        if Controller.Going:
-            Controller.Going = False
+        if ControllerCommands.Going:
+            ControllerCommands.Going = False
             self.__command_thread.join()
             self.__brickpi.off()
             self.__command_thread = None
