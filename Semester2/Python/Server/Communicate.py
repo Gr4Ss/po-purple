@@ -28,5 +28,4 @@ class DriverCommincator:
             else:
                 return False
         except:
-            self.__socket.close()
             raise Error('Socket server don\'t respond')
