@@ -1,4 +1,4 @@
-from Spook.py import all
+from Spook import *
 import threading
 import random
 

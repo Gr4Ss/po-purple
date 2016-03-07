@@ -13,9 +13,12 @@ def get_ratio(image,
               x_wheel_left, y_wheel_left, x_wheel_right, y_wheel_right,
               last_ratio,
               column_factor, row_factor,
-              correction, a):
+              correction):
     
     intersections = convert_to_pairs(image, height, width, column_factor, row_factor)
+
+
+    
     lengths = []
     intersection_points = []
     alt = 0
@@ -23,6 +26,9 @@ def get_ratio(image,
         lengths.append(len(intersection))
     nb_of_odds = 0
     nb_of_non_zero_evens = 0
+
+    [print len(intersect) for intersect in intersections]
+
     for ln in lengths:
         if is_odd(ln):
             nb_of_odds += 1

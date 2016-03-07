@@ -127,7 +127,9 @@ def to_ratio(point, x_wheel_left, y_wheel_left, x_wheel_right, y_wheel_right):
     right_distance= sqrt((x_des - x_wheel_right)**2 + (y_des - y_wheel_right)**2)
     ratio = right_distance/left_distance
     if ratio > 1:
-        ratio = -1.0/ratio
+        ratio = (-1)*(1.0 - 1.0/ratio)
+    else:
+        ratio = 1.0 - ratio
     return ratio
 
 def guess_ratio(queue):
@@ -160,7 +162,7 @@ def update_direction_list_and_queue(queue, direction_list):
     if back_on_track == 1:
         print 'implement counting crossroads'
         print queue
-        return queue, direction_list
+        return [], direction_list
 
 def convert_to_pairs(image, height, width, column_factor, row_factor):
     left_column = int(width*column_factor)
