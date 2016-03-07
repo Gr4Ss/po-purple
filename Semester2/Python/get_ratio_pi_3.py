@@ -31,7 +31,8 @@ def get_ratio(img,
     height = image.size[1]
     width = image.size[0]
     intersections = convert_to_pairs(image, height, width, column_factor, row_factor)
-
+    print ' '
+    print img
     lengths = []
     intersection_points = []
     for intersection in intersections:
@@ -78,7 +79,7 @@ def get_ratio(img,
 
 
 def choose_path(ratio_queue, layout_queue, direction_list, args, layout, x_wheel_left, y_wheel_left, x_wheel_right, y_wheel_right, width, height):
-
+    print layout
     left_destination = (2, int(height/2))
     right_destination = (width-2, int(height/2))
     ratio_guess = guess_ratio(ratio_queue)
@@ -115,12 +116,13 @@ def choose_path(ratio_queue, layout_queue, direction_list, args, layout, x_wheel
     else:
         raise AssertionError
 
-    weight_of_guess = 0.5
+    weight_of_guess = 0.0
 
     layout_queue = add_to_queue(layout_queue, layout)
     return_ratio = (weight_of_guess) * ratio_guess + (1.0 - weight_of_guess) * ratio_new
     ratio_queue = add_to_queue(ratio_queue, return_ratio)
     new_ratio_queue, new_layout_queue, new_direction_list = update_direction_list_and_queues(ratio_queue, layout_queue, direction_list)
+    print return_ratio
     return inverse_ratio(return_ratio), new_layout_queue, new_ratio_queue, new_direction_list
 
    
@@ -171,8 +173,9 @@ def update_direction_list_and_queues(ratio_queue, layout_queue, direction_list):
         else:
             back_on_track = 0
     if back_on_track == 1:
-        average_ratio = get_average_ratio(ratio_queue)
-        boundry = 0.1
+        last_node, indices = get_last_node(layout_queue, 5)
+        average_ratio = get_average_ratio(ratio_queue, indices)
+        boundry = 0.2
         if abs(average_ratio) < boundry:
             average_direction = "straight"
         elif average_ratio > boundry:
@@ -180,7 +183,6 @@ def update_direction_list_and_queues(ratio_queue, layout_queue, direction_list):
         elif average_ratio < (-1)*boundry:
             average_direction = "right"
         if average_direction == direction_list[0]:
-            last_node = get_last_node(layout_queue, 5)
             if last_node == "No node found":
                 print "No node found"
                 return [], [], direction_list
@@ -189,14 +191,15 @@ def update_direction_list_and_queues(ratio_queue, layout_queue, direction_list):
                 return [], [], direction_list[1:]
         else:
             print 'turned incorrectly!'
+            print 'average_direction'
             return ratio_queue, layout_queue, direction_list
     return ratio_queue, layout_queue, direction_list
     
-def get_average_ratio(ratio_queue):
+def get_average_ratio(ratio_queue, indices):
     average = 0
-    for ratio in ratio_queue:
-        average += ratio
-    average = average/sum(ratio_queue)
+    for index in indices:
+        average += ratio_queue[index]
+    average = average/len(indices)
     return average
 
 def get_most_common_in_queue(layout_queue):
@@ -234,12 +237,16 @@ def get_most_common_in_queue(layout_queue):
         raise AssertionError
 
 def get_last_node(layout_queue, size):
+    
     for i in xrange(0, len(layout_queue)-size):
         curr_layout = layout_queue[i]
+        indices = []
         node_found = 1
         for k in xrange(i, i + size):
+            
             if not layout_queue[k] == curr_layout or curr_layout == "normal_straight" or curr_layout == "normal_left" or curr_layout == "normal_right":
                 node_found = 0
+                indices.append(k)
         if node_found == 1:
             return curr_layout
     return "No node found"      
