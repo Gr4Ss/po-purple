@@ -22,6 +22,8 @@ def select_parcel(edges, vertices, position, parcels):
                 if parcel[1] == distanceTo[ind][0] and (chosenParcel == None or chosenParcel[-1] > (parcel[-1] + distanceTo[ind][1])):
                     chosenParcel = parcel
                     chosenParcel[-1] = chosenParcel[-1] + distanceTo[ind][1]
+    if chosenParcel == None:
+        return False
     return chosenParcel[0:3]
 
 '''
@@ -31,7 +33,7 @@ parcels = {"available-parcels": [[142, 1, 2],[145, 2, 3],[147, 2, 1],],"on-the-r
 
 def get_edges():
         return map.get('edges')
-    
+
 def get_vertices():
         return map.get('vertices')
 

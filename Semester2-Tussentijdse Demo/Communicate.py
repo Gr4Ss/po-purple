@@ -1,6 +1,6 @@
 import sockets_client
 import zmq
-PORT = 5075
+PORT = 5064
 
 
 # A class that communicate with the drive server
