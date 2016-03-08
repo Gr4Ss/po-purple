@@ -162,6 +162,7 @@ def get_weights(queue):
 def update_direction_list_and_queues(ratio_queue, layout_queue, direction_list):
     if len(layout_queue) < 5:
         return ratio_queue, layout_queue, direction_list
+    print layout_queue
     check_list = layout_queue[:5]
     back_on_track = 1
     for elem in check_list:
@@ -170,7 +171,7 @@ def update_direction_list_and_queues(ratio_queue, layout_queue, direction_list):
         else:
             back_on_track = 0
     if back_on_track == 1:
-        last_direction, indices = get_direction(layout_queue, 5)
+        last_direction = get_direction(layout_queue, 4, ratio_queue)
         if last_direction == direction_list[0]:
             print 'turned correctly to the ' + last_direction
             print layout_queue
@@ -227,21 +228,13 @@ def get_most_common_in_queue(layout_queue):
         raise AssertionError
 
 
-def get_direction(layout_queue, size):
-    left_list = ['normal_left','T_flat','T_left','crossroads']
-    right_list = ['normal_right','T_flat','T_right','crossroads']
-    straight_list = ['normal_straight','T_left','T_right','crossroads']
-    left, left_indices = recognize_direction(layout_queue, size, left_list)
-    right, right_indices = recognize_direction(layout_queue, size, right_list)
-    straight, straight_indices = recognize_direction(layout_queue, size, straight_list)
-    if not left == "No node found":
-        return "left", left_indices
-    elif not right == "No node found":
-        return "right", right_indices
-    elif not straight == "No node found":
-        return "straight", straight_indices
+def get_direction(layout_queue, size, ratio_queue):
+    direction_list = ['normal_left','normal_right','normal_straight','T_flat','T_left','crossroads']
+    direction = recognize_direction(layout_queue, size, direction_list, ratio_queue)
+    if not direction == "No node found":
+        return direction
     else:
-        return "No node found", []
+        return "No node found"
         
     
 def recognize_direction(layout_queue, size, direction_list, ratio_queue):
@@ -251,20 +244,15 @@ def recognize_direction(layout_queue, size, direction_list, ratio_queue):
         nb = 0
         nb_special = 0
         for k in xrange(i, i + size):            
-            if layout_queue[k] in direction_list:
-                nb += 1
-
-        for k in xrange(i, i + size):
-            if not layout_queue[k] in direction_list[1:]:
+            if layout_queue[k] in direction_list[2:]:
                 nb_special += 1
-                indices.append(k)
+                indices.append(k)        
         if nb > size - 1:
             for index in indices:
                 total_ratio = 0
                 for index in indices:
                     total_ratio += ratio_queue[index]
                 total_ratio = total_ratio / len(indices)
-                print total_ratio
                 boundry = 0.2
                 if abs(total_ratio) < boundry:
                     return 'straight'
@@ -272,7 +260,7 @@ def recognize_direction(layout_queue, size, direction_list, ratio_queue):
                     return 'right'
                 else:
                     return 'left'
-    return "No node found", []     
+    return "No node found"     
                 
         
 def get_points(left, right, bottom, top):
