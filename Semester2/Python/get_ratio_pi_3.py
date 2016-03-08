@@ -39,6 +39,7 @@ def get_ratio(img,
     top = intersections[1]
     right = intersections[2]
     bottom = intersections[3]
+    
     left, top, right = get_points(left, right, bottom, top)
     points = left + top + right
     if len(left) == 0 and len(right) == 0 and len(top) == 0:
@@ -119,7 +120,7 @@ def choose_path(ratio_queue, layout_queue, direction_list, args, layout, x_wheel
     return_ratio = (weight_of_guess) * ratio_guess + (1.0 - weight_of_guess) * ratio_new
     ratio_queue = add_to_queue(ratio_queue, return_ratio)
     new_ratio_queue, new_layout_queue, new_direction_list = update_direction_list_and_queues(ratio_queue, layout_queue, direction_list)
-    return inverse_ratio(return_ratio), new_layout_queue, new_ratio_queue, new_direction_list
+    return return_ratio, new_layout_queue, new_ratio_queue, new_direction_list
 
    
 def to_ratio(point, x_wheel_left, y_wheel_left, x_wheel_right, y_wheel_right):
@@ -243,7 +244,7 @@ def get_direction(layout_queue, size):
         return "No node found", []
         
     
-def recognize_direction(layout_queue, size, direction_list):
+def recognize_direction(layout_queue, size, direction_list, ratio_queue):
     for i in xrange(0, len(layout_queue)-size):
         curr_layout = layout_queue[i]
         indices = []
@@ -252,12 +253,25 @@ def recognize_direction(layout_queue, size, direction_list):
         for k in xrange(i, i + size):            
             if layout_queue[k] in direction_list:
                 nb += 1
-                indices.append(k)
+
         for k in xrange(i, i + size):
             if not layout_queue[k] in direction_list[1:]:
                 nb_special += 1
-        if (nb > size - 1) and (nb_special > 1):
-            return curr_layout, indices
+                indices.append(k)
+        if nb > size - 1:
+            for index in indices:
+                total_ratio = 0
+                for index in indices:
+                    total_ratio += ratio_queue[index]
+                total_ratio = total_ratio / len(indices)
+                print total_ratio
+                boundry = 0.2
+                if abs(total_ratio) < boundry:
+                    return 'straight'
+                elif total_ratio > boundry:
+                    return 'right'
+                else:
+                    return 'left'
     return "No node found", []     
                 
         
@@ -265,6 +279,7 @@ def get_points(left, right, bottom, top):
     if len(bottom) == 2:
         return left, top, right
     else:
+        max_index = -1
         if len(bottom) == 1:
             others = left + top + right
             if len(others) == 0:
@@ -276,6 +291,8 @@ def get_points(left, right, bottom, top):
             for other in others:
                 if other[1] == maxi:
                     max_index = others.index(other)
+            if max_index  == -1:
+                return left, top, right
             return pop_from(left, top, right, max_index)
         elif len(bottom) == 0:            
             others = left + top + right
@@ -288,6 +305,8 @@ def get_points(left, right, bottom, top):
             for other in others:
                 if other[1] == maxi:
                     max_index = others.index(other)
+            if max_index == -1:
+                return left, top, right
             others.pop(max_index)
             maxi = 0
             for other in others:
@@ -296,6 +315,8 @@ def get_points(left, right, bottom, top):
             for other in others:
                 if other[1] == maxi:
                     max_index = others.index(other)
+            if max_index == -1:
+                return left, top , right
             others.pop(max_index)
             return pop_from(left, top, right, max_index)
         else:
