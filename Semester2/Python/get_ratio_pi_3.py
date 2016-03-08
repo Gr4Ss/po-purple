@@ -162,7 +162,6 @@ def get_weights(queue):
 def update_direction_list_and_queues(ratio_queue, layout_queue, direction_list):
     if len(layout_queue) < 5:
         return ratio_queue, layout_queue, direction_list
-    print layout_queue
     check_list = layout_queue[:5]
     back_on_track = 1
     for elem in check_list:
