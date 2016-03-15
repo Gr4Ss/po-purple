@@ -162,6 +162,7 @@ def get_weights(queue):
 def update_direction_list_and_queues(ratio_queue, layout_queue, direction_list):
     if len(layout_queue) < 5:
         return ratio_queue, layout_queue, direction_list
+    print layout_queue
     check_list = layout_queue[:5]
     back_on_track = 1
     for elem in check_list:
@@ -170,7 +171,7 @@ def update_direction_list_and_queues(ratio_queue, layout_queue, direction_list):
         else:
             back_on_track = 0
     if back_on_track == 1:
-        last_direction = get_direction(layout_queue, 4, ratio_queue)
+        last_direction = get_direction(layout_queue, 5, ratio_queue)
         if last_direction == direction_list[0]:
             print 'turned correctly to the ' + last_direction
             print layout_queue
@@ -228,12 +229,10 @@ def get_most_common_in_queue(layout_queue):
 
 
 def get_direction(layout_queue, size, ratio_queue):
-    direction_list = ['normal_left','normal_right','normal_straight','T_flat','T_left','crossroads']
-    direction = recognize_direction(layout_queue, size, direction_list, ratio_queue)
-    if not direction == "No node found":
-        return direction
-    else:
-        return "No node found"
+    direction_list = ['normal_straight','normal_right','normal_left','T_flat','T_left','T_right','crossroads']
+    direction = recognize_direction2(layout_queue, size, direction_list, ratio_queue)
+    return direction
+
         
     
 def recognize_direction(layout_queue, size, direction_list, ratio_queue):
@@ -261,7 +260,38 @@ def recognize_direction(layout_queue, size, direction_list, ratio_queue):
                     return 'left'
     return "No node found"     
                 
-        
+def recognize_direction2(layout_queue, size, direction_list, ratio_queue):
+    start_special = -1
+    end_special = -1
+    for i in xrange(0, len(layout_queue)):    
+        if is_special(layout_queue[i]) and start_special == -1:
+            start_special = i
+        if (not is_special(layout_queue[i]) or i == len(layout_queue)-1) and not start_special == -1:
+            end_special = i
+        if not end_special == -1 and not start_special == -1:
+            if abs(end_special-start_special)<4:
+                start_special = -1
+                end_special = -1
+            else:
+                total_ratio = 0
+                nb = 0
+                for j in xrange(start_special, end_special):
+                    total_ratio += ratio_queue[j]
+                    nb += 1
+                total_ratio = total_ratio /nb
+                print total_ratio
+                boundry = 0.2
+                if abs(total_ratio) < boundry:
+                    return 'straight'
+                elif total_ratio > boundry:
+                    return 'right'
+                else:
+                    return 'left'                            
+    return "No node found"
+
+def is_special(layout):
+    return (layout in ['T_flat','T_left','T_right','crossroads'])
+
 def get_points(left, right, bottom, top):
     if len(bottom) == 2:
         return left, top, right

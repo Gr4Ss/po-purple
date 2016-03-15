@@ -102,8 +102,8 @@ class JsonBase:
         if not self.check_key(team,key):
             return False
         positions = self.__positions["positions"]
-        for i in range(len(positions)):
-            if positions[i][0] == team:
+        for i in range(len(positions)-1,-1,-1):
+            if str(positions[i][0]) == team:
                 del positions[i]
 
         self.__positions["positions"].append([team,from_node,end_node ])

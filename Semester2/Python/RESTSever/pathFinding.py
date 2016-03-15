@@ -12,6 +12,7 @@ def find_path(vertices, edges, current, target):
     while True:
         if current == target:
             path = [target]
+            print 'short, ', shortestPath , ', target: ', target
             node = shortestPath[target]
             while True:
                 path.insert(0, node)

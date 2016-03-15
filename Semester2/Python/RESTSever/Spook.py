@@ -3,6 +3,7 @@ import time
 import random
 from pathFinding import *
 from parcelSelection import *
+from findAllPaths import *
 root = 'http://localhost:9000'
 
 def generate_vehicle(teamname, speed):
@@ -37,6 +38,7 @@ class Vehicle(RestClient):
 
     def get_position(self):
         positions = (self.get_positions()).get('positions')
+        print (self.get_teamname(), positions)
         for x in positions:
     	    if x[0] == self.get_teamname():
     	        return [x[1],x[2]]
@@ -102,13 +104,14 @@ class Vehicle(RestClient):
     	position = self.get_position()
     	edges = self.get_edges()
     	for x in positions:
-    	    if x[0] != self.get_teamname():
+    	    if x[0] != self.get_teamname() and x[1] != x[2]:
                 if x[2] == position[0]:
                     edge = [x[2], x[1], self.get_edge_length([x[2], x[1]])]
-                if edges.count(edge) != 0:
+                    if edges.count(edge) != 0:
                         edges.remove(edge)
     		if x[1] == position[0]:
-    		    i = edges.index([x[1], x[2], self.get_edge_length([x[2], x[1]])])
+                    print edges
+    		    i = edges.index([x[1], x[2], self.get_edge_length([x[1], x[2]])])
     		    edge = edges.pop(i)
     		    edge[2] = edge[2]*2
     		    edges.insert(i, edge)
@@ -134,6 +137,7 @@ class Vehicle(RestClient):
                 elif not self.get_parcel_status():
                     self.inv_parcel_status()
                 continue
+            print ('pathfinding, ', position[1], target)
             path = find_path(self.get_vertices(), self.update_edges_traffic(), position[1], target)
             self.pushposition([path[0],path[1]])
 '''

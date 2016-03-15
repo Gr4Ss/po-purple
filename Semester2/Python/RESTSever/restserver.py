@@ -114,11 +114,13 @@ def set_position(team,from_node,to_node):
             ok = JBase.update_position(from_node,to_node,team,value)
             return  'OK' if ok else 'SORRY'
     except:
+        print 'Exception happened'
         return 'SORRY'
 # A method that returns the positions of the team at this moment
 @app.get('/positions')
 def get_positions():
     try:
+        print JBase.get_positions()
         return JBase.get_positions()
     except:
         return 'SORRY'
