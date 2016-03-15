@@ -7,8 +7,7 @@ pieterX = 1/18.*np.array([[-3,-6,0,6,3],[-6,-12,0,12,6],[-3,-6,0,6,3]])
 pieterY = 1/18.*np.array([[-3,-6,-3],[-6,-12,-6],[0,0,0],[6,12,6],[3,6,3]])
 
 def load_image():
-    #"http://10.42.0.23/cam.jpg"
-    urllib.urlretrieve('http://www.leuven.be/binaries/Stadhuis-CoprightLaylaAerts_tcm16-24398.jpg',"/run/shm/cam.jpg")
+    urllib.urlretrieve("http://10.42.0.23/cam.jpg","/run/shm/cam.jpg")
     img = Image.open("/run/shm/cam.jpg")
     return img
 

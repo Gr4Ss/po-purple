@@ -29,7 +29,7 @@ class raspiSocket:
                 sys.exit()
     def receive(self,conn,addr):
         try:
-            data = conn.recv(100)
+            data = conn.recv(512)
             self.__values = pickle.loads(data)
             self.__new_data = True
             if data == 'END':
