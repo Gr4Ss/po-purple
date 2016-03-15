@@ -55,7 +55,7 @@
 }**/
 
 /*Dataset for the demo*/
-var Dataset = {
+/*var Dataset = {
 	"vertices": [
 		[1, {"origin": 1, "straight": 2}],
 		[2, {"origin": 1, "straight": 3}],
@@ -99,7 +99,53 @@ var Dataset = {
 		[9, 14, 0.2],
 		[11, 3, 0.3],
 	]
+}*/
+
+var Dataset = {
+	"vertices": [
+		[0, {"origin": 1, "left": 2, "right": 5}],
+		[1, {"origin": 0, "straight": 2, "left": 4}],
+		[2, {"origin": 0, "left": 1, "right": 3}],
+		[3, {"origin": 2, "left": 4, "right": 7, "straight": 8}],
+		[4, {"origin": 1, "right": 3, "left": 5, "straight": 8}],
+		[5, {"origin": 0, "right": 4, "left": 6}],
+		[6, {"origin": 5, "straight": 7, "right": 8}],
+		[7, {"origin": 3, "right": 6, "straight": 8}],
+		[8, {"origin": 3, "left": 4, "straight": 6, "right": 7}]
+	],
+	"edges": [
+		[0, 1, 1.0],
+		[0, 2, 4.0],
+		[1, 0, 1.0],
+		[1, 2, 2.0],
+		[1, 4, 4.0],
+		[2, 0, 4.0],
+		[2, 1, 2.0],
+		[2, 3, 5.0],
+		[3, 2, 5.0],
+		[3, 4, 2.0],
+		[3, 7, 4.0],
+		[3, 8, 1.5],
+		[4, 1, 4.0],
+		[4, 5, 2.0],
+		[4, 8, 1.5],
+		[5, 0, 5.0],
+		[5, 4, 2.0],
+		[5, 6, 4.0],
+		[6, 5, 4.0],
+		[6, 7, 4.0],
+		[6, 8, 1.5],
+		[7, 3, 4.0],
+		[7, 6, 4.0],
+		[7, 8, 1.5],
+		[8, 3, 1.5],
+		[8, 4, 1.5],
+		[8, 6, 1.5],
+		[8, 7, 1.5]
+	]
 }
+
+console.log(Dataset["vertices"][0]);
 
 /** Checks whether there are two-way streets **/
 function checkDependencies(edgeset) {
@@ -121,6 +167,7 @@ var visSetEdges = new vis.DataSet();
 function convertDataSet() {
 	/* First add the nodes */
 	for (i in Dataset["vertices"]) {
+		console.log(i)
 		var localset = new Set();
 		localset = {id: Dataset["vertices"][i][0], label: Dataset["vertices"][i][0]};
 		visSetNodes.add(localset);
@@ -128,7 +175,7 @@ function convertDataSet() {
 	/* Then add the edges */
 	for (i in Dataset["edges"]) {
 		var localset = new Set();
-		localset = {from: Dataset["edges"][i][0], to: Dataset["edges"][i][1], label: Dataset["edges"][i][2], length: 600*(Dataset["edges"][i][2])*(Dataset["edges"][i][2]), id: (7*Dataset["edges"][i][0] +11*Dataset["edges"][i][1])};
+		localset = {from: Dataset["edges"][i][0], to: Dataset["edges"][i][1], label: Dataset["edges"][i][2], length: (Dataset["edges"][i][2])*(Dataset["edges"][i][2]), id: (7*Dataset["edges"][i][0] +11*Dataset["edges"][i][1])};
 		if (visSetEdges.get({filter: function (item) {return (item.from == localset.to && item.to ==localset.from);}}).length != 0) {
 			visSetEdges.update({id: 7*localset.to+11*localset.from, arrows: { from: {enabled: true, scaleFactor: 1}}});
 			visSetEdges.remove({from: localset.to, to: localset.from, label: localset.label, length: localset.length, arrows: { from: {enabled: true, scaleFactor: 1}}});
@@ -185,7 +232,7 @@ var options = {
 		}
 	},
 	layout: {
-		randomSeed: 370342
+		randomSeed: 395813
 	}
 };
 
