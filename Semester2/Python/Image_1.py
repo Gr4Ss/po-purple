@@ -79,21 +79,23 @@ def fast_check_column2(column,image,start=0,end=-1):
     # Hold only the biggest one
     return [(column,t[i]+start) for i in xrange(t.shape[0]) if not check_neighbours_y(Gy,t,i)]
 def fast_check_column3(column,image,start=0,end=-1):
+    t1 = time.time()
     if end == -1:
         end = image.size[1]
     img = image.crop((column-1,start,column+2,end))
-    npimg = np.array(img,order='F')[::2]
+    npimg = np.array(img,order='F')
 
     TRESHHOLD = 25.0
     gray = rgb2gray(npimg)
     # Convoluting the column + columns to the left and the right  with the sobel mask
-    Gy = np.abs(sig.convolve2d(gray,pieterY,'valid'))
+    Gy = np.abs(sig.convolve2d(gray,pieterYF,'valid'))
     # Check where in the colom the gradient is bigger than the threshhold
     # + The +1 comes from here !!!!
     t = np.where(Gy[:,0]>TRESHHOLD)[0]
     # Thinning the convolution creates 4/5 point for each shift
     # Hold only the biggest one
-    return [(column,(t[i]+start)*2) for i in xrange(t.shape[0]) if not check_neighbours_y(Gy,t,i)]
+    print time.time() - t1
+    return [(column,(t[i]+start)) for i in xrange(t.shape[0]) if not check_neighbours_y(Gy,t,i)]
 def check_neighbours_y(Gy,t,i):
     return Gy[t[i],0] <= Gy[t[i]-1,0]  or Gy[t[i],0] <  Gy[t[i]+1,0]
 def fast_check_row2(row,image,start=0,end=-1):
@@ -108,16 +110,17 @@ def fast_check_row2(row,image,start=0,end=-1):
     t = np.where(Gx[0,3:-3]>TRESHHOLD)[0]+3
     return [(t[i]+start,row) for i in xrange(t.shape[0]) if not check_neighbours(Gx,t,i)]
 def fast_check_row3(row,image,start=0,end=-1):
-    global pieterX
+    t1= time.time()
     if end == -1:
         end = image.size[0]
     TRESHHOLD = 25
     img = image.crop((start,row-1,end,row+2))
-    npimg = np.array(img)[:,::2]
+    npimg = np.array(img)
     gray = rgb2gray(npimg)
     Gx = np.abs(sig.convolve2d(gray,pieterX,'valid'))
     t = np.where(Gx[0,:]>TRESHHOLD)[0]
-    return [((t[i]+start)*2,row) for i in xrange(t.shape[0]) if not check_neighbours(Gx,t,i)]
+    print 'ri', time.time() - t1
+    return [((t[i]+start),row) for i in xrange(t.shape[0]) if not check_neighbours(Gx,t,i)]
 
 def check_neighbours(Gx,t,i):
     return Gx[0,t[i]] <= Gx[0,t[i]-1]  or Gx[0,t[i]] <  Gx[0,t[i]+1]

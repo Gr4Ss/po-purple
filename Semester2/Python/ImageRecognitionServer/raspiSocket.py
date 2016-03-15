@@ -1,21 +1,22 @@
-import  threading,time,socket,sys
+import  threading,time,socket
 import cPickle as pickle
 
-class CustomSocketServer:
+class raspiSocket:
     def __init__(self,port):
         self.socket = socket.socket(socket.AF_INET, socket.SOCK_STREAM)
         self.socket.bind(('',port))
         print("Server started")
         self.socket.listen(10)
-        self.receivequeue = []
+        self.__new_data = False
+        self.__values = None
         self.thread = threading.Thread(target=self.accept)
         self.thread.setDaemon(True)
         self.thread.start()
-    def get_data(self):
-        while True:
-                if len(self.receivequeue) >0:
-                    return self.receivequeue.pop(0)
-                    time.sleep(0.01)
+    def get_values(self):
+        self.__new_data = False
+        return self.__values
+    def new_values(self):
+        return self.__new_data
     def accept(self):
         while True:
             try:
@@ -28,22 +29,15 @@ class CustomSocketServer:
                 sys.exit()
     def receive(self,conn,addr):
         try:
-            print 'New connection from ', addr
-            data = conn.recv(1024)
-            data = pickle.loads(data)
-            print data
+            data = conn.recv(100)
+            self.__values = pickle.loads(data)
+            self.__new_data = True
             if data == 'END':
                 print "Close"
                 conn.send("**END**")
-                conn.close()
             else:
                 conn.send('OK')
-                message = conn.recv(data)
-                message = pickle.loads(message)
-                self.receivequeue.append((conn,message))
+            conn.close()
         except:
             print 'Error occured, connection closed'
             conn.close()
-    def send(self,conn,data):
-        conn.send(data)
-        conn.close()

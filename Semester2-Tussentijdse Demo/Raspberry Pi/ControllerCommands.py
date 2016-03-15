@@ -64,7 +64,7 @@ def manual_bend(directionx,directiony):
         outer_engine = Leftengine
     while Going:
         global_speed = min(global_speed+5,255)
-        diff = min(diff+5,50)
+        diff = min(diff+5,100)
         outer_engine.set_speed(directiony*global_speed)
         inner_engine.set_speed(directiony*(global_speed-diff))
     Rightengine.set_speed(0)
@@ -76,7 +76,7 @@ def forward_right():
 def backward_left():
     manual_bend(-1,-1)
 def backward_right():
-    manual_bend(-1,1)
+    manual_bend(1,-1)
 # if direction = 1 : left
 # if direction = -1 : right
 def manual_rotate(direction):

@@ -27,7 +27,8 @@ if __name__ == '__main__':
         c1 = time.time()
         print 'Load Image', c1- start
         IMAGE_SIZE = im.size
-        a = fast_check_row3(int(IMAGE_SIZE[1]*0.9),im)
+	c = fast_check_column2(int(IMAGE_SIZE[0]*0.2),im)
+        a = fast_check_row3(int(IMAGE_SIZE[1]*0.7),im)
         b= fast_check_row3(int(IMAGE_SIZE[1]*0.8),im)
         c2 = time.time()
         print 'Rows', c2-c1
@@ -41,7 +42,7 @@ if __name__ == '__main__':
         c3 = time.time()
         print 'Load Image2', c3-start
         IMAGE_SIZE = im.size
-        a = fast_check_row2(int(IMAGE_SIZE[1]*0.9),im)
+        a = fast_check_row2(int(IMAGE_SIZE[1]*0.7),im)
         b= fast_check_row2(int(IMAGE_SIZE[1]*0.8),im)
         c4 = time.time()
         print 'Row2',c4-c1
