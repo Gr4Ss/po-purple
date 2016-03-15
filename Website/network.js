@@ -298,9 +298,6 @@ var otherCar1;
 var otherCar2;
 var otherCar3;
 
-//changeNodeColor(1, '#ababab');
-//changeEdgeColor(3, 4, '#ab78ab');
-
 var prevPos = 1;
 var carPos = 1;
 var prevIterator = 1;
@@ -327,6 +324,16 @@ network.on("startStabilizing", function() {
 network.on("stabilized", function(params) {
 	
 	console.log("stabilized", params);
+});
+
+$.get("http://localhost:9000/positions", function(data) {
+	console.log(data);
+	var data2 = $.parseJSON(data);
+	console.log(data2.positions);
+	for (i in data2.positions) {
+		console.log(data2.positions[i][1]);
+		changeNodeColor(data2.positions[i][1], "#ab78ab");
+	}
 });
 
 /**
