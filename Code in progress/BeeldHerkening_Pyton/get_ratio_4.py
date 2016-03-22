@@ -73,7 +73,7 @@ def get_ratio(imageAddress, xCoLeft, yCoLeft, xCoRight, yCoRight, last_ratio,
     elif len(left) == 0 and len(right) > 0 and len(top) > 0:
         right_des = cog_y(right)
         top_des = cog_x(top)
-        return choose_path(ratio_queue, layout_queue, direction_list, [top_des, right_des], 'T_right', xCoLeft, yCoLeft, xCoRight, yCoRight)
+        return choose_path(ratio_queue, layout_queue, direction_list, [right_des,top_des] , 'T_right', xCoLeft, yCoLeft, xCoRight, yCoRight)
     
     # Else there are crossroads which are detected
     else:
@@ -101,16 +101,16 @@ def choose_path(ratio_queue, layout_queue, direction_list, args, layout, xCoLeft
         elif next_direction == 'straight':
             ratio_new = to_ratio(((args[0][0] + args[1][0])/2,((args[0][1]+args[1][1])/2)), xCoLeft, yCoLeft, xCoRight, yCoRight)
         else:
-            raise AssertionError
+            raise Error
     elif layout == 'T_right' or layout == 'T_left':
         if next_direction == 'left':
             ratio_new = to_ratio(args[0], xCoLeft, yCoLeft, xCoRight, yCoRight)
         elif next_direction == 'right':
-            ratio_new = to_ratio(args[1], xCoLeft, yCoLeft, xCoRight, yCoRight)
-        elif next_direction == 'straight':
             ratio_new = to_ratio(args[0], xCoLeft, yCoLeft, xCoRight, yCoRight)
+        elif next_direction == 'straight':
+            ratio_new = to_ratio(args[1], xCoLeft, yCoLeft, xCoRight, yCoRight)
         else:
-            raise AssertionError        
+            raise Error        
     elif layout == 'crossroads':
         if next_direction == 'left':
             ratio_new = to_ratio(args[0], xCoLeft, yCoLeft, xCoRight, yCoRight)
@@ -119,9 +119,9 @@ def choose_path(ratio_queue, layout_queue, direction_list, args, layout, xCoLeft
         elif next_direction == 'straight':
             ratio_new = to_ratio(args[1], xCoLeft, yCoLeft, xCoRight, yCoRight)
         else:
-            raise AssertionError        
+            raise Error        
     else:
-        raise AssertionError
+        raise Error
 
     # Guess the ratio from the ratio queue.
     ratio_guess = guess_ratio(ratio_queue)
@@ -181,8 +181,9 @@ def update_direction_list_and_queues(ratio_queue, layout_queue, direction_list):
             pass
         else:
             back_on_track = 0
+            break
     if back_on_track == 1:
-        last_direction = get_direction(layout_queue, 5, ratio_queue)
+        last_direction = get_direction(layout_queue,  ratio_queue)
         if last_direction == direction_list[0]:
             print 'turned correctly to the ' + last_direction
             print layout_queue
@@ -201,39 +202,13 @@ def get_most_common_in_queue(layout_queue):
     return max(set(layout_queue), key=layout_queue.count)
 
 
-def get_direction(layout_queue, size, ratio_queue):
+def get_direction(layout_queue, ratio_queue):
     direction_list = ['normal_straight','normal_right','normal_left','T_flat','T_left','T_right','crossroads']
-    direction = recognize_direction2(layout_queue, size, direction_list, ratio_queue)
+    direction = recognize_direction2(layout_queue, direction_list, ratio_queue)
     return direction
 
-        
-    
-def recognize_direction(layout_queue, size, direction_list, ratio_queue):
-    for i in xrange(0, len(layout_queue)-size):
-        curr_layout = layout_queue[i]
-        indices = []
-        nb = 0
-        nb_special = 0
-        for k in xrange(i, i + size):            
-            if layout_queue[k] in direction_list[2:]:
-                nb_special += 1
-                indices.append(k)        
-        if nb > size - 1:
-            for index in indices:
-                total_ratio = 0
-                for index in indices:
-                    total_ratio += ratio_queue[index]
-                total_ratio = total_ratio / len(indices)
-                boundry = 0.2
-                if abs(total_ratio) < boundry:
-                    return 'straight'
-                elif total_ratio > boundry:
-                    return 'right'
-                else:
-                    return 'left'
-    return "No node found"     
-                
-def recognize_direction2(layout_queue, size, direction_list, ratio_queue):
+
+def recognize_direction2(layout_queue, direction_list, ratio_queue):
     start_special = -1
     end_special = -1
     for i in xrange(0, len(layout_queue)):    
@@ -253,10 +228,10 @@ def recognize_direction2(layout_queue, size, direction_list, ratio_queue):
                     nb += 1
                 total_ratio = total_ratio /nb
                 print total_ratio
-                boundry = 0.2
-                if abs(total_ratio) < boundry:
+                boundary = 0.2
+                if abs(total_ratio) < boundary:
                     return 'straight'
-                elif total_ratio > boundry:
+                elif total_ratio > boundary:
                     return 'right'
                 else:
                     return 'left'                            
@@ -265,17 +240,7 @@ def recognize_direction2(layout_queue, size, direction_list, ratio_queue):
 def is_special(layout):
     return (layout in ['T_flat','T_left','T_right','crossroads'])
 
-#Get the appropriate columns for 
-        
-def pop_from(left, top, right, max_index):
-    if max_index < len(left):
-        left.pop(max_index)
-    elif max_index < len(left)+len(top):
-        top.pop(max_index-len(left))
-    else:
-        right.pop(max_index-len(left)-len(top))
-    return left, top, right
-    
+   
 # Return the points which are intersecting with the drawn lines.
 def getIntersectingPoints(image, height, width, column_factor, row_factor):
     left_column = int(width*column_factor)
