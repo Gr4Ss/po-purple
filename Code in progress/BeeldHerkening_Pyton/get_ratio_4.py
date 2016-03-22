@@ -2,6 +2,7 @@ import numpy
 import Image_2 as img
 
 global layout_queue, ratio_queue
+ratio_queue_length = 40
 
 # Returns the x coordinate of the first point and the average
 # x coordinate for all points
@@ -19,9 +20,9 @@ def cog_y(points):
 
 # Add the item to the queue, while maintaining the maximum queue length
 def add_to_queue(queue, ratio):
-    len_queue = 40
+    global ratio_queue_length
     queue.insert(0, ratio)
-    if len(queue) > len_queue:
+    if len(queue) > ratio_queue_length:
         queue.pop()
     return queue
 
@@ -38,10 +39,6 @@ def get_ratio(imageAddress, xCoLeft, yCoLeft, xCoRight, yCoRight, last_ratio,
     top = intersections[1]
     right = intersections[2]
     bottom = intersections[3]
-    
-	
-    left, top, right = getPoints(left, right, bottom, top)
-	
     points = left + top + right
 	
     # There are no points on the image, do as before
@@ -111,7 +108,7 @@ def choose_path(ratio_queue, layout_queue, direction_list, args, layout, xCoLeft
         elif next_direction == 'right':
             ratio_new = to_ratio(args[1], xCoLeft, yCoLeft, xCoRight, yCoRight)
         elif next_direction == 'straight':
-            ratio_new = to_ratio(args[1], xCoLeft, yCoLeft, xCoRight, yCoRight)
+            ratio_new = to_ratio(args[0], xCoLeft, yCoLeft, xCoRight, yCoRight)
         else:
             raise AssertionError        
     elif layout == 'crossroads':
@@ -268,51 +265,7 @@ def recognize_direction2(layout_queue, size, direction_list, ratio_queue):
 def is_special(layout):
     return (layout in ['T_flat','T_left','T_right','crossroads'])
 
-#Get the appropriate columns for crossroad detection
-def getPoints(left, right, bottom, top):
-    if len(bottom) == 2:
-        return left, top, right
-    else:
-        max_index = -1
-        if len(bottom) == 1:
-            others = left + top + right
-            maxi = 0
-            for other in others:
-                if other[1] > maxi:
-                    maxi = other[1]
-            for other in others:
-                if other[1] == maxi:
-                    max_index = others.index(other)
-            if max_index  == -1:
-                return left, top, right
-            return pop_from(left, top, right, max_index)
-        elif len(bottom) == 0:            
-            others = left + top + right
-            if len(others)<2:
-                return left, top, right
-            maxi = 0
-            for other in others:
-                if other[1] > maxi:
-                    maxi = other[1]
-            for other in others:
-                if other[1] == maxi:
-                    max_index = others.index(other)
-            if max_index == -1:
-                return left, top, right
-            others.pop(max_index)
-            maxi = 0
-            for other in others:
-                if other[1] > maxi:
-                    maxi = other[1]
-            for other in others:
-                if other[1] == maxi:
-                    max_index = others.index(other)
-            if max_index == -1:
-                return left, top , right
-            others.pop(max_index)
-            return pop_from(left, top, right, max_index)
-        else:
-            return left, top, right
+#Get the appropriate columns for 
         
 def pop_from(left, top, right, max_index):
     if max_index < len(left):
