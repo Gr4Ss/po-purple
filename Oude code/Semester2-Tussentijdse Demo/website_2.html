@@ -1,0 +1,285 @@
+<!DOCTYPE html>
+<html>
+<head>
+
+    <meta charset="utf-8">
+
+    <title>P&O Purple</title>
+
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+    <script src="static/angular.min.js"></script>
+    <script src="static/jquery.min.js"></script>
+    <script src="static/bootstrap.min.js"></script>
+    <script type="text/javascript" src="static/vis.min.js"></script>
+	   <script type="text/javascript" src="static/network.js"></script>
+    <link rel="stylesheet" href="static/bootstrap.min.css">
+    <link rel="stylesheet" href="static/bootstrap-theme.min.css" >
+    <script src="/static/angular_controller.js"></script>
+    <!--<script src="/static/keypress.js"></script> -->
+    <link rel="stylesheet" href="static/cssv2.css">
+    <link rel="stylesheet" href="static/vis.min.css">
+	   <style type="text/css">
+        #mynetwork {
+            width: 600px;
+            height: 400px;
+            border: 1px solid lightgray;
+        }
+    </style>
+    <!--
+    <script src="chart.js"></script>
+
+    <script src="js/raspimjpeg.js"></script>
+
+  -->
+  <script>window.addEventListener("keydown", function(e) {
+  // space and arrow keys
+  if([32, 37, 38, 39, 40].indexOf(e.keyCode) > -1) {
+              e.preventDefault();
+            }
+          }, false);
+  </script>
+</head>
+
+<body  data-spy="scroll" data-target=".navbar" data-offset="50" onload="setTimeout('init();', 100);" >
+  <div ng-app='purpleApp' ng-controller='purpleController' ng-keydown = "keyDown($event)" ng-keyup ="keyUp($event)">
+    <nav class="navbar navbar-inverse navbar-fixed-top">
+      <div class="container">
+        <div class="navbar-header">
+          <button type="button" class="navbar-toggle collapsed" data-toggle="collapse" data-target="#navbar" aria-expanded="false" aria-controls="navbar">
+            <span class="sr-only">Toggle navigation</span>
+            <span class="icon-bar"></span>
+            <span class="icon-bar"></span>
+            <span class="icon-bar"></span>
+          </button>
+          <a class="navbar-brand" href="#">P&O Purple</a>
+        </div>
+        <div id="navbar" class="collapse navbar-collapse">
+          <ul class="nav navbar-nav">
+            <li class="active"><a href="#home" class="smooth-nav">Home</a></li>
+	    <li><a href="#videostream" class="smooth-nav">Videostream</a></li>
+            <li><a href="#about" class="smooth-nav">About</a></li>
+          </ul>
+        </div><!--/.nav-collapse -->
+      </div>
+    </nav>
+
+    <div class="container" id='home'>
+		    <div class="starter-template">
+          <br>
+          <br>
+          <div class="jumbotron">
+            <h1>Get lock!</h1>
+            <form name = "lock" novalidate>
+              <input type = "submit" ng-click="getLock()"  value ='Lock' name ='lock'>
+              <input type = "submit" ng-click="getUnlock()"  value ='Unlock'name = 'unlock'>
+            </form>
+          </div>
+          <div class="alert alert-danger" role="alert" ng-show="failure">
+            <p>Sorry something went wrong.</p>
+          </div>
+          <div class="alert alert-danger" role="alert" ng-show="noLock">
+            <p><strong>D'oh!</strong>, someone else has already a lock. Please try later again. </p>
+          </div>
+          <div class="alert alert-danger" role="alert" ng-show="invalidMessage">
+            <p> <strong>Invalid</strong> message</p>
+          </div>
+          <div class="alert alert-success" role="alert" ng-show="locker">
+            <p>You <strong> successfully </strong> acquired a lock </p>
+          </div>
+          <div class="alert alert-danger" role="alert" ng-show="claimLock">
+            <p> You must have a lock to control the robot, please try to claim a lock.</p>
+          </div>
+          <div class="alert alert-success" role="alert" ng-show="succes">
+            <p> The command is successfully started </p>
+          </div>
+          <div class="alert alert-success" role="alert" ng-show="unlock">
+            <p>You are <strong> successfully </strong> unlocked </p>
+          </div>
+          <div class="panel-group" id="accordion" role="tablist" aria-multiselectable="false">
+            <div class="panel panel-default">
+              <div class="panel-heading" role="tab" id="headingOne">
+                <h4 class="panel-title">
+                  <a class="collapsed" role="button" data-toggle="collapse" data-parent="#accordion" href="#collapseOne" aria-expanded="false" aria-controls="collapseOne">
+                    Send commands
+                  </a>
+                </h4>
+              </div>
+              <div id="collapseOne" class="panel-collapse collapse" role="tabpanel" aria-labelledby="headingOne">
+                <div class="panel-body">
+                  <div class="form1">
+                    <form class="form-horizontal" ng-submit="parcoursSubmit()">
+                      <p>
+                        <textarea  rows="3" class="form-control commandList" placeholder="Send list of commands" name='commands' ng-model="parcours"></textarea>
+                      </p>
+                      <p>
+                        <button type="submit" class="btn btn-default btn-lg btn-block">Send</button>
+                      </p>
+                      <p>
+                        <button type="reset" class="btn btn-default btn-lg btn-block">Reset</button>
+                      </p>
+                    </form>
+                    <p>
+                      <div class="row">
+                        <div class="col-xs-2">
+                          <input type="number" class="valueLeft" placeholder="left"></input>
+                        </div>
+                        <div class="col-xs-2">
+                          <button class="btn btn-default btn-block nextLeft">Left</button>
+                        </div>
+                        <div class="col-xs-2">
+                          <input type="number" class="valueRight" placeholder="right"></input>
+                        </div>
+                        <div class="col-xs-2">
+                          <button class="btn btn-default btn-block nextStraight">Right</button>
+                        </div>
+                        <div class="col-xs-2">
+                          <input type="number" class="valueDistance" placeholder="distance (cm)"></input>
+                        </div>
+                        <div class="col-xs-2">
+                          <button class="btn btn-default btn-block nextDistance">Distance</button>
+                        </div>
+                      </div>
+                    </p>
+                </div>
+            </div>
+          </div>
+        </div>
+
+        <div class="panel panel-default">
+          <div class="panel-heading" role="tab" id="headingTwo">
+            <h4 class="panel-title">
+              <a class="collapsed" role="button" data-toggle="collapse" data-parent="#accordion" href="#collapseTwo" aria-expanded="false" aria-controls="collapseTwo">
+              Manual driving
+              </a>
+            </h4>
+          </div>
+          <div id="collapseTwo" class="panel-collapse collapse" role="tabpanel" aria-labelledby="headingTwo">
+              <div class="panel-body">
+              <div class="touch-keys" >
+                <div class="row">
+                  <div class="col-xs-4 col-xs-offset-4">
+                    <button class="btn btn-default btn-block driveForward not_pressed" ng-mouseup="keyUpReleased()" ng-mousedown="keyUpPressed()">
+                    F
+                    </button>
+                  </div>
+                </div>
+                <div class="row">
+                  <div class="col-xs-4">
+                    <button class="btn btn-default btn-block driveLeft not_pressed" ng-mouseup="keyLeftReleased()" ng-mousedown="keyLeftPressed()">
+                    L
+                    </button>
+                  </div>
+                  <div class="col-xs-4">
+                    <button class="btn btn-default btn-block driveReverse not_pressed" ng-mouseup="keyDownReleased()" ng-mousedown="keyDownPressed()">
+                    B
+                    </button>
+                  </div>
+                  <div class="col-xs-4">
+                    <button class="btn btn-default btn-block driveRight not_pressed" ng-mouseup="keyRightReleased()" ng-mousedown="keyRightPressed()">
+                    R
+                    </button>
+                  </div>
+                </div>
+              </div>
+              <div class="keyboard-keys">
+              Or press the keyboard arrow keys to control the vehicle!
+
+              </div>
+              </div>
+          </div>
+        </div>
+
+
+      </div>
+      </div>
+      <div id="mynetwork"></div>
+      <div class='container' id='videostream'>
+      <div class="starter-template">
+      <h1> Videostream </h1>
+      <img class="img-responsive" id="mjpeg_dest" width=720px height=400px>
+      </div>
+      </div>
+
+      <div class='container'id='about'>
+      <div class="starter-template">
+      <h1> About us </h1>
+      <div id="carousel-example-generic" class="carousel slide" data-ride="carousel" style="max-width: 720px;width: 100%; margin: 0 auto">
+      <!-- Indicators -->
+        <ol class="carousel-indicators">
+          <li data-target="#carousel-example-generic" data-slide-to="0" class="active"></li>
+          <li data-target="#carousel-example-generic" data-slide-to="1"></li>
+          <li data-target="#carousel-example-generic" data-slide-to="2"></li>
+        </ol>
+
+        <!-- Wrapper for slides -->
+        <div class="carousel-inner" role="listbox">
+          <div class="item active">
+            <!-- <img src="Images/Rear_view.jpg" alt="Couldn't load image"> -->
+            <div class="carousel-caption">
+              <p> Rear view </p>
+            </div>
+          </div>
+          <div class="item">
+            <!--<img src="Images/Side_view.jpg" alt="Couldn't load image">-->
+            <div class="carousel-caption">
+              <p> Side view </p>
+            </div>
+          </div>
+          <div class="item">
+            <!--<img src="Images/Front_view.jpg" alt="Couldn't load image">-->
+            <div class="carousel-caption">
+              <p> Front view </p>
+            </div>
+          </div>
+        </div>
+
+        <!-- Controls -->
+         <a class="left carousel-control" href="#carousel-example-generic" role="button" data-slide="prev">
+          <span class="glyphicon glyphicon-chevron-left" aria-hidden="true"></span>
+          <span class="sr-only">Previous</span>
+        </a>
+        <a class="right carousel-control" href="#carousel-example-generic" role="button" data-slide="next">
+          <span class="glyphicon glyphicon-chevron-right" aria-hidden="true"></span>
+          <span class="sr-only">Next</span>
+        </a>
+      </div>
+      </div>
+      </div>
+
+      <script>
+      $('.smooth-nav').click(function(){
+      $('html, body').animate({
+          scrollTop: $( $.attr(this, 'href') ).offset().top
+      }, 500);
+      return false;
+      });
+      </script>
+
+      <script>
+      $('.nextLeft').click(function(){
+        $('.commandList').val($('.commandList').val() + 'Left(' + $('.valueLeft').val() + '),');
+        $('.valueLeft').val('');
+      });
+
+      $('.nextStraight').click(function(){
+        $('.commandList').val($('.commandList').val() + 'Right(' + $('.valueRight').val() + '),');
+        $('.valueRight').val('');
+      });
+
+      $('.nextDistance').click(function(){
+        $('.commandList').val($('.commandList').val() + 'Distance(' + $('.valueDistance').val() + '),');
+        $('.valueDistance').val('');
+      });
+      </script>
+
+      <script>
+        $('#sevenLink').click(function(){
+          console.log('cliked');
+          $('#speedChart').css('width:400px,height:600px');
+        });
+      </script>
+    </div>
+
+  <div>
+</body>
+</html>
