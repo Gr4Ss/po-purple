@@ -1,11 +1,13 @@
-# import libary for controlling the brickpi ports
-from BrickPi import *
-# Setup the brickpi after loading the module
-BrickPiSetup()
 # time module for timing
 import time
 # import libary for controlling the GPI0 pin
 import RPi.GPIO as GPIO
+
+from GPIO_thread import *
+from Sensor import *
+from utility import *
+import math
+import time
 
 
 class Sensor:
@@ -52,6 +54,15 @@ class DistanceSensor(Sensor):
         GPIO.setup(echo_gpio, GPIO.IN, pull_up_down = GPIO.PUD_DOWN)
         GPIO.setup(trig_gpio, GPIO.OUT)
         GPIO.output(trig_gpio,False)
+	
+	# Storing the GPIO distance sensor
+        self.__distancePi = DistanceSensor(17,4)
+        # Storing a reference to a gpio thread
+        self.__gpio = GPIO_Thread([self.__distancePi])
+        # Turn the threads on
+        self.__brickpi.on()
+        self.__gpio.on()
+
     # A new value is added to Sensor.__value
     def update_value(self):
         trig_duration = 0.0001
@@ -76,4 +87,6 @@ class DistanceSensor(Sensor):
             self.add_value(distance)
         else:
             self.add_value(None)
-	
+    def kill_threads(self):
+       	self.__brickpi.off()
+       	self.__gpio.off()
