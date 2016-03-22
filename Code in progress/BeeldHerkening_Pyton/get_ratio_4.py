@@ -1,22 +1,23 @@
-from numpy import sqrt
+import numpy
 import Image_2 as img
 
 global layout_queue, ratio_queue
 
+# Returns the x coordinate of the first point and the average
+# x coordinate for all points
 def cog_x(points):
-	cog_x = 0
-    for point in points:
-        cog_x += point[0]
-    cog_x = cog_x/len(points)
+    pointss = numpy.array(points)
+    cog_x = numpy.average(pointss, axis=0)[0]
     return (cog_x, points[0][1])
 
+# Returns the y coordinate of the first point and the average
+# y coordinate for all points
 def cog_y(points):
-    cog_y = 0
-    for point in points:
-        cog_y += point[1]
-    cog_y = cog_y/len(points)
+    pointss = numpy.array(points)
+    cog_y = numpy.average(pointss, axis=0)[1]
     return (points[0][0], cog_y)
 
+# Add the item to the queue, while maintaining the maximum queue length
 def add_to_queue(queue, ratio):
     len_queue = 40
     queue.insert(0, ratio)
@@ -26,12 +27,12 @@ def add_to_queue(queue, ratio):
 
 def get_ratio(imageAddress, xCoLeft, yCoLeft, xCoRight, yCoRight, last_ratio,
               column_factor, row_factor, direction_list):
-	# Load in the current image
-    image = im.load_image(str(imgageAddress))
+    # Load in the current image
+    image = im.load_image(str(imageAddress))
     imgHeight = image.size[1]
     imgWidth = image.size[0]
 	
-	# Get the points which are intersecting with the drawn lines.
+    # Get the points which are intersecting with the drawn lines.
     intersections = getIntersectingPoints(image, imageHeight, imageWidth, column_factor, row_factor)
     left = intersections[0]
     top = intersections[1]
@@ -43,88 +44,90 @@ def get_ratio(imageAddress, xCoLeft, yCoLeft, xCoRight, yCoRight, last_ratio,
 	
     points = left + top + right
 	
-	# There are no points on the image, do as before
+    # There are no points on the image, do as before
     if len(left) == 0 and len(right) == 0 and len(top) == 0:
         return last_ratio
     
-	# There are points on the top half of the image, go straight.
+    # There are points on the top half of the image, go straight.
     elif ((len(left) == 0 and len(right) == 0 and len(top) > 0)):
-        return choose_path(ratio_queue, layout_queue, direction_list, [cog_y(points)], 'normal_straight', xCoLeft, yCoLeft, xCoRight, yCoRight, imgWidth, imgHeight)
+        return choose_path(ratio_queue, layout_queue, direction_list, [cog_y(points)], 'normal_straight', xCoLeft, yCoLeft, xCoRight, yCoRight)
        
-	# There are points on the right side of the image, go right.
+    # There are points on the right side of the image, go right.
     elif (len(left) == 0 and len(right) > 0 and len(top) == 0):
-        return choose_path(ratio_queue, layout_queue, direction_list, [cog_x(points)], 'normal_right', x_wheel_left, y_wheel_left, x_wheel_right, y_wheel_right, width, height)
+        return choose_path(ratio_queue, layout_queue, direction_list, [cog_x(points)], 'normal_right', xCoLeft, yCoLeft, xCoRight, yCoRight)
         
-	# There are points on the left side of the image, go left.
+    # There are points on the left side of the image, go left.
     elif (len(left) > 0 and len(right) == 0 and len(top) == 0) :
-        return choose_path(ratio_queue, layout_queue, direction_list, [cog_x(points)], 'normal_left', x_wheel_left, y_wheel_left, x_wheel_right, y_wheel_right, width, height)
+        return choose_path(ratio_queue, layout_queue, direction_list, [cog_x(points)], 'normal_left', xCoLeft, yCoLeft, xCoRight, yCoRight)
         
-	# There are points on the left and right side of the image.
+    # There are points on the left and right side of the image.
     elif len(left) > 0 and len(right) > 0 and len(top) == 0:
         left_des = cog_y(left)
         right_des = cog_y(right)
-        return choose_path(ratio_queue, layout_queue, direction_list, [left_des, right_des], 'T_flat', x_wheel_left, y_wheel_left, x_wheel_right, y_wheel_right, width, height)
+        return choose_path(ratio_queue, layout_queue, direction_list, [left_des, right_des], 'T_flat', xCoLeft, yCoLeft, xCoRight, yCoRight)
 
-	# There are points on the left and the top side of the image
+    # There are points on the left and the top side of the image
     elif len(left) > 0 and len(right) == 0 and len(top) > 0:
         left_des = cog_y(left)
         top_des = cog_x(top)
-        return choose_path(ratio_queue, layout_queue, direction_list, [left_des, top_des], 'T_left', x_wheel_left, y_wheel_left, x_wheel_right, y_wheel_right, width, height)
+        return choose_path(ratio_queue, layout_queue, direction_list, [left_des, top_des], 'T_left', xCoLeft, yCoLeft, xCoRight, yCoRight)
 
-	# There are points on the right and the top side of the image
+    # There are points on the right and the top side of the image
     elif len(left) == 0 and len(right) > 0 and len(top) > 0:
         right_des = cog_y(right)
         top_des = cog_x(top)
-        return choose_path(ratio_queue, layout_queue, direction_list, [top_des, right_des], 'T_right', x_wheel_left, y_wheel_left, x_wheel_right, y_wheel_right, width, height)
+        return choose_path(ratio_queue, layout_queue, direction_list, [top_des, right_des], 'T_right', xCoLeft, yCoLeft, xCoRight, yCoRight)
     
-	# Else there are crossroads which are detected
+    # Else there are crossroads which are detected
     else:
         left_des = cog_x(top)
         right_des = cog_y(right)
         top_des = cog_x(top)
-        return choose_path(ratio_queue, layout_queue, direction_list, [left_des, top_des, right_des], 'crossroads', x_wheel_left, y_wheel_left, x_wheel_right, y_wheel_right, width, height)
+        return choose_path(ratio_queue, layout_queue, direction_list, [left_des, top_des, right_des], 'crossroads', xCoLeft, yCoLeft, xCoRight, yCoRight)
 
 
 # Choose which path you are going to take
-def choose_path(ratio_queue, layout_queue, direction_list, args, layout, x_wheel_left, y_wheel_left, x_wheel_right, y_wheel_right, width, height):
-	# Guess the ratio from the ratio queue.
+def choose_path(ratio_queue, layout_queue, direction_list, args, layout, xCoLeft, yCoLeft, xCoRight, yCoRight):
+    # Guess the ratio from the ratio queue.
     ratio_guess = guess_ratio(ratio_queue)
 	
     next_direction = direction_list[0]
 	
-	# Calculate ratios for all different layouts
+    # Calculate ratios for all different layouts
     if layout == 'normal_straight' or layout == 'normal_left' or layout == 'normal_right':
-        ratio_new = to_ratio(args[0], x_wheel_left, y_wheel_left, x_wheel_right, y_wheel_right)
+        ratio_new = to_ratio(args[0], xCoLeft, yCoLeft, xCoRight, yCoRight)
     elif layout == 'T_flat':
         if next_direction == 'left':
-            ratio_new = to_ratio(args[0], x_wheel_left, y_wheel_left, x_wheel_right, y_wheel_right)
+            ratio_new = to_ratio(args[0], xCoLeft, yCoLeft, xCoRight, yCoRight)
         elif next_direction == 'right':
-            ratio_new = to_ratio(args[1], x_wheel_left, y_wheel_left, x_wheel_right, y_wheel_right)
+            ratio_new = to_ratio(args[1], xCoLeft, yCoLeft, xCoRight, yCoRight)
         elif next_direction == 'straight':
-            ratio_new = to_ratio(((args[0][0] + args[1][0])/2,((args[0][1]+args[1][1])/2)), x_wheel_left, y_wheel_left, x_wheel_right, y_wheel_right)
+            ratio_new = to_ratio(((args[0][0] + args[1][0])/2,((args[0][1]+args[1][1])/2)), xCoLeft, yCoLeft, xCoRight, yCoRight)
         else:
             raise AssertionError
     elif layout == 'T_right' or layout == 'T_left':
         if next_direction == 'left':
-            ratio_new = to_ratio(args[0], x_wheel_left, y_wheel_left, x_wheel_right, y_wheel_right)
+            ratio_new = to_ratio(args[0], xCoLeft, yCoLeft, xCoRight, yCoRight)
         elif next_direction == 'right':
-            ratio_new = to_ratio(args[1], x_wheel_left, y_wheel_left, x_wheel_right, y_wheel_right)
+            ratio_new = to_ratio(args[1], xCoLeft, yCoLeft, xCoRight, yCoRight)
         elif next_direction == 'straight':
-            ratio_new = to_ratio(args[1], x_wheel_left, y_wheel_left, x_wheel_right, y_wheel_right)
+            ratio_new = to_ratio(args[1], xCoLeft, yCoLeft, xCoRight, yCoRight)
         else:
             raise AssertionError        
     elif layout == 'crossroads':
         if next_direction == 'left':
-            ratio_new = to_ratio(args[0], x_wheel_left, y_wheel_left, x_wheel_right, y_wheel_right)
+            ratio_new = to_ratio(args[0], xCoLeft, yCoLeft, xCoRight, yCoRight)
         elif next_direction == 'right':
-            ratio_new = to_ratio(args[2], x_wheel_left, y_wheel_left, x_wheel_right, y_wheel_right)
+            ratio_new = to_ratio(args[2], xCoLeft, yCoLeft, xCoRight, yCoRight)
         elif next_direction == 'straight':
-            ratio_new = to_ratio(args[1], x_wheel_left, y_wheel_left, x_wheel_right, y_wheel_right)
+            ratio_new = to_ratio(args[1], xCoLeft, yCoLeft, xCoRight, yCoRight)
         else:
             raise AssertionError        
     else:
         raise AssertionError
 
+    # Guess the ratio from the ratio queue.
+    ratio_guess = guess_ratio(ratio_queue)
     weight_of_guess = 0.0
     layout_queue = add_to_queue(layout_queue, layout)
 	
@@ -134,9 +137,9 @@ def choose_path(ratio_queue, layout_queue, direction_list, args, layout, x_wheel
     return return_ratio, new_layout_queue, new_ratio_queue, new_direction_list
 
    
-def to_ratio(point, x_wheel_left, y_wheel_left, x_wheel_right, y_wheel_right):
-    left_distance = sqrt((point[0] - x_wheel_left)**2 + (point[1] - y_wheel_left)**2)
-    right_distance= sqrt((point[0] - x_wheel_right)**2 + (point[1] - y_wheel_right)**2)
+def to_ratio(point, xCoLeft, yCoLeft, xCoRight, yCoRight):
+    left_distance = sqrt((point[0] - xCoLeft)**2 + (point[1] - yCoLeft)**2)
+    right_distance= sqrt((point[0] - xCoRight)**2 + (point[1] - yCoRight)**2)
     ratio = right_distance/left_distance
 
     if ratio > 1:
@@ -196,35 +199,9 @@ def update_direction_list_and_queues(ratio_queue, layout_queue, direction_list):
                 print layout_queue                
                 return [], [], direction_list
     return ratio_queue, layout_queue, direction_list
-    
-def get_average_ratio(ratio_queue, indices):
-    average = 0
-    for index in indices:
-        average += ratio_queue[index]
-    average = average/len(indices)
-    return average
 
 def get_most_common_in_queue(layout_queue):
-	# nb_normal = layout_queue.count("normal_left") + layout_queue.count("normal_right") + layout_queue("normal_straight")
-	# nb_T_flat = layout_queue.count("T_flat")
-	# nb_T_left = layout_queue.count("T_left")
-	# nb_T_right = layout_queue.count("T-right")
-	# nb_crossroads = layout_queue.count("crossroads")
-    # numbers = [nb_normal, nb_T_flat, nb_T_left, nb_T_right, nb_crossroads]
-    # max_index = numbers.index(max(numbers))
-    # if max_index == 0:
-        # return 'normal'
-    # elif max_index == 1:
-        # return 'T_flat'
-    # elif max_index == 2:
-        # return 'T_left'
-    # elif max_index == 3:
-        # return 'T_left'
-    # elif max_index == 4:
-        # return 'crossroads'
-    # else:
-        # raise AssertionError
-	return max(set(layout_queue), key=layout_queue.count)
+    return max(set(layout_queue), key=layout_queue.count)
 
 
 def get_direction(layout_queue, size, ratio_queue):
