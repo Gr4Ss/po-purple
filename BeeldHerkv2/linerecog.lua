@@ -1,6 +1,6 @@
 
-local DEBUG = 2;
-local BM = 1;
+local DEBUG = 0;
+local BM = 0;
 local bmTbl = {};
 
 --[[
@@ -30,19 +30,49 @@ local width, height = 480, 256;
 local getPixel, setPixel;
 
 -- Generate a list of pixels to iterate over
-local pixelList = {};
+local pixelList1 = {};
+--local pixelList2 = {};
+--local pixelList3 = {};
+--local pixelList4 = {};
+
 do
-	local interval = 4;
+	--[[local interval = 5;
 	local distFromTop = 10;
 	local distFromBottom = 20;
 	for i = 1, (width / interval) - 1 do
 		local x = i * interval;
 		local y = math.floor((height - (distFromTop + distFromBottom)) * ((width - x * 2) / width) ^ 4);
-		pixelList[#pixelList + 1] = {x, distFromTop + y};
+		pixelList2[#pixelList2 + 1] = {x, distFromTop + y};
+	end;
+
+	for i = 1, (width / interval) - 1 do
+		pixelList1[#pixelList1 + 1] = {i * interval, height - distFromBottom};
+	end;]]
+
+	local distFromLeft = 20;
+	local distFromRight = 20;
+	local distFromTop = 20;
+	local distFromBottom = 20;
+	local interval = 2;
+
+	for i = height - distFromBottom - 1, distFromTop, -interval do
+		pixelList1[#pixelList1 + 1] = {distFromLeft, i};
+	end;
+
+	for i = distFromLeft + 1, width - distFromRight, interval do
+		pixelList2[#pixelList2 + 1] = {i, distFromTop};
+	end;
+
+	for i = distFromTop + 1, height - distFromBottom, interval do
+		pixelList3[#pixelList3 + 1] = {width - distFromRight, i};
+	end;
+
+	for i = width - distFromRight - 1, distFromLeft, -interval do
+		pixelList4[#pixelList4 + 1] = {i, height - distFromBottom};
 	end;
 end;
 
-local function calcDiffs(getPixel)
+local function calcDiffs(pixelList, getPixel)
 	local previous = pixelList[1];
 	local previousLuma = getPixel(previous[1], previous[2]);
 	local lumaDiffList = {};
@@ -60,24 +90,25 @@ local function calcDiffs(getPixel)
 
 	table.sort(lumaDiffList);
 
-	for i = 1, #lumaDiffList do
-		if (lumaDiffList[i + 1] - lumaDiffList[i] > 2) then
+	for i = 1, #lumaDiffList - 1 do
+		if (lumaDiffList[i + 1] - lumaDiffList[i] >= 2) then
 			if (DEBUG >= 1) then
-				print("Threshold:", lumaDiffList[i + 1]);
+				print("Threshold:", lumaDiffList[i]);
 			end;
-			return lumaDiffList[i + 1];
+			return lumaDiffList[i];
 		end;
 	end;
 
-	return 0;
+	print("No threshold found")
+	return 10;
 end;
 
-local function getIntersectPoints(diffThreshold)
+local function getIntersectPoints(pixelList, diffThreshold)
 	local pointList = {};
 	local inLine;
 	for i, current in ipairs(pixelList) do
 		if (current[3]) then
-			if (current[3] < -diffThreshold and (not inLine or inLine + 3 < i)) then
+			if (current[3] <= -diffThreshold and (not inLine or inLine + (#pixelList / 3) < i)) then
 				inLine = i;
 				if (DEBUG >= 1) then
 					if (DEBUG >= 2) then
@@ -89,8 +120,8 @@ local function getIntersectPoints(diffThreshold)
 					setPixel(current[1], current[2] + 1, 128, 255, 255);
 					setPixel(current[1], current[2] - 1, 128, 255, 255);
 				end;
-			elseif (current[3] > diffThreshold and inLine) then
-				if (i - inLine < #pixelList / 10) then
+			elseif (current[3] >= diffThreshold and inLine) then
+				if (i - inLine > 1) then
 					pointList[#pointList + 1] = {math.floor((pixelList[inLine][1] + current[1]) / 2), math.floor((pixelList[inLine][2] + current[2]) / 2)};
 				end;
 				inLine = false;
@@ -117,26 +148,9 @@ local function getIntersectPoints(diffThreshold)
 	return pointList;
 end;
 
-function getTargetPoint(imagePath)
+local function getIntersectPointList(pixelList, getPixel)
 	if (BM >= 1) then
 		bmTbl.total = os.clock();
-	end;
-
-	--[[
-		Load in the image and setup get/setPixel functions
-	]]
-	if (BM >= 1) then
-		bmTbl.load = os.clock();
-	end;
-
-	local image = libjpeg.load({path = imagePath});
-	local getPxl, setPxl = bitmap.pixel_interface(image);
-	if (DEBUG >= 1) then
-		getPixel, setPixel = getPxl, setPxl;
-	end;
-
-	if (bmTbl.load) then
-		print("---- Load time:", os.clock() - bmTbl.load);
 	end;
 
 	--[[
@@ -146,7 +160,7 @@ function getTargetPoint(imagePath)
 		bmTbl.threshold = os.clock();
 	end;
 
-	local diffThreshold = calcDiffs(getPxl);
+	local diffThreshold = calcDiffs(pixelList, getPixel);
 
 	if (bmTbl.threshold) then
 		print("---- Thres time:", os.clock() - bmTbl.threshold);
@@ -159,7 +173,7 @@ function getTargetPoint(imagePath)
 		bmTbl.points = os.clock();
 	end;
 
-	local pointList = getIntersectPoints(diffThreshold);
+	local pointList = getIntersectPoints(pixelList, diffThreshold);
 
 	if (bmTbl.points) then
 		print("---- Points time:", os.clock() - bmTbl.points);
@@ -179,10 +193,22 @@ function getTargetPoint(imagePath)
 			setPixel(point[1], point[2] - 1, 128, 0, 255);
 		end;
 	end;
+end;
 
+function getAllIntersectPoints()
+	local image = libjpeg.load(loadTable);
+	local getPxl, setPxl = bitmap.pixel_interface(image);
 	if (DEBUG >= 1) then
-		libjpeg.save({bitmap = image, path = "test.jpg"});
+		getPixel, setPixel = getPxl, setPxl;
 	end;
+
+	local returnTable = {};
+	returnTable[1] = getIntersectPointList(pixelList1, getPxl);
+	returnTable[2] = getIntersectPointList(pixelList2, getPxl);
+	returnTable[3] = getIntersectPointList(pixelList3, getPxl);
+	returnTable[4] = getIntersectPointList(pixelList4, getPxl);
+
+	return returnTable;
 end;
 
 if (bmTbl.setup) then
@@ -193,16 +219,41 @@ end;
 --[[
 	TEST STUFF
 ]]
+--[[DEBUG
 local amount = tonumber(arg[2]) or 1;
 if (amount ~= 1) then
 	DEBUG = 0;
 	BM = 0;
 end;
+local loadTable = {path = arg[1]};
 
 local bmStart = os.clock();
 for i = 1, amount do
-	getTargetPoint(arg[1]);
+	if (BM >= 1) then
+		bmTbl.funcs = os.clock();
+	end;
+
+	local image = libjpeg.load(loadTable);
+	local getPxl, setPxl = bitmap.pixel_interface(image);
+	if (DEBUG >= 1) then
+		getPixel, setPixel = getPxl, setPxl;
+	end;
+
+	if (bmTbl.funcs) then
+		print("---- Funcs time:", os.clock() - bmTbl.funcs);
+	end;
+
+	local returnTable = {};
+	returnTable[1] = getIntersectPointList(pixelList1, getPxl);
+	returnTable[2] = getIntersectPointList(pixelList2, getPxl);
+	returnTable[3] = getIntersectPointList(pixelList3, getPxl);
+	returnTable[4] = getIntersectPointList(pixelList4, getPxl);
+
+	if (DEBUG >= 1) then
+		libjpeg.save({bitmap = image, path = "test.jpg"});
+	end;
 end;
 print("-----------------------")
 print("Amount of runs:", amount);
 print("Average time:", (os.clock() - bmStart) / amount);
+--]]
