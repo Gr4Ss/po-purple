@@ -90,15 +90,25 @@ def manual_rotate(direction):
         time.sleep(0.05)
     Rightengine.set_speed(0)
     Leftengine.set_speed(0)
+
 def left():
     manual_rotate(1)
+
 # A method to turn right
 def right():
+
     manual_rotate(-1)
+
 # A method to stop driving
 def stop():
     Leftengine.set_speed(0)
     Rightengine.set_speed(0)
+
+def deliver_packets():
+    pass
+
+def follow_path(path):
+    pass
 
 def correct_speed3(lspeed,rspeed):
     MINIMUM_SPEED = 100

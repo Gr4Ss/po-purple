@@ -2,12 +2,11 @@
 import time
 # import libary for controlling the GPI0 pin
 import RPi.GPIO as GPIO
-
-from GPIO_thread import *
-from Sensor import *
+# import libary for controlling the brickpi ports
+from BrickPi import *
 from utility import *
 import math
-import time
+
 
 
 class Sensor:
@@ -16,37 +15,38 @@ class Sensor:
         self.__values = []
         # self.__nb_values indicating how many values must be hold
         self.__nb_values = nb_values
-	
+
     # A method that calculate a new sensor and add it afterwards to the self.values
     def update_value(self):
         pass
-    # A method to add a given value to the self.__value FIFO
-    # if len(self.__value) < self.__nb_values then the value is just added to self.__value
-    # Else the len(self.__value) - self.__nb_values + 1 first values will be deleted.
+    ''' A method to add a given value to the self.__value FIFO
+     if len(self.__value) < self.__nb_values then the value is just added to self.__value
+     Else the len(self.__value) - self.__nb_values + 1 first values will be deleted and the new value will be
+    added.'''
     def add_value(self,value):
         while (len(self.__values) >= self.__nb_values):
-	     self.__values.pop(0)
-	self.__values.append(value)
-	
-    # Return the median of the not None values in self.__value	
+            self.__values.pop(0)
+	    self.__values.append(value)
+
+    # Return the median of the not None values in self.__value
     def get_value(self):
-	try:
-	    copy = sorted(self.__value)
-	    while copy[0] == None:
-		copy.pop(0)
-	    return copy[len(copy)/2]
-	except:
-	    return None       
+        try:
+            copy = sorted(self.__value)
+            while copy[0] == None:
+                copy.pop(0)
+            return copy[len(copy)/2]
+        except:
+	           return None
 
 ##
 ## A class to get the value of the distance sensor.
 ## Code conform Hands-on tutorial raspberry pi
-## 
+##
 class DistanceSensor(Sensor):
     # self.__echo_gpio and self.__trig_gpio contain the numbers of the pin needed
     # for triggering the sensor and one to determine how long the echo is high
     def __init__(self,echo_gpio,trig_gpio):
-	Sensor.__init__(self,5)
+	    Sensor.__init__(self,5)
         self.__echo_gpio = echo_gpio
         self.__trig_gpio = trig_gpio
         # Some work to configure the GPIO pins
@@ -54,14 +54,6 @@ class DistanceSensor(Sensor):
         GPIO.setup(echo_gpio, GPIO.IN, pull_up_down = GPIO.PUD_DOWN)
         GPIO.setup(trig_gpio, GPIO.OUT)
         GPIO.output(trig_gpio,False)
-	
-	# Storing the GPIO distance sensor
-        self.__distancePi = DistanceSensor(17,4)
-        # Storing a reference to a gpio thread
-        self.__gpio = GPIO_Thread([self.__distancePi])
-        # Turn the threads on
-        self.__brickpi.on()
-        self.__gpio.on()
 
     # A new value is added to Sensor.__value
     def update_value(self):
@@ -69,7 +61,7 @@ class DistanceSensor(Sensor):
         inttimeout = 2100
         v_snd = 340.29
         # Trigger an output signal
-	GPIO.output(self.__trig_gpio,True)
+	    GPIO.output(self.__trig_gpio,True)
        	time.sleep(trig_duration)
         GPIO.output(self.__trig_gpio,False)
         count_high = inttimeout
@@ -87,6 +79,3 @@ class DistanceSensor(Sensor):
             self.add_value(distance)
         else:
             self.add_value(None)
-    def kill_threads(self):
-       	self.__brickpi.off()
-       	self.__gpio.off()

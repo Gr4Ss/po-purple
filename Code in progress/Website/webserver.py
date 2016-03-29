@@ -1,21 +1,23 @@
 from bottle import Bottle,run,static_file, request,post,error,response,abort
 import datetime
 from webserver_utility import *
-import Communicate
-import json
+import data
+#import Communicate
+import json, random
 
 # Interface hiding away problems with the Raspberry Pi
-DriverCom = Communicate.DriverCommincator()
+#DriverCom = Communicate.DriverCommincator()
 # Create a new Bottle app
 app = Bottle()
 # Storing a refence to the location of the static files
-static_root = '/home/pieter/Documenten/Ku Leuven/PenO/po-purple/Semester2-Tussentijdse Demo/Static'
-#static_root = 'C:\Users\Ict\Documents\JS'
+static_root = 'Static/'
+data_logger = data.Data()
+data_logger.start()
 # Returning the home page
 @app.route('/')
 def home():
     # Open the file
-    html = open('website_2.html','r')
+    html = open('home.html','r')
     # Check if the user has already a cookie, if not create one
     if not request.get_cookie('ID'):
         # Cookie expires over 1 year
@@ -23,11 +25,25 @@ def home():
         response.set_cookie('ID',create_hash(16), path='/',expires=expire_time)
     # return the webpage
     return html
-
+@app.route('/stats')
+def stats():
+    # Open the file
+    html = open('stats.html','r')
+    return html
 # Method to return the static files
 @app.route('/static/<filename>')
 def server_static(filename):
     return static_file(filename,root=static_root)
+@app.route('/stats/data')
+def get_data():
+    d = data_logger.get_data()
+    r = {"data":[{"name":i["name"],"delivered":len(i["deliveries"]),"distance":len(i["positions"])} for i in d]}
+    print r
+    return json.dumps(r)
+@app.route('/stats/data/<team>')
+def data_team(team):
+    d = data_logger.get_data_team(team)
+    return json.dumps(d)
 # Method when the user tries to get a lock
 @app.get('/lock')
 def lock():

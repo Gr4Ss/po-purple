@@ -7,7 +7,8 @@ class JsonBase:
     def __init__(self):
         self.__teams = dict()
         self.__map = {"vertices": [[1, {"origin": 3, "straight": 2}],[2, {"origin": 1, "straight": 3}],[3, {"origin": 2, "straight": 1, "left": 4}],
-        [4, {"origin": 3, "straight": 1, "left": 2}]],"edges": [[1, 2, 0.3],[1, 3, 0.5],[3, 1, 0.5],[2, 3, 0.1],[3, 2, 0.1],[3, 4, 0.7],[4, 2, 0.3],[4, 1, 0.8]]}
+        [4, {"origin": 3, "straight": 1, "left": 2}]],"edges": [[1, 2, 0.3],[1, 3, 0.5],[3, 1, 0.5],[2, 3, 0.1],[3, 2, 0.1],[3, 4, 0.7],
+        [4, 2, 0.3],[4, 1, 0.8]]}
         self.__parcels = {"available-parcels": [[142, 1, 2],[145, 2, 3],[147, 2, 1], [148, 1, 2], [149, 1, 2], [152, 1, 2], [162, 1, 2], [172, 1, 2]],"on-the-road-parcels": [],"delivered-parcels": []}
         self.__positions = {"positions":[]}
         self.__secret_key = 'SecretKey'

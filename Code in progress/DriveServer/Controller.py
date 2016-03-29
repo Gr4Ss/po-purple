@@ -2,7 +2,8 @@ import threading
 import time
 import math
 from Engine import *
-from BrickPi_thread import *
+from Sensor import *
+from IO_thread import *
 import ControllerCommands
 
 
@@ -15,15 +16,16 @@ class Controller:
         # Storing the engines of this car
         self.__leftengine = Engine('A')
         self.__rightengine = Engine('B')
-        self.__engines = [self.__leftengine,self.__rightengine]
+        self.__distance_sensor = DistanceSensor(17,4)
         # Storing the distance between the centers of the cars
-        self.__widthcar = 2.6 + 11.1 - .2
-        self.__gearratio = 1.
+        # TODO measure width and gearratio
+        self.__widthcar = None
+        self.__gearratio = None
         # Storing the perimeter of the wheels (2*pi*r)
         self.__perimeter = 2*math.pi* 2.579
-        ControllerCommands.init(self.__leftengine,self.__rightengine,self.__perimeter,self.__gearratio,self.__widthcar)
+        ControllerCommands.init(self.__leftengine,self.__rightengine,self.__distance_sensor,self.__perimeter,self.__gearratio,self.__widthcar)
         # Storing a reference to a brickpi thread
-        self.__brickpi = BrickPi_Thread(self.__engines)
+        self.__io = IO_Thread(self.__engines)
         self.__command_going = False
         self.__command_thread = None
         self.__parcours = None
@@ -35,7 +37,7 @@ class Controller:
     def start_command(self,command,arguments = None):
         if ControllerCommands.Going:
             self.stop_command()
-        self.__brickpi.on()
+        self.__io.on()
         ControllerCommands.Going = True
         if arguments != None:
             thread = threading.Thread(target= command,args=arguments)
@@ -52,10 +54,8 @@ class Controller:
         if ControllerCommands.Going:
             ControllerCommands.Going = False
             self.__command_thread.join()
-            self.__brickpi.off()
+            self.__io.off()
             self.__command_thread = None
-    def BrickPi_start(self):
-        self.__brickpi.on()
     # Turn the thread back off
     def kill_threads(self):
-        self.__brickpi.off()
+        self.__io.off()

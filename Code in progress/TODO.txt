@@ -1,0 +1,26 @@
+PacketDeliveryServer:
+- Het idee achter deze server is om naar de robot door te sturen hoe hij moet rijden (rechtdoor,links,rechts)
+om zo efficiënt mogelijk pakjes op te op te halen en af te leveren. De robot stopt voor ieder kruispunt
+en vraagt dan aan deze server wat hij moet doen. Ook verantwoordelijk voor het claimen en deliveren van
+pakjes. Eventueel kunnen we dit ook rechtstreeks op de Pi draaien.
+- Bijhouden positie robot
+- Berekenen van efficientste route (al geïmplementeerd voor spook server)
+- Eventueel bijhouden lengte van verschillende wegen zodat robot makkelijker parcours kan volgen.
+Website:
+- Nadenken over welke data we willen weergeven
+- Opmaak weer gegeven data
+- Opnieuw instellen van livestream vermits webserver niet langer op Raspberry Pi
+- Globale opmaak website aanpassen
+Spookserver:
+- Nog steeds een kleine bug
+Beeldherkening:
+- Interface tussen lua - Python
+- get_ratio... heet nu follow_parcours en moet worden opgeschoond
+- gebruikmakend van follow_parcours en packet delivery rijden en pakjes ophalen en afleveren.
+Sockets:
+- Nalezen + testen
+RESTServer + RESTClient:
+- Nalezen + testen
+- Er staan nog wat kleine TODO's maar deze zijn van geen belang want toch maar testserver.
+Controller + ControllerCommands
+- Meten overbrengingsverhouding + breedte robot

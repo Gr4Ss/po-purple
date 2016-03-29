@@ -49,9 +49,7 @@ class Interface:
     ## Coming soon : Top angle -> The angle of the top motor
     ## Note: Not yet tested
     def get_sensor_value(self):
-        result = dict()
         result['Distancesensor1'] = self.__distancePi.get_value()
-        result['Distancesensor2'] = self.__distanceLego.get_value()
         ## result['Top angle'] = (self.__topengine.get_count()%1) *2*math.pi
         return result
     ## Turn the thread back off

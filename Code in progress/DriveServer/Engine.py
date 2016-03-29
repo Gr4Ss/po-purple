@@ -36,11 +36,12 @@ class Engine:
             speed = sign(speed) * 255
         if abs(speed)< 80:
             speed = sign(speed)* 0
+        BrickPi.MotorSpeed[self.__port] = int(speed)
         self.__speed = int(speed)
 
     ## The motor is pulsed with the current speed
-    def pulse(self):
-        BrickPi.MotorSpeed[self.__port] = self.__speed
+    ##def pulse(self):
+    ##    BrickPi.MotorSpeed[self.__port] = self.__speed
     # A method returning the number of rotations (expressed in number of rotations) of the motor since the last time
     # reset_count() is executed
     def get_count(self):

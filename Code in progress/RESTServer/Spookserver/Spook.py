@@ -1,6 +1,17 @@
-from restclient import *
-import time
+
+import time,os,sys
 import random
+
+
+
+
+#first change the cwd to the script path
+scriptPath = os.path.realpath(os.path.dirname(sys.argv[0]))
+os.chdir(scriptPath)
+sys.path.append("..")
+from restclient import *
+#append the relative location you want to import from
+sys.path.append("../../PacketDeliveryServer")
 from pathFinding import *
 from parcelSelection import *
 from findAllPaths import *
@@ -38,7 +49,6 @@ class Vehicle(RestClient):
 
     def get_position(self):
         positions = (self.get_positions()).get('positions')
-        print (self.get_teamname(), positions)
         for x in positions:
     	    if x[0] == self.get_teamname():
     	        return [x[1],x[2]]
@@ -128,7 +138,8 @@ class Vehicle(RestClient):
                 target = parcel[1]
             else:
     	        target = parcel[2]
-            time.sleep(length/self.get_speed())
+
+            time.sleep(float(length)/self.get_speed())
             self.pushposition(position[1])
             if position[1] == target:
                 if self.get_parcel_status():

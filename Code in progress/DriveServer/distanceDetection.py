@@ -1,7 +1,6 @@
-from Sensor import *
-from time import *
+from time import sleep
 
-sensor = DistanceSensor()
+
 #warning levels:
 # <50 : 1
 # <40 : 2
@@ -21,7 +20,7 @@ while True:
             getting_closer = True
     else if previous_warning != warning:
         counter = 0
-    previous_warning = warning    
+    previous_warning = warning
     distance = sensor.update_value()
     for x in range(len(warningLevels)):
         if distance <= warningLevels[x]:

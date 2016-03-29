@@ -10,7 +10,7 @@ def generate_secret_key(length):
     return result
 
 class RestClient(object):
-    def __init__(self,root,teamname):
+    def __init__(self,root,teamname = None):
         self.__root = root
         self.__secret_key = generate_secret_key(16)
         self.__registed = False
