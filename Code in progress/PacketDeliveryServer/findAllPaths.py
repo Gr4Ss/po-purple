@@ -1,12 +1,12 @@
 import random
 from sys import maxint
-
+# Return distance to all nodes using Dijkstra's algorithm
 def find_all_paths(edges, vertices, current):
     unvisited = {node[0]: maxint for node in vertices}
     visited = {}
     currentDistance = 0
     unvisited[current] = currentDistance
-    while True:        
+    while True:
         for x in range(len(edges) - 1, -1, -1):
             if edges[x][0] == current:
                 neighbour = edges[x][1]
@@ -26,7 +26,7 @@ map = {"vertices": [[1, {"origin": 3, "straight": 2, "left": 4}],[2, {"origin": 
 
 def get_edges():
         return map.get('edges')
-    
+
 def get_vertices():
         return map.get('vertices')
 

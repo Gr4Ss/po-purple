@@ -10,11 +10,18 @@ from lua_python_bridge import *
 #-----------END IMPORTS------------------
 
 class Ratio:
-	def __init__(self,PositionLeftWheel,PositionRightWheel):
-		self.leftWheel = PositionLeftWheel
-		self.rightWheel = PositionRightWheel
+	def __init__(self,PositionLeftWheel,PositionRightWheel,packet_delivery=False,directions=[]):
+		# Storing the position of the left wheel
+		self.left_wheel = PositionLeftWheel
+		# Storing the position of the right wheel
+		self.right_wheel = PositionRightWheel
+		# If packet delivery flag is set the server will not follow the directions listed in
+		# direction list but instead use data from the packet delivery server to choose it next direction
+		self.packet_delivery = packet_delivery
+		# Variabele storing the last used ratio
 		self.last_ratio = 0
-		self.direction_list = []
+		self.direction_list = directions
+		# List storing the valid directions
 		self.valid_directions = ['forward','left','right']
 		self.ratio_queue = []
 		self.layout_queue = []
@@ -23,7 +30,7 @@ class Ratio:
 	The given parameter may be a single direction or a list of directions.
 	'''
 	def append_directions(self,directions):
-		if hasattr(directions, '__iter__'):
+		if hasattr(directions, __iter__):
 			for d in directions:
 				if d in valid_directions:
 					self.direction_list.append(d)
@@ -48,94 +55,82 @@ class Ratio:
 		# There are no points on the image, do as before
 		if len(left) == 0 and len(right) == 0 and len(top) == 0:
     		return self.last_ratio
-		# There are points on the top half of the image, go straight.
+		# There are points on the top row of the image, it's just a normal straight.
 		elif ((len(left) == 0 and len(right) == 0 and len(top) > 0)):
-    		return self.choose_path([cog_y(points)], 'normal_straight')
+    		return self.choose_path([mean_y(points]}, 'normal_straight')
     	# There are points on the right side of the image, go right.
     	elif (len(left) == 0 and len(right) > 0 and len(top) == 0):
-        	return self.choose_path([cog_x(points)], 'normal_right')
+        	return self.choose_path([mean_x(points)], 'normal_right')
     	# There are points on the left side of the image, go left.
     	elif (len(left) > 0 and len(right) == 0 and len(top) == 0) :
-        	return self.choose_path([cog_x(points)], 'normal_left')
+        	return self.choose_path([mean_x(points)], 'normal_left')
 	    # There are points on the left and right side of the image.
     	elif len(left) > 0 and len(right) > 0 and len(top) == 0:
-        	left_des = cog_y(left)
-        	right_des = cog_y(right)
+        	left_des = mean_y(left)
+        	right_des = mean_y(right)
 		    return self.choose_path([left_des, right_des], 'T_flat')
 
     	# There are points on the left and the top side of the image
     	elif len(left) > 0 and len(right) == 0 and len(top) > 0:
-        	left_des = cog_y(left)
-        	top_des = cog_x(top)
+        	left_des = mean_y(left)
+        	top_des = mean_x(top)
         	return self.choose_path([left_des, top_des], 'T_left')
 
     	# There are points on the right and the top side of the image
     	elif len(left) == 0 and len(right) > 0 and len(top) > 0:
-        	right_des = cog_y(right)
-        	top_des = cog_x(top)
+        	right_des = mean_y(right)
+        	top_des = mean_x(top)
         	return self.choose_path([right_des,top_des] , 'T_right')
 
     	# Else there are crossroads which are detected
     	else:
-        	left_des = cog_x(top)
-        	right_des = cog_y(right)
-        	top_des = cog_x(top)
-        	return self.choose_path(ratio_queue, layout_queue, direction_list, [left_des, top_des, right_des], 'crossroads', xCoLeft, yCoLeft, xCoRight, yCoRight)
+        	left_des = mean_x(top)
+        	right_des = mean_y(right)
+        	top_des = mean_x(top)
+        	return self.choose_path([left_des, top_des, right_des], 'crossroads')
 
 	# Choose which path you are going to take
-	def choose_path(self,ratio_queue, layout_queue, args, layout):
-    	# Guess the ratio from the ratio queue.
-    	ratio_guess = guess_ratio(ratio_queue)
+	def choose_path(self, args, layout):
 		next_direction = self.direction_list[0]
     	# Calculate ratios for all different layouts
     	if layout == 'normal_straight' or layout == 'normal_left' or layout == 'normal_right':
-        	ratio_new = to_ratio(args[0])
-    		elif layout == 'T_flat':
-        		if next_direction == 'left':
-            			ratio_new = to_ratio(args[0])
-        		elif next_direction == 'right':
-        			 ratio_new = to_ratio(args[1]
+        	ratio_new = self.to_ratio(args[0])
+    	elif layout == 'T_flat':
+        	if next_direction == 'left':
+            	ratio_new = self.to_ratio(args[0])
+        	elif next_direction == 'right':
+        		ratio_new = self.to_ratio(args[1]
 			elif next_direction == 'straight':
-            			ratio_new = to_ratio(((args[0][0] + args[1][0])/2,((args[0][1]+args[1][1])/2)), xCoLeft, yCoLeft, xCoRight, yCoRight)
-        		else:
-            			raise Error
-    		elif layout == 'T_right' or layout == 'T_left':
-        		if next_direction == 'left':
-            			ratio_new = to_ratio(args[0], xCoLeft, yCoLeft, xCoRight, yCoRight)
-        		elif next_direction == 'right':
-            			ratio_new = to_ratio(args[0], xCoLeft, yCoLeft, xCoRight, yCoRight)
-        		elif next_direction == 'straight':
-            			ratio_new = to_ratio(args[1], xCoLeft, yCoLeft, xCoRight, yCoRight)
-        		else:
-            			raise Error
-    		elif layout == 'crossroads':
-        		if next_direction == 'left':
-            			ratio_new = to_ratio(args[0], xCoLeft, yCoLeft, xCoRight, yCoRight)
-        		elif next_direction == 'right':
-            			ratio_new = to_ratio(args[2], xCoLeft, yCoLeft, xCoRight, yCoRight)
-        		elif next_direction == 'straight':
-            			ratio_new = to_ratio(args[1], xCoLeft, yCoLeft, xCoRight, yCoRight)
-        		else:
-            			raise Error
-    		else:
-        		raise Error
+            	ratio_new = self.to_ratio(((args[0][0] + args[1][0])/2,((args[0][1]+args[1][1])/2)))
+    	elif layout == 'T_left':
+        	if next_direction == 'left':
+        			ratio_new = self.to_ratio(args[0])
+        	elif next_direction == 'straight':
+            		ratio_new = self.to_ratio(args[1])
+        elif layout == 'T_right':
+			if next_direction == 'right':
+				ratio_new = self.to_ratio(args[0])
+			elif next_direction == 'straight':
+				ratio_new = self.to_ratio(args[1])
+    	elif layout == 'crossroads':
+        	if next_direction == 'left':
+            	ratio_new = self.to_ratio(args[0])
+        	elif next_direction == 'right':
+            	ratio_new = self.to_ratio(args[2])
+        	elif next_direction == 'straight':
+            	ratio_new = self.to_ratio(args[1])
 
-    		# Guess the ratio from the ratio queue.
-    		ratio_guess = guess_ratio(ratio_queue)
-    		weight_of_guess = 0.0
-    		layout_queue = add_to_queue(layout_queue, layout)
-
-    		return_ratio = (weight_of_guess) * ratio_guess + (1.0 - weight_of_guess) * ratio_new
-    		ratio_queue = add_to_queue(ratio_queue, return_ratio)
-    		new_ratio_queue, new_layout_queue, new_direction_list = update_direction_list_and_queues(ratio_queue, layout_queue, direction_list)
+    	# Guess the ratio from the ratio queue.
+    	layout_queue = add_to_queue(layout_queue, layout)
+    	return_ratio = (weight_of_guess) * ratio_guess + (1.0 - weight_of_guess) * ratio_new
+    	ratio_queue = add_to_queue(ratio_queue, return_ratio)
+    	new_ratio_queue, new_layout_queue, new_direction_list = update_direction_list_and_queues(ratio_queue, layout_queue, direction_list)
 		return return_ratio, new_layout_queue, new_ratio_queue, new_direction_list
 
-
 	def to_ratio(self,point):
-    		left_distance = sqrt((point[0] - self.leftWheelX)**2 + (point[1] - yCoLeft)**2)
-    		right_distance= sqrt((point[0] - xCoRight)**2 + (point[1] - yCoRight)**2)
+    		left_distance = sqrt((point[0] - self.left_wheel[0])**2 + (point[1] - self.left_wheel[1])**2)
+    		right_distance= sqrt((point[0] - self.right_wheel[0])**2 + (point[1] - self.right_wheel[1])**2)
     		ratio = right_distance/left_distance
-
     		if ratio > 1:
         		ratio = (-1)*(1.0 - 1.0/ratio)
     		else:
@@ -144,17 +139,17 @@ class Ratio:
 
 # Returns the x coordinate of the first point and the average
 # x coordinate for all points
-def cog_x(points):
+def mean_x(points):
     pointss = numpy.array(points)
-    cog_x = numpy.average(pointss, axis=0)[0]
-    return (cog_x, points[0][1])
+    mean_x = numpy.average(pointss, axis=0)[0]
+    return (mean_x, points[0][1])
 
 # Returns the y coordinate of the first point and the average
 # y coordinate for all points
-def cog_y(points):
+def mean_y(points):
     pointss = numpy.array(points)
-    cog_y = numpy.average(pointss, axis=0)[1]
-    return (points[0][0], cog_y)
+    mean_y = numpy.average(pointss, axis=0)[1]
+    return (points[0][0], mean_y)
 
 # Add the item to the queue, while maintaining the maximum queue length
 def add_to_queue(queue, ratio):
@@ -226,11 +221,11 @@ def get_most_common_in_queue(layout_queue):
 
 def get_direction(layout_queue, ratio_queue):
     direction_list = ['normal_straight','normal_right','normal_left','T_flat','T_left','T_right','crossroads']
-    direction = recognize_direction2(layout_queue, direction_list, ratio_queue)
+    direction = recognize_direction2(layout_queue, ratio_queue)
     return direction
 
 
-def recognize_direction2(layout_queue, direction_list, ratio_queue):
+def recognize_direction2(layout_queue, ratio_queue):
     start_special = -1
     end_special = -1
     for i in xrange(0, len(layout_queue)):
@@ -238,25 +233,25 @@ def recognize_direction2(layout_queue, direction_list, ratio_queue):
             start_special = i
         if (not is_special(layout_queue[i]) or i == len(layout_queue)-1) and not start_special == -1:
             end_special = i
-        if not end_special == -1 and not start_special == -1:
-            if abs(end_special-start_special)<4:
-                start_special = -1
-                end_special = -1
-            else:
-                total_ratio = 0
-                nb = 0
-                for j in xrange(start_special, end_special):
-                    total_ratio += ratio_queue[j]
-                    nb += 1
-                total_ratio = total_ratio /nb
-                print total_ratio
-                boundary = 0.2
-                if abs(total_ratio) < boundary:
-                    return 'straight'
-                elif total_ratio > boundary:
-                    return 'right'
-                else:
-                    return 'left'
+		if not end_special == -1 and not start_special == -1:
+        	if abs(end_special-start_special)<4:
+            	start_special = -1
+            	end_special = -1
+        	else:
+            	total_ratio = 0
+            	nb = 0
+            	for j in xrange(start_special, end_special):
+                	total_ratio += ratio_queue[j]
+                	nb += 1
+            	total_ratio = total_ratio /nb
+            	print total_ratio
+            	boundary = 0.2
+            	if abs(total_ratio) < boundary:
+                	return 'straight'
+            	elif total_ratio > boundary:
+                	return 'right'
+            	else:
+                	return 'left'
     return "No node found"
 
 def is_special(layout):
