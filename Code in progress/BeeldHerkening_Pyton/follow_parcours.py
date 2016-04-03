@@ -75,12 +75,12 @@ class Ratio:
 	Method that return the speed (left,right) based on the current image, the direction list, ...
 	'''
 	def get_speed(self):
-    	# Get the points which are intersecting with the drawn lines.
-    	left,top,right,bottom = get_points()
+		# Get the points which are intersecting with the drawn lines.
+		left,top,right,bottom = get_points()
 		# Determine the layout of the current image
 		current_layout = classify_image(left,top,right)
 		if self.driving_state == 'normal':
-			if !is_special(current_layout) or current_layout == None:
+			if (not is_special(current_layout)) or current_layout == None:
 				s = self.get_normal_speed(left,top,right,current_layout)
 				self.last_speed = s
 				return s
@@ -133,19 +133,19 @@ class Ratio:
 				return (0,0)
 		# If turning on a split
 		elif self.driving_state == 'split_turning':
-			if !is_special(current_layout):
+			if (not is_special(current_layout)):
 				self.back_on_track_count +=1
 			else:
 				self.back_on_track_count = 0
 			# Check if we are back on track after the split
 			back_on_track = self.back_on_track()
 			if back_on_track:
-		        last_direction = self.recognize_direction()
-		        if last_direction == direction_list[0]:
-		            print 'turned correctly to the ' + last_direction
-		            self.direction_list.pop(0)
-		        else:
-		            print 'turned incorrectly to the'+ last_direction +' !'
+				last_direction = self.recognize_direction()
+				if last_direction == direction_list[0]:
+					print 'turned correctly to the ' + last_direction
+					self.direction_list.pop(0)
+				else:
+					print 'turned incorrectly to the'+ last_direction +' !'
 				# Return back to the normal state
 				self.driving_state = 'normal'
 				self.split_ratio = [0,0]
@@ -173,71 +173,83 @@ class Ratio:
 			return to_speed(ratio,self.minimum_speed)
 	def get_split_ratio(self,left,top,right,layout,next_direction):
 		left_destination = (2, int(height/2))
-    	right_destination = (width-2, int(height/2))
+		right_destination = (width-2, int(height/2))
 		if layout == None:
 			ratio = (self.last_speed[1]/self.last_speed[0])
 			if ratio > 1:
-        		ratio = (-1)*(1.0 - 1.0/ratio)
+				ratio = (-1)*(1.0 - 1.0/ratio)
     		else:
         		ratio = (1.0 - ratio)
     		return ratio
-    	if layout == 'normal_straight':
-        	return self.to_ratio(mean_x(top))
+		if layout == 'normal_straight':
+			return self.to_ratio(mean_x(top))
 		elif layout == 'normal_right':
-        	return self.to_ratio(mean_y(right))
+			return self.to_ratio(mean_y(right))
 		elif layout == 'normal_left':
 			return self.to_ratio(mean_y(left))
-    	elif layout == 'T_flat':
-        	if next_direction == 'left':
+		elif layout == 'T_flat':
+			if next_direction == 'left':
 				return self.to_ratio(mean_y(left))
-        	elif next_direction == 'right':
-            	ratio = self.to_ratio(mean_y(right))
-				return to_speed(ratio,self.minimum_speed)
-        	else:
-				return self.last_speed
-    	elif layout == 'T_right':
-        	if next_direction == 'right':
-            	ratio = self.to_ratio(mean_y(right))
-				return to_speed(ratio,self.minimum_speed)
-        	elif next_direction == 'straight':
-            	ratio = self.to_ratio(mean_x(top))
-				return to_speed(ratio,self.minimum_speed)
+			elif next_direction == 'right':
+				return self.to_ratio(mean_y(right))
 			else:
-				return self.last_speed
+				ratio = (self.last_speed[1]/self.last_speed[0])
+				if ratio > 1:
+					ratio = (-1)*(1.0 - 1.0/ratio)
+				else:
+					ratio = (1.0 - ratio)
+	    		return ratio
+		elif layout == 'T_right':
+			if next_direction == 'right':
+				return self.to_ratio(mean_y(right))
+			elif next_direction == 'straight':
+				return self.to_ratio(mean_x(top))
+			else:
+				ratio = (self.last_speed[1]/self.last_speed[0])
+				if ratio > 1:
+					ratio = (-1)*(1.0 - 1.0/ratio)
+				else:
+					ratio = (1.0 - ratio)
+	    		return ratio
 		elif layout == 'T_left':
 			if next_direction == 'left':
-				ratio = self.to_ratio(mean_y(left))
-				return to_speed(ratio,self.minimum_speed)
+				return self.to_ratio(mean_y(left))
 			elif next_direction == 'straight':
-				ratio = self.to_ratio(mean_x(top))
-				return to_speed(ratio,self.minimum_speed)
+				return self.to_ratio(mean_x(top))
 			else:
-				return self.last_speed
-    	elif layout == 'crossroads':
-        	if next_direction == 'left':
-            	ratio_new = self.to_ratio(mean_y(left))
-				return to_speed(ratio,self.minimum_speed)
-        	elif next_direction == 'right':
-            	ratio_new = self.to_ratio(mean_y(right))
-				return to_speed(ratio,self.minimum_speed)
+				ratio = (self.last_speed[1]/self.last_speed[0])
+				if ratio > 1:
+					ratio = (-1)*(1.0 - 1.0/ratio)
+				else:
+					ratio = (1.0 - ratio)
+	    		return ratio
+		elif layout == 'crossroads':
+			if next_direction == 'left':
+				return self.to_ratio(mean_y(left))
+			elif next_direction == 'right':
+				return self.to_ratio(mean_y(right))
         	elif next_direction == 'straight':
-            	ratio_new = self.to_ratio(mean_x(top))
-				return to_speed(ratio,self.minimum_speed)
+				return self.to_ratio(mean_x(top))
 		else:
-			return last_speed
+			ratio = (self.last_speed[1]/self.last_speed[0])
+			if ratio > 1:
+				ratio = (-1)*(1.0 - 1.0/ratio)
+			else:
+				ratio = (1.0 - ratio)
+			return ratio
 
 	def recognize_direction(self):
-	    total_ratio = self.split_ratio[0]
-	    nb = self.split_ratio[1]
-	    total_ratio = total_ratio /nb
-	    print total_ratio
-	    boundary = self.recognize_direction_boundary
-	    if abs(total_ratio) < boundary:
-	        return 'straight'
-	    elif total_ratio > boundary:
-	        return 'right'
+		total_ratio = self.split_ratio[0]
+		nb = self.split_ratio[1]
+		total_ratio = total_ratio /nb
+		print total_ratio
+		boundary = self.recognize_direction_boundary
+		if abs(total_ratio) < boundary:
+			return 'straight'
+		elif total_ratio > boundary:
+			return 'right'
 		else:
-	    	return 'left'
+			return 'left'
 
 	def to_ratio(self,point):
     		left_distance = sqrt((point[0] - self.left_wheel[0])**2 + (point[1] - self.left_wheel[1])**2)
