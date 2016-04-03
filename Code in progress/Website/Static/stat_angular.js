@@ -6,43 +6,103 @@ app.controller('statController',function($scope,dataService){
   $scope.deliveries = [];
   $scope.positions = [];
   $scope.loadingTeamInfo = false;
-  $scope.get_global_data = function(fn){
-    teams = [];
-    delivered_parcels = [];
-    distance_driven = [];
-    var promise = dataService.getData(null);
-    promise.success(function(returndata){
-    $.each(returndata.data, function(i, obj) {
-          console.log(obj);
-          teams.push(obj.name);
-          delivered_parcels.push(obj.delivered);
-          distance_driven.push(obj.distance);
-        });
-    fn(teams,delivered_parcels,distance_driven);
-    });
+  $scope.lastReload = Date.now();
+  /*
+  Method used when a new team is selected.
+  */
+  $scope.new_team = function(){
+    $scope.showTeamInfo = false;
+    if ($scope.selectedTeam != ""){
+      $scope.loadingTeamInfo = true;
+      var promise = dataService.getData($scope.selectedTeam);
+      promise.success(function(returndata){
+            $scope.deliveries = returndata.deliveries;
+            $scope.positions = returndata.positions;
+            $scope.draw_team_chart($scope.parce_deliveries($deliveries))
+            $scope.lastReload = Date.now();
+            $scope.loadingTeamInfo = false;
+            $scope.showTeamInfo = true;
+      });
     }
-    $scope.loop = function(){
-      console.log('update');
-      $scope.get_global_data($scope.update_chart);
-      setTimeout ($scope.loop,10000 );
-    }
-    $scope.update_team_data = function(){
-      $scope.showTeamInfo = false;
-      if ($scope.selectedTeam != ""){
-        $scope.loadingTeamInfo = true;
-        var promise = dataService.getData($scope.selectedTeam);
-        promise.success(function(returndata){
-              $scope.deliveries = returndata.deliveries;
-              $scope.positions = returndata.positions;
-              $scope.draw_team_info();
-        });
-      }
+  }
+  $scope.parce_deliveries(){
 
+  }
+  $scope.update_team_data = function(){
+
+
+  }
+  $scope.draw_team_chart = function(initial_labels,intial_deliveries){
+    var data = {
+      labels: initial_labels,
+      datasets: [
+        {
+            label: "My First dataset",
+            fillColor: "rgba(220,220,220,0.2)",
+            strokeColor: "rgba(220,220,220,1)",
+            pointColor: "rgba(220,220,220,1)",
+            pointStrokeColor: "#fff",
+            pointHighlightFill: "#fff",
+            pointHighlightStroke: "rgba(220,220,220,1)",
+            data: intial_deliveries
+          },
+        ]
+    };
+    var options = {
+    ///Boolean - Whether grid lines are shown across the chart
+    scaleShowGridLines : true,
+    //String - Colour of the grid lines
+    scaleGridLineColor : "rgba(0,0,0,.05)",
+    //Number - Width of the grid lines
+    scaleGridLineWidth : 1,
+    //Boolean - Whether to show horizontal lines (except X axis)
+    scaleShowHorizontalLines: true,
+    //Boolean - Whether to show vertical lines (except Y axis)
+    scaleShowVerticalLines: true,
+    //Boolean - Whether the line is curved between points
+    bezierCurve : true,
+    //Number - Tension of the bezier curve between points
+    bezierCurveTension : 0.4,
+    //Boolean - Whether to show a dot for each point
+    pointDot : true,
+    //Number - Radius of each point dot in pixels
+    pointDotRadius : 4,
+    //Number - Pixel width of point dot stroke
+    pointDotStrokeWidth : 1,
+    //Number - amount extra to add to the radius to cater for hit detection outside the drawn point
+    pointHitDetectionRadius : 20,
+    //Boolean - Whether to show a stroke for datasets
+    datasetStroke : true,
+    //Number - Pixel width of dataset stroke
+    datasetStrokeWidth : 2,
+    //Boolean - Whether to fill the dataset with a colour
+    datasetFill : true,
+    //String - A legend template
+    legendTemplate : "<ul class=\"<%=name.toLowerCase()%>-legend\"><% for (var i=0; i<datasets.length; i++){%><li><span style=\"background-color:<%=datasets[i].strokeColor%>\"></span><%if(datasets[i].label){%><%=datasets[i].label%><%}%></li><%}%></ul>"
+  };
+  var ctx = document.getElementById("myChart").getContext("2d");
+  var myLineChart = new Chart(ctx).Line(data, options);
     }
-    $scope.draw_team_info = function(){
-      $scope.loadingTeamInfo = false;
-      $scope.showTeamInfo = true;
-    }
+    $scope.get_global_data = function(fn){
+      teams = [];
+      delivered_parcels = [];
+      distance_driven = [];
+      var promise = dataService.getData(null);
+      promise.success(function(returndata){
+      $.each(returndata.data, function(i, obj) {
+            console.log(obj);
+            teams.push(obj.name);
+            delivered_parcels.push(obj.delivered);
+            distance_driven.push(obj.distance);
+          });
+      fn(teams,delivered_parcels,distance_driven);
+      });
+      }
+      $scope.loop = function(){
+        console.log('update');
+        $scope.get_global_data($scope.update_chart);
+        setTimeout ($scope.loop,10000 );
+      }
   $scope.draw_chart = function(teams,delivered_parcels,distance_driven){
     //Get the context of the canvas element we want to select
     $scope.teams = teams;
