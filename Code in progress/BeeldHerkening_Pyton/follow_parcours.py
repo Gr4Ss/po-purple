@@ -37,7 +37,7 @@ class Ratio:
 		# Storing a int representing the split check phase
 		self.split_check_phase = 0
 		# Storing a list with the layouts discovered during checking
-		self.split_check_layout = []
+		self.split_check_layout= []
 		self.split_layout = None
 		#
 		self.split_count = 0
@@ -372,6 +372,16 @@ def get_most_common_in_queue(layout_queue):
     else:
         raise AssertionError
 
+def find_layout(layout_queue):
+    nb_special = 0
+    nb_special = len(layout_queue) - nb_normal
+    if nb_special < 2:
+        return "normal"
+    else:
+        return get_most_common_in_queue(layout_queue)
 
 def is_special(layout):
     return (layout.split('_')[0]!= 'normal')
+
+
+        
