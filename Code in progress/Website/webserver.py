@@ -38,7 +38,6 @@ def server_static(filename):
 def get_data():
     d = data_logger.get_data()
     r = {"data":[{"name":i["name"],"delivered":len(i["deliveries"]),"distance":len(i["positions"])} for i in d]}
-    print r
     return json.dumps(r)
 @app.route('/stats/data/<team>')
 def data_team(team):

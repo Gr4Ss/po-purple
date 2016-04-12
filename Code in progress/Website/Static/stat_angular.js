@@ -25,7 +25,7 @@ app.controller('statController',function($scope,dataService){
       });
     }
   }
-  $scope.parce_deliveries(){
+  $scope.parce_deliveries = function(){
 
   }
   $scope.update_team_data = function(){
