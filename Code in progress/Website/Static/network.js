@@ -145,11 +145,9 @@ var Dataset = {
 	]
 }
 
-console.log(Dataset["vertices"][0]);
 
-/** Checks whether there are two-way streets **/
+/* Checks whether there are two-way streets */
 function checkDependencies(edgeset) {
-	console.log(edgeset);
 	for (i=0; i<edgeset.length; i++) {
 		for (j=0; j<edgeset[i].length; j++) {
 			
@@ -167,7 +165,6 @@ var visSetEdges = new vis.DataSet();
 function convertDataSet() {
 	/* First add the nodes */
 	for (i in Dataset["vertices"]) {
-		console.log(i)
 		var localset = new Set();
 		localset = {id: Dataset["vertices"][i][0], label: Dataset["vertices"][i][0]};
 		visSetNodes.add(localset);
@@ -263,16 +260,19 @@ function removeTeamNameEdge(teamname, fromNode, toNode, labelDist) {
 	data.edges.update([{id: (7*fromNode + 11*toNode), label: labelDist}])
 };
 
-/* Change the position of a team */
+function changeTeamPosition(carTeam) {
+	if (hasNodePosition(car)) {
+		
+	}
+	else {
+		
+	}
+}
+
+/* Changes the position of a team */
 function changePositionTeam(prevPosition, newPosition, teamName) {
 	pass;
 };
-
-/* Converts the dataset to a new one usable in vis */
-convertDataSet();
-
-/* Setup a new network */
-var network = new vis.Network(container, data, options);
 
 /* */
 function showRouteTeam(teamname, nodeList, edgeList) {
@@ -293,41 +293,39 @@ function showRouteTeam(teamname, nodeList, edgeList) {
 	}
 }
 
-var ownCar = {team: 'Purple', currentNodePos: 1, currentEdgePos: {from: 1, to: 3}};
-var otherCar1;
-var otherCar2;
-var otherCar3;
+//////////// SETTING UP NETWORK ////////////
+
+/* Converts the dataset to a new one usable in vis */
+convertDataSet();
+
+/* Setup a new network */
+var network = new vis.Network(container, data, options);
 
 //changeNodeColor(1, '#ababab');
 //changeEdgeColor(3, 4, '#ab78ab');
+
+//////////// MAINTAINING THE NETWORK ///////
+
+/* Dynamically lets the network fit to the canvas */
+setInterval(function() {network.fit()}, 10);
+
+var canvas = document.getElementById('mynetwork');
+fitToContainer(canvas);
+
+function fitToContainer(canvas){
+  // Make it visually fill the positioned parent
+  canvas.style.width ='100%';
+  canvas.style.height='100%';
+  // ...then set the internal size to match
+  canvas.width  = canvas.offsetWidth;
+  canvas.height = canvas.offsetHeight;
+}
+
 
 var prevPos = 1;
 var carPos = 1;
 var prevIterator = 1;
 var iterator = 1;
-
-/* Dynamically lets the network fit to the canvas */
-setInterval(function() {network.fit()}, 10);
-
-network.on("stabilizationProgress", function(params) {
-	console.log("progress: ", params);
-});
-
-network.on("stabilizationIterationsDone", function() {
-	console.log("true");
-});
-
-network.on("startStabilizing", function() {
-	network.on("stabilizationProgress", function(params) {
-		console.log("progress: ", params);
-	})
-	console.log("Starting stabilization");
-});
-
-network.on("stabilized", function(params) {
-	
-	console.log("stabilized", params);
-});
 
 /**
 setInterval(function(){ 

@@ -42,13 +42,13 @@
           <div id ='statController' ng-app='statApp' ng-controller='statController'>
                   <div>
                     <canvas id="myChart" width="400" height="400"></canvas>
-                    <script>
+                    <!--<script>
                     $( document ).ready(function(){
                       var scope = angular.element(document.getElementById('statController')).scope();
                       scope.$apply(scope.get_global_data(scope.draw_chart));
                       setTimeout(function(){scope.$apply(scope.loop())},10000);
                     });
-                    </script>
+                    </script>-->
                   </div>
                   <div >
                       <select id='selectTeam' ng-model='selectedTeam' ng-options="team for team in teams" ng-change="new_team()">
