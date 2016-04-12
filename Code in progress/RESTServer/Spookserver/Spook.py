@@ -59,14 +59,15 @@ class Vehicle(RestClient):
         for x in parcels.get('on-the-road-parcels'):
             if x[3] == self.get_teamname():
                 return x
-        parcel = select_parcel(self.get_edges(), self.get_vertices(), position, parcels.get('available-parcels'))
+        parcel = select_parcel(self.update_edges_traffic(), self.get_vertices(), position, parcels.get('available-parcels'))
         if parcel == False:
             return False
         self.claim_parcel(parcel[0])
         return parcel
 
-    def get_edge_length(self, edge):
-    	edges = self.get_edges()
+    def get_edge_length(self, edge, edges = None):
+        if edges == None:
+    	       edges = self.get_edges()
     	for x in edges:
     	    if x[0] == edge[0] and x[1] == edge[1]:
                 return x[2]
@@ -121,7 +122,7 @@ class Vehicle(RestClient):
                         edges.remove(edge)
     		if x[1] == position[0]:
                     print edges
-    		    i = edges.index([x[1], x[2], self.get_edge_length([x[1], x[2]])])
+    		    i = edges.index([x[1], x[2], self.get_edge_length([x[1], x[2]], edges)])
     		    edge = edges.pop(i)
     		    edge[2] = edge[2]*2
     		    edges.insert(i, edge)
