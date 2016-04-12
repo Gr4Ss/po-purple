@@ -65,8 +65,9 @@ class Vehicle(RestClient):
         self.claim_parcel(parcel[0])
         return parcel
 
-    def get_edge_length(self, edge):
-    	edges = self.get_edges()
+    def get_edge_length(self, edge, edges = None):
+        if edges == None:
+    	       edges = self.get_edges()
     	for x in edges:
     	    if x[0] == edge[0] and x[1] == edge[1]:
                 return x[2]
@@ -121,7 +122,7 @@ class Vehicle(RestClient):
                         edges.remove(edge)
     		if x[1] == position[0]:
                     print edges
-    		    i = edges.index([x[1], x[2], self.get_edge_length([x[1], x[2]])])
+    		    i = edges.index([x[1], x[2], self.get_edge_length([x[1], x[2]], edges)])
     		    edge = edges.pop(i)
     		    edge[2] = edge[2]*2
     		    edges.insert(i, edge)
