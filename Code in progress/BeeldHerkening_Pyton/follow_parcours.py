@@ -1,5 +1,6 @@
 import numpy
 import os,sys,inspect
+from math import *
 #first change the cwd to the script path
 scriptPath = os.path.realpath(os.path.dirname(sys.argv[0]))
 os.chdir(scriptPath)
@@ -80,7 +81,7 @@ class Ratio:
 		# Determine the layout of the current image
 		current_layout = classify_image(left,top,right)
 		if self.driving_state == 'normal':
-			if (not is_special(current_layout)) or current_layout == None:
+			if current_layout == None or (not is_special(current_layout)):
 				s = self.get_normal_speed(left,top,right,current_layout)
 				self.last_speed = s
 				return s
@@ -101,7 +102,7 @@ class Ratio:
 						return s
 					else:
 						ratio = self.to_ratio(mean_x(top))
-						s = to_speed(ratio,self.minimum_speed)
+						s = self.to_speed(ratio,self.minimum_speed)
 						self.last_speed = s
 						return s
 		# A possible split is detected, extra check is preformed.
@@ -109,14 +110,17 @@ class Ratio:
 			#If we are in split_check_phase 0-4 we just look straight at the intersect
 			if self.split_check_phase < 5:
 				self.split_check_layout.append(current_layout)
+				self.split_check_phase += 1
 				return (0,0)
 			# During split_check_phase 5-10 we turn slightly to the left and back to the center
 			elif self.split_check_phase < 11:
 				self.split_check_layout.append(current_layout)
+				self.split_check_phase += 1
 				return (self.minimum_speed*sign(self.split_check_phase-7.5),0)
 			# During split_check_phase 11-16 we turn slightly to the right and back to the center
 			elif self.split_check_phase <17:
 				self.split_check_layout.append(current_layout)
+				self.split_check_phase += 1
 				return (0,self.minimum_speed*sign(self.split_check_phase-13.5))
 			# All checks are done
 			else:
@@ -155,14 +159,14 @@ class Ratio:
 				self.split_ratio[0] += ratio
 				self.split_ratio[1] += 1
 				return to_speed(ratio,self.minimum_speed)
-	def get_normal_speed(self,left,top,right,layout):
+	def get_normal_speed(self,left,top,right,current_layout):
 		if current_layout == None:
 			return self.last_ratio
 		elif current_layout == 'normal_straight':
 			ratio = self.to_ratio(mean_x(top))
 			if ratio != 0:
 				basic_speed = max(self.minimum_speed,min(math.log(1./abs(ratio)**2,10)*self.minimum_speed,self.maximum_speed))
-				return to_speed(ratio,basic_speed)
+				return self.to_speed(ratio,basic_speed)
 			else:
 				return (self.maximum_speed,self.maximum_speed)
 		elif current_layout == 'normal_left':
@@ -265,6 +269,27 @@ class Ratio:
 	'''
 	def back_on_track(self):
 		return self.back_on_track_count > self.back_on_track_threshold
+	def to_speed(self,ratio,basic_speed):
+		# If ratio is bigger then one than left must drive a bigger distance then right
+		if ratio >= 0:
+			rspeed = (1.-ratio)*basic_speed
+			# If the right speed is very low it must drive backward
+			if (rspeed < self.minimum_speed*0.75):
+				rspeed = (-1.)*self.minimum_speed
+			# If the right speed is low it must drive the minimum speed
+			elif (rspeed < self.minimum_speed):
+				rspeed = self.minimum_speed
+			return (basic_speed,rspeed)
+		else:
+			lspeed = (1.+ratio)*basic_speed
+			# If the left speed is very low it must drive backward
+			if (lspeed < self.minimum_speed*0.75):
+				lspeed = (-1.)*self.minimum_speed
+			# If the right speed is low it must drive the minimum speed
+			elif (lspeed < self.minimum_speed):
+				lspeed = self.minimum_speed
+			return (lspeed,basic_speed)
+
 
 
 
@@ -287,7 +312,7 @@ def mean_y(points):
  'T-flat','T-right','T-left','crossroads' or None when no points are detected
  Intersections in the form of [left,top,right]
 '''
-def classify_image(intersections):
+def classify_image(left,top,right):
 	# There are no points on the image, do as before
 	if len(left) == 0 and len(right) == 0 and len(top) == 0:
 		return None
@@ -312,27 +337,6 @@ def classify_image(intersections):
 	# Else there are crossroads which are detected
 	else:
 		return 'crossroads'
-
-def to_speed(ratio,basic_speed):
-	# If ratio is bigger then one than left must drive a bigger distance then right
-	if ratio >= 0:
-		rspeed = (1.-ratio)*basic_speed
-		# If the right speed is very low it must drive backward
-		if (rspeed < self.minimum_speed*0.75):
-			rspeed = (-1.)*self.minimum_speed
-		# If the right speed is low it must drive the minimum speed
-		elif (rspeed < self.minimum_speed):
-			rspeed = self.minimum_speed
-		return (basic_speed,rspeed)
-	else:
-		lspeed = (1.+ratio)*basic_speed
-		# If the left speed is very low it must drive backward
-		if (lspeed < self.minimum_speed*0.75):
-			lspeed = (-1.)*self.minimum_speed
-		# If the right speed is low it must drive the minimum speed
-		elif (lspeed < self.minimum_speed):
-			lspeed = self.minimum_speed
-		return (lspeed,basic_speed)
 
 
 def sign(value):
@@ -373,15 +377,10 @@ def get_most_common_in_queue(layout_queue):
         raise AssertionError
 
 def find_layout(layout_queue):
-    nb_special = 0
-    nb_special = len(layout_queue) - nb_normal
-    if nb_special < 2:
-        return "normal"
-    else:
-        return get_most_common_in_queue(layout_queue)
+    return get_most_common_in_queue(layout_queue)
 
 def is_special(layout):
     return (layout.split('_')[0]!= 'normal')
-
-
-        
+rt = Ratio((0,0),(235,0),False,['left','right'])
+while True:
+	rt.get_speed()

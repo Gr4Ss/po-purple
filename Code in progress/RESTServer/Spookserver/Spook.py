@@ -59,7 +59,7 @@ class Vehicle(RestClient):
         for x in parcels.get('on-the-road-parcels'):
             if x[3] == self.get_teamname():
                 return x
-        parcel = select_parcel(self.get_edges(), self.get_vertices(), position, parcels.get('available-parcels'))
+        parcel = select_parcel(self.update_edges_traffic(), self.get_vertices(), position, parcels.get('available-parcels'))
         if parcel == False:
             return False
         self.claim_parcel(parcel[0])
