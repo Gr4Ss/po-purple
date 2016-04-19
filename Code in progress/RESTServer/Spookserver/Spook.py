@@ -111,22 +111,26 @@ class Vehicle(RestClient):
     	return 'OK'
 
     def update_edges_traffic(self):
-    	positions = (self.get_positions()).get('positions')
-    	position = self.get_position()
-    	edges = self.get_edges()
-    	for x in positions:
+        positions = (self.get_positions()).get('positions')
+        position = self.get_position()
+        edges = self.get_edges()
+        for x in positions:
     	    if x[0] != self.get_teamname() and x[1] != x[2]:
                 if x[2] == position[0]:
                     edge = [x[2], x[1], self.get_edge_length([x[2], x[1]])]
                     if edges.count(edge) != 0:
                         edges.remove(edge)
-    		if x[1] == position[0]:
-                    print edges
-    		    i = edges.index([x[1], x[2], self.get_edge_length([x[1], x[2]], edges)])
-    		    edge = edges.pop(i)
-    		    edge[2] = edge[2]*2
-    		    edges.insert(i, edge)
-    	return edges
+                        continue
+            if x[1] == position[0] and x[1] != x[2]:
+                print edges
+                try:
+                    i = edges.index([x[1], x[2], self.get_edge_length([x[1], x[2]], edges)])
+                    edge = edges.pop(i)
+                    edge[2] = edge[2]*2
+                    edges.insert(i, edge)
+                except:
+                    pass
+        return edges
 
     def drive(self):
     	while True:
