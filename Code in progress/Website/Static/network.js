@@ -152,6 +152,11 @@ $.getJSON("http://localhost:9000/map", function(data) {
 	Dataset = data;
 	console.log(data);
 	convertDataSet();
+	network.on("stabilized", function(params) {
+		network.fit();
+		colorAllPositions;
+		makeExternalLegend;
+	});
 })
 
 
@@ -172,10 +177,14 @@ function convertDataSet() {
 	/* Then add the edges */
 	for (i in Dataset["edges"]) {
 		var localset = new Set();
-		localset = {from: Dataset["edges"][i][0], to: Dataset["edges"][i][1], label: Dataset["edges"][i][2], length: (Dataset["edges"][i][2])*(Dataset["edges"][i][2]), id: (7*Dataset["edges"][i][0] +11*Dataset["edges"][i][1])};
+		minVal = Math.min(Dataset["edges"][i][0], Dataset["edges"][i][1]);
+		maxVal = Math.max(Dataset["edges"][i][0], Dataset["edges"][i][1]);
+		localset = {from: Dataset["edges"][i][0], to: Dataset["edges"][i][1], label: Dataset["edges"][i][2], length: (Dataset["edges"][i][2])*(Dataset["edges"][i][2]), id: (7*minVal +11*maxVal)};
 		if (visSetEdges.get({filter: function (item) {return (item.from == localset.to && item.to ==localset.from);}}).length != 0) {
-			visSetEdges.update({id: 7*localset.to+11*localset.from, arrows: { from: {enabled: true, scaleFactor: 1}}});
-			visSetEdges.remove({from: localset.to, to: localset.from, label: localset.label, length: localset.length, arrows: { from: {enabled: true, scaleFactor: 1}}});
+			minVal = Math.min(localset.to, localset.from);
+			maxVal = Math.max(localset.to, localset.from);
+			visSetEdges.update({id: 7*minVal+11*maxVal, arrows: { from: {enabled: true, scaleFactor: 1}}});
+			visSetEdges.remove({from: minVal, to: maxVal, label: localset.label, length: localset.length, arrows: { from: {enabled: true, scaleFactor: 1}}});
 		} else {
 			visSetEdges.add(localset);
 		}
@@ -290,6 +299,7 @@ myPositions = "haha";
 
 carPrevPosMap = [];
 carPosMap = [];
+carHashMap = {};
 
 function colorAllPositions() {
 	$.getJSON("http://localhost:9000/positions", function(data) {
@@ -297,6 +307,7 @@ function colorAllPositions() {
 		myPositions = data;
 		for (i in myPositions["positions"]){
 			carPosMap[i] = [myPositions["positions"][i][0], myPositions["positions"][i][1], myPositions["positions"][i][2]];
+			carHashMap[hashCode(myPositions["positions"][i][0])] = myPositions["positions"][i][0];
 			console.log(carPosMap[i]);
 		}
 		if (carPrevPosMap.length == 0) {
@@ -308,26 +319,28 @@ function colorAllPositions() {
 			if (carPosMap[car] == carPrevPosMap[car]) {
 				if (carPosMap[car][1] == carPosMap[car][2]) {
 					//addTeamNameNode(carPosMap[car][0], carPosMap[car][1])
-					changeNodeColor(carPosMap[car][1], intToRGB(hashCode(carPosMap[car][0])));
+					changeNodeColor(carPosMap[car][1], hexToRgbA(intToRGB(hashCode(carPosMap[car][0]))));
 				} else {
 					//addTeamNameEdge(carPosMap[car][0], carPosMap[car][1], carPosMap[car][2], 1);
 					//addTeamNameEdge(carPosMap[car][0], carPosMap[car][2], carPosMap[car][1], 1);
-					changeEdgeColor(carPosMap[car][1], carPosMap[car][2], intToRGB(hashCode(carPosMap[car][0])));
-					changeEdgeColor(carPosMap[car][2], carPosMap[car][1], intToRGB(hashCode(carPosMap[car][0])));
+					changeEdgeColor(carPosMap[car][1], carPosMap[car][2], hexToRgbA(intToRGB(hashCode(carPosMap[car][0]))));
+					changeEdgeColor(carPosMap[car][2], carPosMap[car][1], hexToRgbA(intToRGB(hashCode(carPosMap[car][0]))));
 				}
 			} else {
 				console.log("elsing2");
 				if (carPosMap[car][1] == carPosMap[car][2]) {
-					changeNodeColor(carPrevPosMap[car][1], intToRGB(hashCode(carPosMap[car][0])));
+					changeNodeColor(carPrevPosMap[car][1], hexToRgbA(intToRGB(hashCode(carPosMap[car][0]))));
 					changeEdgeColor(carPrevPosMap[car][1], carPrevPosMap[car][2], "#3399ff");
 				} else {
 					console.log(carPosMap[car][1]);
-					changeEdgeColor(carPosMap[car][1], carPosMap[car][2], intToRGB(hashCode(carPosMap[car][0])));
+					changeEdgeColor(carPosMap[car][1], carPosMap[car][2], hexToRgbA(intToRGB(hashCode(carPosMap[car][0]))));
 					changeNodeColor(carPrevPosMap[car][1], "#3399ff");
 				}
 			}
 		}
 		carPrevPosMap = carPosMap;
+		
+		console.log(carHashMap);
 		
 		
 	});
@@ -349,13 +362,90 @@ function intToRGB(i){
     return "00000".substring(0, 6 - c.length) + c;
 }
 
-//colorAllPositions();
+function hexToRgbA(hex){
+	hex = "#" + hex;
+    var c;
+    if(/^#([A-Fa-f0-9]{3}){1,2}$/.test(hex)){
+        c= hex.substring(1).split('');
+        if(c.length== 3){
+            c= [c[0], c[0], c[1], c[1], c[2], c[2]];
+        }
+        c= '0x'+c.join('');
+        return 'rgba('+[(c>>16)&255, (c>>8)&255, c&255].join(',')+',.5)';
+    }
+    throw new Error('Bad Hex');
+}
+
+
+function makeExternalLegend() {
+	var legendDiv = document.getElementById("mylegend");
+	for (car in carPosMap) {
+		var containerDiv = document.createElement("div");
+		var descriptionDiv = document.createElement("button");
+
+		containerDiv.className = 'legend-element-container';
+		descriptionDiv.className = "description-container";
+
+		console.log(carPosMap[car][0]);
+		descriptionDiv.innerHTML = carPosMap[car][0];
+		
+		legendDiv.appendChild(containerDiv);
+		containerDiv.appendChild(descriptionDiv);
+		
+		containerDiv.style.width = "100%";
+		descriptionDiv.style.width = 100/carPosMap.length + '%';
+		descriptionDiv.style.float = 'left';
+		descriptionDiv.style.backgroundColor = hexToRgbA(intToRGB(hashCode(carPosMap[car][0])));
+		
+		$(descriptionDiv).click(function(event) {
+			zoomToID(event.target.innerHTML);
+		});
+		
+	}
+}
+
+function zoomToID(teamName) {
+	for (car in carPosMap) {
+		if (carPosMap[car][0] == teamName) {
+			console.log(carPosMap[car]);
+			zoomNodeID = [carPosMap[car][1], carPosMap[car][2]];
+			break;
+		}
+	}
+	
+	if (zoomNodeID[0] == zoomNodeID[1]) {
+		network.focus(zoomNodeID[0], {
+			scale: 2,
+			animation: {
+				duration: 300,
+				easingFunction: "easeInQuad"
+			}
+			});
+	} else {
+		nodePositions = network.getPositions(zoomNodeID);
+		valX1 = nodePositions[zoomNodeID[0]].x;
+		valX2 = nodePositions[zoomNodeID[1]].x;
+		valY1 = nodePositions[zoomNodeID[0]].y;
+		valY2 = nodePositions[zoomNodeID[1]].y;
+		valX = (valX1 + valX2)/2;
+		valY = (valY1 + valY2)/2;
+		
+		network.moveTo({
+			position: {x: valX, y: valY},
+			scale: 2,
+			animation: {
+				duration: 300,
+				easingFunction: "easeInQuad"
+			}
+		})
+	}
+} 
 
 
 //////////// MAINTAINING THE NETWORK ///////
 
 /* Dynamically lets the network fit to the canvas */
-setInterval(function() {network.fit()}, 10);
+//setInterval(function() {network.fit()}, 10);
 
 var canvas = document.getElementById('mynetwork');
 fitToContainer(canvas);
@@ -367,6 +457,17 @@ function fitToContainer(canvas){
   // ...then set the internal size to match
   canvas.width  = canvas.offsetWidth;
   canvas.height = canvas.offsetHeight;
+}
+
+String.prototype.hashCode = function(){
+	var hash = 0;
+	if (this.length == 0) return hash;
+	for (i = 0; i < this.length; i++) {
+		char = this.charCodeAt(i);
+		hash = ((hash<<5)-hash)+char;
+		hash = hash & hash; // Convert to 32bit integer
+	}
+	return hash;
 }
 
 
