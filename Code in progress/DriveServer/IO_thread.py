@@ -45,10 +45,7 @@ class IO_Thread:
         k = 0
         while self.__going:
             k += 1
-            ##for i in self.__engines:
-            ##    i.pulse()
-
-            if k == 10:
+            if k == 5:
                 k = 0
                 for sensor in self.__sensors:
                     sensor.update_value()

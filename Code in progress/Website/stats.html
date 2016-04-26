@@ -42,16 +42,16 @@
           <div id ='statController' ng-app='statApp' ng-controller='statController'>
                   <div>
                     <canvas id="myChart" width="400" height="400"></canvas>
-                    <!--<script>
+                    <script>
                     $( document ).ready(function(){
                       var scope = angular.element(document.getElementById('statController')).scope();
                       scope.$apply(scope.get_global_data(scope.draw_chart));
                       setTimeout(function(){scope.$apply(scope.loop())},10000);
                     });
-                    </script>-->
+                    </script>
                   </div>
                   <div >
-                      <select id='selectTeam' ng-model='selectedTeam' ng-options="team for team in teams" ng-change="new_team()">
+                      <select id='selectTeam' ng-model='selectedTeam' ng-options="team for team in teams" ng-change="new_team_selected()">
                           <option style="" value="">select a team</option>
                       </select>
                       <div class="teamInfo" ng-show='showTeamInfo'>
@@ -77,16 +77,17 @@
                         <div id='rightTeamInfo'>
                           <canvas id="teamChart" width="400" height="400"></canvas>
                           <script>
-                          $(document ).ready(function(){
+                          /*$(document ).ready(function(){
                             var scope = angular.element(document.getElementById('statController')).scope();
                             scope.$apply(scope.get_global_data(scope.draw_chart));
                             setTimeout(function(){scope.$apply(scope.loop())},10000);
-                          });
+                          });*/
                           </script>
                         </div>
                         <div id='loadingBarTeam'>
                           <p>Last reload at {{lastReload}}</p>
                         </div>
+
                         <style>
                           #leftTeamInfo{
                             width:49%;
@@ -100,6 +101,9 @@
                       </div>
                       <div ng-show="loadingTeamInfo">
                         <img src="/static/loading.gif" alt="Loading" style="width:100px;height:100px;">
+                      </div>
+                      <div ng-show="errorTeamInfo">
+                        Sorry, unable to load team data.
                       </div>
                   </div>
                 </div>

@@ -49,10 +49,10 @@ do
 		pixelList1[#pixelList1 + 1] = {i * interval, height - distFromBottom};
 	end;]]
 
-	local distFromLeft = 20;
-	local distFromRight = 20;
-	local distFromTop = 20;
-	local distFromBottom = 20;
+	local distFromLeft = 5;
+	local distFromRight = 5;
+	local distFromTop = 15;
+	local distFromBottom = 5;
 	local interval = 2;
 
 	for i = height - distFromBottom - 1, distFromTop, -interval do

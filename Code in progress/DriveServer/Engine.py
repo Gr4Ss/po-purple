@@ -32,10 +32,11 @@ class Engine:
     ## If the given is a float it will be round down to an int
     ## If the absolute value of the speed bigger is then 255 the speed will be set to -/+ 255
     def set_speed(self,speed):
+        speed = speed *(-1)
         if abs(speed) > 255:
             speed = sign(speed) * 255
-        if abs(speed)< 80:
-            speed = sign(speed)* 0
+        if abs(speed)< 50:
+            speed = 0
         BrickPi.MotorSpeed[self.__port] = int(speed)
         self.__speed = int(speed)
 

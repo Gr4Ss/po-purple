@@ -26,12 +26,13 @@ class Sensor:
     def add_value(self,value):
         while (len(self.__values) >= self.__nb_values):
             self.__values.pop(0)
-	    self.__values.append(value)
+        self.__values.append(value)
+
 
     # Return the median of the not None values in self.__value
     def get_value(self):
         try:
-            copy = sorted(self.__value)
+            copy = sorted(self.__values)
             while copy[0] == None:
                 copy.pop(0)
             return copy[len(copy)/2]
@@ -46,7 +47,7 @@ class DistanceSensor(Sensor):
     # self.__echo_gpio and self.__trig_gpio contain the numbers of the pin needed
     # for triggering the sensor and one to determine how long the echo is high
     def __init__(self,echo_gpio,trig_gpio):
-	    Sensor.__init__(self,5)
+        Sensor.__init__(self,5)
         self.__echo_gpio = echo_gpio
         self.__trig_gpio = trig_gpio
         # Some work to configure the GPIO pins
@@ -61,8 +62,8 @@ class DistanceSensor(Sensor):
         inttimeout = 2100
         v_snd = 340.29
         # Trigger an output signal
-	    GPIO.output(self.__trig_gpio,True)
-       	time.sleep(trig_duration)
+        GPIO.output(self.__trig_gpio,True)
+        time.sleep(trig_duration)
         GPIO.output(self.__trig_gpio,False)
         count_high = inttimeout
         while ( GPIO.input(self.__echo_gpio) == 0 and count_high >0):

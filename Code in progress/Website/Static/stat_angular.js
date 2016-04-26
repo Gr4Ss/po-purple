@@ -6,27 +6,33 @@ app.controller('statController',function($scope,dataService){
 	  $scope.deliveries = [];
 	  $scope.positions = [];
 	  $scope.loadingTeamInfo = false;
+		$scope.errorTeamInfo = false;
 	  $scope.lastReload = Date.now();
 	  /*
 	  Method used when a new team is selected.
 	  */
-	  $scope.new_team = function(){
+	  $scope.new_team_selected = function(){
 			console.log('new team');
-		$scope.showTeamInfo = false;
-		if ($scope.selectedTeam != ""){
-		  $scope.loadingTeamInfo = true;
-		  var promise = dataService.getData($scope.selectedTeam);
-		  promise.success(function(returndata){
-				$scope.deliveries = returndata.deliveries;
-				$scope.positions = returndata.positions;
-				$scope.draw_team_chart($scope.parce_deliveries($scope.deliveries))
-				$scope.lastReload = Date.now();
-				$scope.loadingTeamInfo = false;
-				$scope.showTeamInfo = true;
-		  });
-		}
+			$scope.showTeamInfo = false;
+			$scope.errorTeamInfo = false;
+			if ($scope.selectedTeam != ""){
+		  	$scope.loadingTeamInfo = true;
+		  	var promise = dataService.getData($scope.selectedTeam);
+		  	promise.success(function(returndata){
+					$scope.deliveries = returndata.deliveries;
+					$scope.positions = returndata.positions;
+					$scope.draw_team_chart($scope.parce_deliveries($scope.deliveries))
+					$scope.lastReload = Date.now();
+					$scope.loadingTeamInfo = false;
+					$scope.showTeamInfo = true;
+		  	});
+				promise.error(function(){
+					$scope.errorTeamInfo = true;
+					$scope.loadingTeamInfo = false;
+				});
+			}
 	  }
-	  
+
 	  $scope.parce_deliveries = function(){
 
 	  }
@@ -85,7 +91,7 @@ app.controller('statController',function($scope,dataService){
 	var ctx = document.getElementById("myChart").getContext("2d");
 	var myLineChart = new Chart(ctx).Line(data, options);
 }
-  
+
 	$scope.get_global_data = function(fn){
 		teams = [];
 		delivered_parcels = [];
@@ -102,7 +108,7 @@ app.controller('statController',function($scope,dataService){
 		fn(teams,delivered_parcels,distance_driven);
 		});
 	}
-  
+
 $scope.loop = function(){
 	console.log('update');
 	$scope.get_global_data($scope.update_chart);
@@ -217,7 +223,7 @@ $scope.draw_chart = function(teams,delivered_parcels,distance_driven){
 
 app.factory('dataService',function($http){
     var dataGetter = {};
-	
+
     dataGetter.getData = function(team){
 		var url = '/stats/data';
 		if (team != null){
