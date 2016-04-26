@@ -26,6 +26,7 @@ class RestClient(object):
     def get_map(self):
         resp = requests.get(self.__root + "/map")
         return resp.json()
+
     def get_parcels(self):
         resp = requests.get(self.__root + "/parcels")
 

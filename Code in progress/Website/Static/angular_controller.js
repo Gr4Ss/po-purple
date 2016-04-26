@@ -7,6 +7,7 @@ app.controller('purpleController',function($scope,lockClaimerService,formSenderS
   $scope.claimLock = false;
   $scope.succes = false;
   $scope.unlock = false;
+  $scope.superlock_password = 'Password';
   $scope.moveLeft = 0;
   $scope.moveRight = 0;
   $scope.moveDown = 0;
@@ -35,6 +36,36 @@ app.controller('purpleController',function($scope,lockClaimerService,formSenderS
         $scope.failure = true;
       });
   };
+  $scope.getSuperlock = function(){
+    hide_all_messages();
+    var promise = lockClaimerService.claimSuperlock($scope.superlock_password);
+    promise.success(function(data,status){
+          if (data == 'OK'){
+            $scope.locker = true;
+          }
+          else{
+            $scope.noLock = true;
+          }
+      });
+    promise.error(function(data,status){
+        $scope.failure = true;
+      });
+  }
+  $scope.getSuperunlock = function(){
+    hide_all_messages();
+    var promise = lockClaimerService.claimSuperunlock($scope.superlock_password);
+    promise.success(function(data,status){
+          if (data == 'OK'){
+            $scope.locker = true;
+          }
+          else{
+            $scope.noLock = true;
+          }
+      });
+    promise.error(function(data,status){
+        $scope.failure = true;
+      });
+  }
   $scope.getUnlock = function(){
     hide_all_messages();
     var promise = lockClaimerService.claimUnlock();
@@ -53,7 +84,7 @@ app.controller('purpleController',function($scope,lockClaimerService,formSenderS
 
   };
   $scope.keyDown = function(e){
-    if ($("#collapseTwo").attr('aria-expanded') == 'true'){
+    console.log('Keypresed');
       switch (e.which) {
         case 37:
           $scope.keyLeftPressed();
@@ -68,10 +99,8 @@ app.controller('purpleController',function($scope,lockClaimerService,formSenderS
           $scope.keyDownPressed();
           break;
       }
-    }
   }
   $scope.keyUp = function(e){
-    if ($("#collapseTwo").attr('aria-expanded')){
       switch (e.which) {
         case 37:
           $scope.keyLeftReleased();
@@ -87,7 +116,6 @@ app.controller('purpleController',function($scope,lockClaimerService,formSenderS
           break;
       }
     e.preventDefault();
-    }
   }
   $scope.keyLeftPressed = function() {
     if ($scope.moveLeft == 0){
@@ -237,6 +265,20 @@ app.factory('lockClaimerService',function($http){
     var promise = $http({method: 'GET',url:'/unlock'});
     return promise;
   };
+  lockClaimer.claimSuperlock = function(passw){
+    var promise = $http({method:'POST',
+                          url:'/superlock',
+                          data:JSON.stringify({'passw':passw}),
+                          headers: {'Content-Type': 'application/json'}});
+    return promise;
+  }
+  lockClaimer.claimSuperunlock = function(passw){
+    var promise = $http({method:'POST',
+                          url:'/superunlock',
+                          data:JSON.stringify({'passw':passw}),
+                          headers: {'Content-Type': 'application/json'}});
+    return promise;
+  }
   return lockClaimer;
 });
 app.factory('formSenderService',function($http){

@@ -117,7 +117,7 @@ class Vehicle(RestClient):
         for x in positions:
     	    if x[0] != self.get_teamname() and x[1] != x[2]:
                 if x[2] == position[0]:
-                    edge = [x[2], x[1], self.get_edge_length([x[2], x[1]])]
+                    edge = [x[2], x[1], self.get_edge_length([x[2], x[1]],edges)]
                     if edges.count(edge) != 0:
                         edges.remove(edge)
                         continue

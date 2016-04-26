@@ -11,8 +11,6 @@ if([32, 37, 38, 39, 40].indexOf(e.keyCode) > -1) {
 
 $("body").keyup(function(e) {
   $scope.$apply(function(){
-    console.log($("#collapseTwo").attr('aria-expanded'));
-    if ($("#collapseTwo").attr('aria-expanded')){
     switch (e.which) {
       case 37:
         console.log('KeyPressed')
@@ -29,14 +27,11 @@ $("body").keyup(function(e) {
         break;
       }
     e.preventDefault();
-  }
   });
 
 });
 $("body").keydown(function(e) {
-    $scope.$apply(function(){
-  console.log($("#collapseTwo").attr('aria-expanded'));
-  if ($("#collapseTwo").attr('aria-expanded') == 'true'){
+
 switch (e.which) {
     case 37:
       $scope.keyLeftPressed();
@@ -52,5 +47,4 @@ switch (e.which) {
       break;
   }
 }
-});
 });

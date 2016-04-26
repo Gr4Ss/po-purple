@@ -21,7 +21,7 @@ def add_parcels():
     while True:
         requests.put("http://localhost:9000/parcels/add", json=json.dumps({"secretkey":"SecretKey","newParcels":[[count,random.randint(1,4),random.randint(1,4)]]}))
         count += 1
-        time.sleep(0.1)
+        time.sleep(5)
 t = threading.Thread(target = add_parcels)
 t.setDaemon(True)
 t.start()

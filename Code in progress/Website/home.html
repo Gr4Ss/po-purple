@@ -18,7 +18,7 @@
     <!--<script src="/static/keypress.js"></script> -->
     <link rel="stylesheet" href="static/cssv2.css">
     <link rel="stylesheet" href="static/vis.min.css">
-	<style type="text/css">
+	   <style type="text/css">
         #mynetwork {
             width: 600px;
             height: 400px;
@@ -40,13 +40,15 @@
   </script>
 </head>
 
-<body  data-spy="scroll" data-target=".navbar" data-offset="50" onload="setTimeout('init();', 100);" >
-  <div ng-app='purpleApp' ng-controller='purpleController' ng-keydown = "keyDown($event)" ng-keyup ="keyUp($event)">
+<body  data-spy="scroll" data-target=".navbar" data-offset="50" onload="setTimeout('init();', 100);"  ng-app='purpleApp' ng-controller='purpleController' ng-keydown = "keyDown($event)" ng-keyup ="keyUp($event)">
+  <div >
     <nav class="navbar navbar-inverse navbar-fixed-top">
       <div class="container">
         <div class="navbar-header">
           <button type="button" class="navbar-toggle collapsed" data-toggle="collapse" data-target="#navbar" aria-expanded="false" aria-controls="navbar">
             <span class="sr-only">Toggle navigation</span>
+            <span class="icon-bar"></span>
+            <span class="icon-bar"></span>
             <span class="icon-bar"></span>
             <span class="icon-bar"></span>
             <span class="icon-bar"></span>
@@ -56,8 +58,10 @@
         <div id="navbar" class="collapse navbar-collapse">
           <ul class="nav navbar-nav">
             <li class="active"><a href="#home" class="smooth-nav">Home</a></li>
-	    <li><a href="#videostream" class="smooth-nav">Videostream</a></li>
+	          <li><a href="#videostream" class="smooth-nav">Videostream</a></li>
             <li><a href="#about" class="smooth-nav">About</a></li>
+            <li><a href="/control" class = "smooth-nav">Control</a></li>
+            <li><a href="/stats" class = "smooth-nav"> Stats</a></li>
           </ul>
         </div><!--/.nav-collapse -->
       </div>
@@ -94,116 +98,56 @@
           </div>
           <div class="alert alert-success" role="alert" ng-show="unlock">
             <p>You are <strong> successfully </strong> unlocked </p>
-          </div>
-          <div class="panel-group" id="accordion" role="tablist" aria-multiselectable="false">
-            <div class="panel panel-default">
-              <div class="panel-heading" role="tab" id="headingOne">
-                <h4 class="panel-title">
-                  <a class="collapsed" role="button" data-toggle="collapse" data-parent="#accordion" href="#collapseOne" aria-expanded="false" aria-controls="collapseOne">
-                    Send commands
-                  </a>
-                </h4>
+        </div>
+        <div class="manual-control">
+          <h1> Manual Control </h1>
+          <div class="touch-keys" >
+            <div class="row">
+              <div class="col-xs-4 col-xs-offset-4">
+                <button class="btn btn-default btn-block driveForward not_pressed" ng-mouseup="keyUpReleased()" ng-mousedown="keyUpPressed()">
+                F
+                </button>
               </div>
-              <div id="collapseOne" class="panel-collapse collapse" role="tabpanel" aria-labelledby="headingOne">
-                <div class="panel-body">
-                  <div class="form1">
-                    <form class="form-horizontal" ng-submit="parcoursSubmit()">
-                      <p>
-                        <textarea  rows="3" class="form-control commandList" placeholder="Send list of commands" name='commands' ng-model="parcours"></textarea>
-                      </p>
-                      <p>
-                        <button type="submit" class="btn btn-default btn-lg btn-block">Send</button>
-                      </p>
-                      <p>
-                        <button type="reset" class="btn btn-default btn-lg btn-block">Reset</button>
-                      </p>
-                    </form>
-                    <p>
-                      <div class="row">
-                        <div class="col-xs-2">
-                          <input type="number" class="valueLeft" placeholder="left"></input>
-                        </div>
-                        <div class="col-xs-2">
-                          <button class="btn btn-default btn-block nextLeft">Left</button>
-                        </div>
-                        <div class="col-xs-2">
-                          <input type="number" class="valueRight" placeholder="right"></input>
-                        </div>
-                        <div class="col-xs-2">
-                          <button class="btn btn-default btn-block nextStraight">Right</button>
-                        </div>
-                        <div class="col-xs-2">
-                          <input type="number" class="valueDistance" placeholder="distance (cm)"></input>
-                        </div>
-                        <div class="col-xs-2">
-                          <button class="btn btn-default btn-block nextDistance">Distance</button>
-                        </div>
-                      </div>
-                    </p>
-                </div>
+            </div>
+            <div class="row">
+              <div class="col-xs-4">
+                <button class="btn btn-default btn-block driveLeft not_pressed" ng-mouseup="keyLeftReleased()" ng-mousedown="keyLeftPressed()">
+                L
+                </button>
+              </div>
+              <div class="col-xs-4">
+                <button class="btn btn-default btn-block driveReverse not_pressed" ng-mouseup="keyDownReleased()" ng-mousedown="keyDownPressed()">
+                B
+                </button>
+              </div>
+              <div class="col-xs-4">
+                <button class="btn btn-default btn-block driveRight not_pressed" ng-mouseup="keyRightReleased()" ng-mousedown="keyRightPressed()">
+                R
+                </button>
+              </div>
             </div>
           </div>
-        </div>
-
-        <div class="panel panel-default">
-          <div class="panel-heading" role="tab" id="headingTwo">
-            <h4 class="panel-title">
-              <a class="collapsed" role="button" data-toggle="collapse" data-parent="#accordion" href="#collapseTwo" aria-expanded="false" aria-controls="collapseTwo">
-              Manual driving
-              </a>
-            </h4>
-          </div>
-          <div id="collapseTwo" class="panel-collapse collapse" role="tabpanel" aria-labelledby="headingTwo">
-              <div class="panel-body">
-              <div class="touch-keys" >
-                <div class="row">
-                  <div class="col-xs-4 col-xs-offset-4">
-                    <button class="btn btn-default btn-block driveForward not_pressed" ng-mouseup="keyUpReleased()" ng-mousedown="keyUpPressed()">
-                    F
-                    </button>
-                  </div>
-                </div>
-                <div class="row">
-                  <div class="col-xs-4">
-                    <button class="btn btn-default btn-block driveLeft not_pressed" ng-mouseup="keyLeftReleased()" ng-mousedown="keyLeftPressed()">
-                    L
-                    </button>
-                  </div>
-                  <div class="col-xs-4">
-                    <button class="btn btn-default btn-block driveReverse not_pressed" ng-mouseup="keyDownReleased()" ng-mousedown="keyDownPressed()">
-                    B
-                    </button>
-                  </div>
-                  <div class="col-xs-4">
-                    <button class="btn btn-default btn-block driveRight not_pressed" ng-mouseup="keyRightReleased()" ng-mousedown="keyRightPressed()">
-                    R
-                    </button>
-                  </div>
-                </div>
-              </div>
-              <div class="keyboard-keys">
-              Or press the keyboard arrow keys to control the vehicle!
-
-              </div>
-              </div>
+          <div class="keyboard-keys">
+            Or press the keyboard arrow keys to control the vehicle!
           </div>
         </div>
 
-
-      </div>
-	  <div class="legend" id="mylegend">
-		<div class="legend-element-container" id="resetnetwork">
-			<button class="description-container" id="resetdesc">
-				Reset Network
-			</button>
-		</div>
-	  </div>
-	  <div class="networkjs" id="mynetwork"></div>
+      <div class="network-div">
+        <h1> Positions </h1>
+        <p> In the graph below you find the current map and the positions of all the driving teams.</p>
+        <div class="legend" id="mylegend">
+        <div class="legend-element-container" id="resetnetwork">
+          <button class="description-container" id="resetdesc">
+            Reset Network
+          </button>
+        </div>
+        </div>
+        <div class="networkjs" id="mynetwork"></div>
       </div>
       <div class='container' id='videostream'>
       <div class="starter-template">
       <h1> Videostream </h1>
-      <img class="img-responsive center-block" id="mjpeg_dest" width=720px height=400px>
+      <img class="img-responsive center-block" id="mjpeg_dest"  width=720px height=400px>
       </div>
       </div>
 
@@ -221,19 +165,19 @@
         <!-- Wrapper for slides -->
         <div class="carousel-inner" role="listbox">
           <div class="item active">
-            <!-- <img src="Images/Rear_view.jpg" alt="Couldn't load image"> -->
+            <img src="Images/Rear_view.jpg" alt="Couldn't load image">
             <div class="carousel-caption">
               <p> Rear view </p>
             </div>
           </div>
           <div class="item">
-            <!--<img src="Images/Side_view.jpg" alt="Couldn't load image">-->
+            <img src="Images/Side_view.jpg" alt="Couldn't load image">
             <div class="carousel-caption">
               <p> Side view </p>
             </div>
           </div>
           <div class="item">
-            <!--<img src="Images/Front_view.jpg" alt="Couldn't load image">-->
+            <img src="Images/Front_view.jpg" alt="Couldn't load image">
             <div class="carousel-caption">
               <p> Front view </p>
             </div>
@@ -278,7 +222,7 @@
         $('.valueDistance').val('');
       });
       </script>
-	  
+
 	  <script type="text/javascript" src="static/network.js"></script>
     </div>
 

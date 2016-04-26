@@ -25,11 +25,26 @@ def home():
         response.set_cookie('ID',create_hash(16), path='/',expires=expire_time)
     # return the webpage
     return html
+
 @app.route('/stats')
 def stats():
     # Open the file
     html = open('stats.html','r')
     return html
+
+
+@app.route('/control')
+def control():
+    # Open the file
+    html = open('controls.html','r')
+    # Check if the user has already a cookie, if not create one
+    if not request.get_cookie('ID'):
+        # Cookie expires over 1 year
+        expire_time = datetime.datetime.now() + datetime.timedelta(days=366)
+        response.set_cookie('ID',create_hash(16), path='/',expires=expire_time)
+    # return the webpage
+    return html
+
 # Method to return the static files
 @app.route('/static/<filename>')
 def server_static(filename):
