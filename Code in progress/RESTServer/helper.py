@@ -6,9 +6,49 @@ import json
 class JsonBase:
     def __init__(self):
         self.__teams = dict()
-        self.__map = {"vertices": [[1, {"origin": 3, "straight": 2}],[2, {"origin": 1, "straight": 3}],[3, {"origin": 2, "straight": 1, "left": 4}],
-        [4, {"origin": 3, "straight": 1, "left": 2}]],"edges": [[1, 2, 0.3],[1, 3, 0.5],[3, 1, 0.5],[2, 3, 0.1],[3, 2, 0.1],[3, 4, 0.7],
-        [4, 2, 0.3],[4, 1, 0.8]]}
+        self.__map = {
+	"vertices": [
+		[0, {"origin": 1, "left": 2, "right": 5}],
+		[1, {"origin": 0, "straight": 2, "left": 4}],
+		[2, {"origin": 0, "left": 1, "right": 3}],
+		[3, {"origin": 2, "left": 4, "right": 7, "straight": 8}],
+		[4, {"origin": 1, "right": 3, "left": 5, "straight": 8}],
+		[5, {"origin": 0, "right": 4, "left": 6}],
+		[6, {"origin": 5, "straight": 7, "right": 8}],
+		[7, {"origin": 3, "right": 6, "straight": 8}],
+		[8, {"origin": 3, "left": 4, "straight": 6, "right": 7}]
+	],
+	"edges": [
+		[0, 1, 1.0],
+		[0, 2, 4.0],
+		[1, 0, 1.0],
+		[1, 2, 2.0],
+		[1, 4, 4.0],
+		[2, 0, 4.0],
+		[2, 1, 2.0],
+		[2, 3, 5.0],
+		[3, 2, 5.0],
+		[3, 4, 2.0],
+		[3, 7, 4.0],
+		[3, 8, 1.5],
+		[4, 1, 4.0],
+		[4, 5, 2.0],
+		[4, 8, 1.5],
+		[5, 0, 5.0],
+		[5, 4, 2.0],
+		[5, 6, 4.0],
+		[6, 5, 4.0],
+		[6, 7, 4.0],
+		[6, 8, 1.5],
+		[7, 3, 4.0],
+		[7, 6, 4.0],
+		[7, 8, 1.5],
+		[8, 3, 1.5],
+		[8, 4, 1.5],
+		[8, 6, 1.5],
+		[8, 7, 1.5]
+	]
+}
         self.__parcels = {"available-parcels": [[142, 1, 2],[145, 2, 3],[147, 2, 1], [148, 1, 2], [149, 1, 2], [152, 1, 2], [162, 1, 2], [172, 1, 2]],"on-the-road-parcels": [],"delivered-parcels": []}
         self.__positions = {"positions":[]}
         self.__secret_key = 'SecretKey'

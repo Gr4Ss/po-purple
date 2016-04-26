@@ -111,8 +111,9 @@ app.controller('statController',function($scope,dataService){
 
 $scope.loop = function(){
 	console.log('update');
+	
 	$scope.get_global_data($scope.update_chart);
-	setTimeout ($scope.loop,10000 );
+	setTimeout ($scope.loop,5000 );
 }
 
 $scope.draw_chart = function(teams,delivered_parcels,distance_driven){
@@ -123,9 +124,9 @@ $scope.draw_chart = function(teams,delivered_parcels,distance_driven){
           datasets: [
             {
               label: "Delivered parcels",
-              fillColor: "rgba(220,220,220,0.2)",
-              strokeColor: "rgba(220,220,220,1)",
-              pointColor: "rgba(220,220,220,1)",
+              fillColor: "rgba(180,130,220,0.3)",
+              strokeColor: "rgba(180,130,220,1)",
+              pointColor: "rgba(180,130,220,1)",
               pointStrokeColor: "#fff",
               pointHighlightFill: "#fff",
               pointHighlightStroke: "rgba(220,220,220,1)",
@@ -133,9 +134,9 @@ $scope.draw_chart = function(teams,delivered_parcels,distance_driven){
             },
             {
               label: "Distance driven",
-              fillColor: "rgba(151,187,205,0.2)",
-              strokeColor: "rgba(151,187,205,1)",
-              pointColor: "rgba(151,187,205,1)",
+              fillColor: "rgba(187,151,205,0.2)",
+              strokeColor: "rgba(187,151,205,1)",
+              pointColor: "rgba(187,151,205,1)",
               pointStrokeColor: "#fff",
               pointHighlightFill: "#fff",
               pointHighlightStroke: "rgba(151,187,205,1)",

@@ -8,6 +8,8 @@ def find_path(vertices, edges, current, target):
     unvisited[current] = currentDistance
     if target not in unvisited:
         return None
+    if current == target:
+        return [current,target]
 
     while True:
         if current == target:

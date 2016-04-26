@@ -53,5 +53,21 @@ input {
 	height: 5%;
 	display: flex;
 	vertical-align: top;
-	
+}
+
+#mylegend{
+	width: 100%;
+	overflow: hidden;
+}
+
+.legend-element-container{
+	width: 100%;
+}
+
+.description-container{
+	float: left;
+}
+
+#resetdesc{
+	width: 100%;
 }
