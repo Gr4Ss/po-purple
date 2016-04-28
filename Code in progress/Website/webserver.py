@@ -12,8 +12,7 @@ app = Bottle()
 # Storing a refence to the location of the static files
 static_root = 'Static/'
 image_root = 'Images/'
-data_logger = data.Data()
-data_logger.start()
+
 # Returning the home page
 @app.route('/')
 def home():
@@ -53,15 +52,16 @@ def server_static(filename):
 @app.route('/images/<filename>')
 def images(filename):
     return static_file(filename,root=image_root)
+
 @app.route('/stats/data')
 def get_data():
-    d = data_logger.get_data()
-    r = {"data":[{"name":i["name"],"delivered":len(i["deliveries"]),"distance":len(i["positions"])} for i in d]}
-    return json.dumps(r)
+    print 'D', json.dumps(data.get_data())
+    return json.dumps(data.get_data())
 @app.route('/stats/data/<team>')
-def data_team(team):
-    d = data_logger.get_data_team(team)
-    return json.dumps(d)
+def get_team_data(team):
+    print data.get_data_team(team)
+    return json.dumps(data.get_data_team(team))
+
 # Method when the user tries to get a lock
 @app.get('/lock')
 def lock():

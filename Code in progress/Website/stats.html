@@ -64,42 +64,17 @@
                     </script>
                   </div>
                   <div >
-                      <select id='selectTeam' ng-model='selectedTeam' ng-options="team for team in teams" ng-change="new_team_selected()">
+                      <select id='selectTeam' ng-model='selectedTeam' ng-options="team for team in teams" ng-change="load_team_data()">
                           <option style="" value="">select a team</option>
                       </select>
                       <div class="teamInfo" ng-show='showTeamInfo'>
-                        <div id='leftTeamInfo'>
-                          <h1 ng-name="selectedTeam"></h1>
-                          <p><b> Huidig pakje: </b></p>
-                          <p><b> Aantal afgeleverde pakjes: </b></p>
-                          <p><b> Huidige positie: </b></p>
-                          <p><b> Status: </b></p>
-                          <p><b> Gemiddelde levertijd: </b></p>
-                        </div>
-                        <div id='rightTeamInfo'>
-                          <canvas id="teamChart" width="400" height="400"></canvas>
-                          <script>
-                          /*$(document ).ready(function(){
-                            var scope = angular.element(document.getElementById('statController')).scope();
-                            scope.$apply(scope.get_global_data(scope.draw_chart));
-                            setTimeout(function(){scope.$apply(scope.loop())},10000);
-                          });*/
-                          </script>
-                        </div>
+                        <h1 ng-name="selectedTeam"></h1>
+                        <p><b> Huidig pakje: </b> {{selectedCurrentParcel}}</p>
+                        <p><b> Aantal afgeleverde pakjes: </b> {{selectedNbDeliveredParcels}}</p>
+                        <p><b> Huidige positie: </b> {{selectedCurrentPosition}}</p>
                         <div id='loadingBarTeam'>
-                          <p>Last reload at {{lastReload}}</p>
+                          <p>Last reload at {{selectedLastReload}}</p>
                         </div>
-
-                        <style>
-                          #leftTeamInfo{
-                            width:49%;
-                            float:left;
-                          }
-                          #rightTeamInfo{
-                            width:49%;
-                            float:right;
-                          }
-                        </style>
                       </div>
                       <div ng-show="loadingTeamInfo">
                         <img src="/static/loading.gif" alt="Loading" style="width:100px;height:100px;">

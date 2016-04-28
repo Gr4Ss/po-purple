@@ -2,16 +2,17 @@ var app = angular.module("statApp",[]);
 app.controller('statController',function($scope,dataService){
 	  $scope.teams = [];
 	  $scope.showTeamInfo = false;
-	  $scope.selectedTeam = "";
-	  $scope.deliveries = [];
-	  $scope.positions = [];
 	  $scope.loadingTeamInfo = false;
 		$scope.errorTeamInfo = false;
-	  $scope.lastReload = Date.now();
+		$scope.selectedTeam = "";
+		$scope.selectedCurrentParcel = null;
+		$scope.selectedNbDeliveredParcels = null;
+		$scope.selectedCurrentPosition = null;
+	  $scope.selectedLastReload = Date.now();
 	  /*
 	  Method used when a new team is selected.
 	  */
-	  $scope.new_team_selected = function(){
+	  $scope.load_team_data = function(){
 			console.log('new team');
 			$scope.showTeamInfo = false;
 			$scope.errorTeamInfo = false;
@@ -19,10 +20,10 @@ app.controller('statController',function($scope,dataService){
 		  	$scope.loadingTeamInfo = true;
 		  	var promise = dataService.getData($scope.selectedTeam);
 		  	promise.success(function(returndata){
-					$scope.deliveries = returndata.deliveries;
-					$scope.positions = returndata.positions;
-					$scope.draw_team_chart($scope.parce_deliveries($scope.deliveries))
-					$scope.lastReload = Date.now();
+					$scope.selectedCurrentParcel = returndata.current_parcel;
+					$scope.selectedCurrentPosition = returndata.current_position;
+					$scope.selectedNbDeliveredParcels = returndata.deliveries;
+					$scope.selectedLastReload = Date.now();
 					$scope.loadingTeamInfo = false;
 					$scope.showTeamInfo = true;
 		  	});
@@ -32,195 +33,63 @@ app.controller('statController',function($scope,dataService){
 				});
 			}
 	  }
-
-	  $scope.parce_deliveries = function(){
-
-	  }
-	  $scope.update_team_data = function(){
-
-
-	  }
-  $scope.draw_team_chart = function(initial_labels,intial_deliveries){
-    var data = {
-      labels: initial_labels,
-      datasets: [
-        {
-            label: "My First dataset",
-            fillColor: "rgba(220,220,220,0.2)",
-            strokeColor: "rgba(220,220,220,1)",
-            pointColor: "rgba(220,220,220,1)",
-            pointStrokeColor: "#fff",
-            pointHighlightFill: "#fff",
-            pointHighlightStroke: "rgba(220,220,220,1)",
-            data: intial_deliveries
-          },
-        ]
-	};
-	var options = {
-		///Boolean - Whether grid lines are shown across the chart
-		scaleShowGridLines : true,
-		//String - Colour of the grid lines
-		scaleGridLineColor : "rgba(0,0,0,.05)",
-		//Number - Width of the grid lines
-		scaleGridLineWidth : 1,
-		//Boolean - Whether to show horizontal lines (except X axis)
-		scaleShowHorizontalLines: true,
-		//Boolean - Whether to show vertical lines (except Y axis)
-		scaleShowVerticalLines: true,
-		//Boolean - Whether the line is curved between points
-		bezierCurve : true,
-		//Number - Tension of the bezier curve between points
-		bezierCurveTension : 0.4,
-		//Boolean - Whether to show a dot for each point
-		pointDot : true,
-		//Number - Radius of each point dot in pixels
-		pointDotRadius : 4,
-		//Number - Pixel width of point dot stroke
-		pointDotStrokeWidth : 1,
-		//Number - amount extra to add to the radius to cater for hit detection outside the drawn point
-		pointHitDetectionRadius : 20,
-		//Boolean - Whether to show a stroke for datasets
-		datasetStroke : true,
-		//Number - Pixel width of dataset stroke
-		datasetStrokeWidth : 2,
-		//Boolean - Whether to fill the dataset with a colour
-		datasetFill : true,
-		//String - A legend template
-		legendTemplate : "<ul class=\"<%=name.toLowerCase()%>-legend\"><% for (var i=0; i<datasets.length; i++){%><li><span style=\"background-color:<%=datasets[i].strokeColor%>\"></span><%if(datasets[i].label){%><%=datasets[i].label%><%}%></li><%}%></ul>"
-	};
-	var ctx = document.getElementById("myChart").getContext("2d");
-	var myLineChart = new Chart(ctx).Line(data, options);
-}
-
-	$scope.get_global_data = function(fn){
-		teams = [];
-		delivered_parcels = [];
-		distance_driven = [];
-		var promise = dataService.getData(null);
-		promise.success(function(returndata){
-			$.each(returndata.data, function(i, obj) {
-				console.log(i, obj);
-				teams.push(obj.name);
-				delivered_parcels.push(obj.delivered);
-				distance_driven.push(obj.distance);
+		$scope.get_global_data = function(fn){
+			teams= [];
+			delivered_parcels = [];
+			var promise = dataService.getData(null);
+			promise.success(function(returndata){
+				$.each(returndata, function(i, obj) {
+					teams.push(obj.name);
+					delivered_parcels.push(obj.deliveries);
+				});
+			console.log(teams);
+			console.log(delivered_parcels);
+			fn(teams,delivered_parcels);
 			});
-		console.log(teams);
-		fn(teams,delivered_parcels,distance_driven);
-		});
+		}
+
+	$scope.loop = function(){
+		console.log('update');
+		$scope.get_global_data($scope.update_chart);
+		setTimeout ($scope.loop,5000 );
 	}
 
-$scope.loop = function(){
-	console.log('update');
-	
-	$scope.get_global_data($scope.update_chart);
-	setTimeout ($scope.loop,5000 );
-}
-
-$scope.draw_chart = function(teams,delivered_parcels,distance_driven){
-    //Get the context of the canvas element we want to select
-    $scope.teams = teams;
-    var data = {
-          labels: teams,
-          datasets: [
-            {
-              label: "Delivered parcels",
-              fillColor: "rgba(180,130,220,0.3)",
-              strokeColor: "rgba(180,130,220,1)",
-              pointColor: "rgba(180,130,220,1)",
-              pointStrokeColor: "#fff",
-              pointHighlightFill: "#fff",
-              pointHighlightStroke: "rgba(220,220,220,1)",
-              data: delivered_parcels
-            },
-            {
-              label: "Distance driven",
-              fillColor: "rgba(187,151,205,0.2)",
-              strokeColor: "rgba(187,151,205,1)",
-              pointColor: "rgba(187,151,205,1)",
-              pointStrokeColor: "#fff",
-              pointHighlightFill: "#fff",
-              pointHighlightStroke: "rgba(151,187,205,1)",
-              data: distance_driven
-            }
-          ]
-      };
-
-
-      var options = {
-        //Boolean - Whether to show lines for each scale point
-        scaleShowLine : true,
-
-        //Boolean - Whether we show the angle lines out of the radar
-        angleShowLineOut : true,
-
-        //Boolean - Whether to show labels on the scale
-        scaleShowLabels : false,
-
-        // Boolean - Whether the scale should begin at zero
-        scaleBeginAtZero : true,
-
-        //String - Colour of the angle line
-        angleLineColor : "rgba(0,0,0,.1)",
-
-        //Number - Pixel width of the angle line
-        angleLineWidth : 1,
-
-        //String - Point label font declaration
-        pointLabelFontFamily : "'Arial'",
-
-        //String - Point label font weight
-        pointLabelFontStyle : "normal",
-
-        //Number - Point label font size in pixels
-        pointLabelFontSize : 10,
-
-        //String - Point label font colour
-        pointLabelFontColor : "#666",
-
-        //Boolean - Whether to show a dot for each point
-        pointDot : true,
-
-        //Number - Radius of each point dot in pixels
-        pointDotRadius : 3,
-
-        //Number - Pixel width of point dot stroke
-        pointDotStrokeWidth : 1,
-
-        //Number - amount extra to add to the radius to cater for hit detection outside the drawn point
-        pointHitDetectionRadius : 20,
-
-        //Boolean - Whether to show a stroke for datasets
-        datasetStroke : true,
-
-        //Number - Pixel width of dataset stroke
-        datasetStrokeWidth : 2,
-
-        //Boolean - Whether to fill the dataset with a colour
-        datasetFill : true,
-
-        //String - A legend template
-        legendTemplate : "<ul class=\"<%=name.toLowerCase()%>-legend\"><% for (var i=0; i<datasets.length; i++){%><li><span style=\"background-color:<%=datasets[i].strokeColor%>\"></span><%if(datasets[i].label){%><%=datasets[i].label%><%}%></li><%}%></ul>"
-      }
-      var ctx = $("#myChart").get(0).getContext("2d");
-      radarChart = new Chart(ctx).Radar(data, options);
-
+	$scope.draw_chart = function(teams,delivered_parcels){
+		console.log('Draw chart')
+		$scope.teams = teams;
+		var ctx = document.getElementById("myChart").getContext("2d");
+		var data = {
+    labels: teams,
+    datasets: [
+        {
+            label: "Number delivered parcels",
+            backgroundColor: "rgba(255,99,132,0.2)",
+            borderColor: "rgba(255,99,132,1)",
+            borderWidth: 1,
+            hoverBackgroundColor: "rgba(255,99,132,0.4)",
+            hoverBorderColor: "rgba(255,99,132,1)",
+            data: delivered_parcels,
+        }
+    ]
+		};
+		barChart = new Chart(ctx).Bar(data);
   }
-  $scope.update_chart = function (teams,delivered_parcels,distance_driven){
+  $scope.update_chart = function (teams,delivered_parcels){
     for (i = 0; i < teams.length; i++) {
       ind = $scope.teams.indexOf(teams[i]);
       if (ind == -1){
         $scope.teams.push(teams[i]);
-        radarChart.addData([delivered_parcels[i], distance_driven[i]], teams[i]);
+        barChart.addData([distance_driven[i]], teams[i]);
       }
       else{
-        radarChart.datasets[0].points[ind].value = delivered_parcels[i];
-        radarChart.datasets[1].points[ind].value = distance_driven[i];
+				console.log(barChart.datasets[0]);
+        barChart.datasets[0].bars[ind].value = delivered_parcels[i];
       }
     }
-    radarChart.update()
+    barChart.update()
   }
 
-});
+	});
 
 app.factory('dataService',function($http){
     var dataGetter = {};

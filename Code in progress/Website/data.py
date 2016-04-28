@@ -1,5 +1,4 @@
-from datetime import datetime
-import time,threading
+import time
 import os,sys,inspect
 #first change the cwd to the script path
 scriptPath = os.path.realpath(os.path.dirname(sys.argv[0]))
@@ -8,59 +7,57 @@ os.chdir(scriptPath)
 sys.path.append("../RESTServer")
 
 from restclient import *
-class Data:
-    def __init__(self):
-        self.data = []
-        self.restclient = RestClient("http://localhost:9000")
-        self.delivered_count = 0
-        self.going = False
-        self.thread = threading.Thread(target=self.updater)
-    def start(self):
-        if not self.going:
-            self.going = True
-            self.thread.setDaemon(True)
-            self.thread.start()
-    def stop(self):
-        self.going = False
-        self.thrad.join()
-    def get_teams(self):
-        r = []
-        for d in self.data:
-            r.append(d['name'])
-        return r
-    def get_index_team(self,team):
-        count = 0
-        for d in self.data:
-            if d['name'] == team:
-                return count
-            count += 1
-        return -1
-    def get_data_team(self,team):
-        for d in self.data:
-            if d['name'] == team:
-                return d
-    def get_data(self):
-        return self.data
-    def add_delivery(self,teamname,parcel_nb):
-        ind = self.get_index_team(teamname)
-        if ind == -1:
-            self.data.append({"name":teamname,"positions":[],"deliveries":[[str(datetime.now()),parcel_nb]]})
-        else:
-            self.data[ind]["deliveries"].append([str(datetime.now()),parcel_nb])
+RESTCLIENT = RestClient("http://localhost:9000")
+DATA = []
+UPDATE_TIME = None
 
-    def add_position(self,teamname,position):
-        ind = self.get_index_team(teamname)
-        if ind == -1:
-            self.data.append({"name":teamname,"positions":[[str(datetime.now()),position]],"deliveries":[]})
-        elif self.data[ind]["positions"][-1][1] != position:
-            self.data[ind]["positions"].append([str(datetime.now()),position])
-    def updater(self):
-        while self.going:
-            delivered_parcels = self.restclient.get_parcels()["delivered-parcels"]
-            positions = self.restclient.get_positions()["positions"]
-            for i in range(0,len(positions)):
-                self.add_position(positions[i][0],(positions[i][1],positions[i][2]))
-            for j in range(self.delivered_count,len(delivered_parcels)):
-                self.add_delivery(delivered_parcels[j][-1],delivered_parcels[j][0])
-            self.delivered_count = len(delivered_parcels)
-            time.sleep(1)
+def get_index_team(team):
+    count = 0
+    for d in DATA:
+        if d['name'] == team:
+            return count
+        count += 1
+    return -1
+
+def get_data_team(team):
+    for d in DATA:
+        if d['name'] == team:
+            return d
+    else:
+        return {}
+def get_data():
+    global DATA,RESTCLIENT,UPDATE_TIME
+    if (UPDATE_TIME == None or time.time() - UPDATE_TIME>1.):
+        DATA =[]
+        parcels = RESTCLIENT.get_parcels()
+        on_road_parcels = parcels["on-the-road-parcels"]
+        delivered_parcels = parcels["delivered-parcels"]
+        positions = RESTCLIENT.get_positions()["positions"]
+        for i in range(0,len(positions)):
+            update_position(positions[i][0],(positions[i][1],positions[i][2]))
+        for j in range(0,len(on_road_parcels)):
+            update_on_road_parcel(on_road_parcels[j][3],on_road_parcels[j][:3])
+        for k in range(0,len(delivered_parcels)):
+            update_delivered_parcels(delivered_parcels[k][3])
+        UPDATE_TIME = time.time()
+        return DATA
+    else:
+        return DATA
+def update_position(team,position):
+    ind = get_index_team(team)
+    if ind == -1:
+        DATA.append({"name":team,"current_position":position,"current_parcel":None,"deliveries":0})
+    else:
+        DATA[ind]["current_position"] = position
+def update_on_road_parcel(team,parcel_info):
+    ind = get_index_team(team)
+    if ind == -1:
+        DATA.append({"name":team,"current_position":None,"current_parcel":parcel_info,"deliveries":0})
+    else:
+        DATA[ind]["current_parcel"] = parcel_info
+def update_delivered_parcels(team):
+    ind = get_index_team(team)
+    if ind == -1:
+        DATA.append({"name":teamname,"current_position":None,"current_parcel":None,"deliveries":1})
+    else:
+        DATA[ind]["deliveries"] += 1

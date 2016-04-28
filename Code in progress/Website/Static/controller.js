@@ -1,5 +1,5 @@
-var app = angular.module("purpleApp",[]);
-app.controller('purpleController',function($scope,lockClaimerService,formSenderService,keySenderService){
+var app = angular.module("controllerApp",[]);
+app.controller('controllerController',function($scope,lockClaimerService,formSenderService,keySenderService){
   $scope.failure = false;
   $scope.noLock = false;
   $scope.invalidMessage = false;
