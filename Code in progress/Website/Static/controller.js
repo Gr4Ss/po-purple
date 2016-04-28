@@ -1,10 +1,11 @@
 var app = angular.module("purpleApp",[]);
-app.controller('purpleController',function($scope,lockClaimerService,keySenderService){
+app.controller('purpleController',function($scope,lockClaimerService,formSenderService,keySenderService){
   $scope.failure = false;
   $scope.noLock = false;
   $scope.invalidMessage = false;
   $scope.locker = false;
   $scope.claimLock = false;
+
   $scope.succes = false;
   $scope.unlock = false;
   $scope.superlock_password = 'Password';
@@ -12,6 +13,12 @@ app.controller('purpleController',function($scope,lockClaimerService,keySenderSe
   $scope.moveRight = 0;
   $scope.moveDown = 0;
   $scope.moveUp = 0;
+  $scope.straightDistance = 50;
+  $scope.invalidStraightDistance = false;
+  $scope.circRadius = 50;
+  $scope.invalidCircRaidus = false;
+  $scope.squareSide = 50;
+  $scope.invalidSquareSide = false;
   hide_all_messages = function(){
     $scope.failure = false;
     $scope.noLock = false;
@@ -220,6 +227,112 @@ app.controller('purpleController',function($scope,lockClaimerService,keySenderSe
     $(".driveForward").addClass('not_pressed');
     var promise = keySenderService.sendData('FStop');
   }
+  $scope.straightSubmit = function(){
+    if ($scope.straightDistance< 20  || $scope.straightDistance>600){
+      $scope.invalidStraightDistance = true;
+    }
+    else{
+      $scope.invalidStraightDistance = false;
+      hide_all_messages();
+      var promise = formSenderService.sendData('STRAIGHT',[$scope.straightDistance])
+      promise.success(function(data,status){
+            if (data == 'OK'){
+              $scope.success = true;
+            }
+            else if (data == 'FAILURE'){
+              $scope.failure = true;
+            }
+            else{
+              $scope.claimLock = true;
+            }
+        });
+      promise.error(function(data,status){
+          $scope.failure = true;
+        });
+    }
+  }
+  $scope.circSubmit = function(){
+    if ($scope.circRadius< 20  || $scope.circRadius>100){
+      $scope.invalidCircRaidus = true;
+    }
+    else{
+      $scope.invalidCircRaidus = false;
+      hide_all_messages();
+      var promise = formSenderService.sendData('CIRC',[$scope.circRadius])
+      promise.success(function(data,status){
+            if (data == 'OK'){
+              $scope.success = true;
+            }
+            else if (data == 'FAILURE'){
+              $scope.failure = true;
+            }
+            else{
+              $scope.claimLock = true;
+            }
+        });
+      promise.error(function(data,status){
+          $scope.failure = true;
+        });
+    }
+  }
+  $scope.squareSubmit = function(){
+    if ($scope.squareSide< 20  || $scope.squareSide>100){
+      $scope.invalidSquareSide = true;
+    }
+    else{
+      $scope.invalidSquareSide = false;
+      hide_all_messages();
+      var promise = formSenderService.sendData('SQUARE',[$scope.squareSide])
+      promise.success(function(data,status){
+            if (data == 'OK'){
+              $scope.success = true;
+            }
+            else if (data == 'FAILURE'){
+              $scope.failure = true;
+            }
+            else{
+              $scope.claimLock = true;
+            }
+        });
+      promise.error(function(data,status){
+          $scope.failure = true;
+        });
+    }
+  }
+  $scope.parcoursSubmit = function(){
+    hide_all_messages();
+    var valid_commands = ['Left','Right','Distance'];
+    var str = $scope.parcours;
+    /*
+    var steps = str.split(',');
+    var parsed_steps = []
+    for (var i = 0; i < steps.length-1; i++){
+      console.log(steps[i]);
+      var number = steps[i].match(/\(([^)]+)\)/)[1];
+      var command = steps[i].match(/(.*)\(/)[1];
+      if ($.inArray(command, valid_commands) && !isNaN(number)){
+        console.log('Idioot')
+        parsed_steps.push([command[0],parseInt(number)]);
+      }
+      console.log(arrayObj.join('\n'));
+    }
+    */
+    var promise = formSenderService.sendData({'parcours':str});
+    promise.success(function(data,status){
+        if (data == 'OK'){
+          $scope.succes = true;
+        }
+        if (data == 'FAILURE'){
+          $scope.failure = true;
+        }
+        else{
+          $scope.claimLock = true;
+        }
+    });
+    promise.error(function(data,status){
+      $scope.failure = true;
+    });
+  }
 });
 app.factory('lockClaimerService',function($http){
   var lockClaimer = {};
@@ -246,6 +359,17 @@ app.factory('lockClaimerService',function($http){
     return promise;
   }
   return lockClaimer;
+});
+app.factory('formSenderService',function($http){
+  var formSender = {};
+  formSender.sendData = function(command,arguments){
+    var promise = $http({method:'POST',url:'/drive',
+      data:JSON.stringify({'command':command,'arguments':arguments}),
+      headers: {'Content-Type': 'application/json'}
+      });
+    return promise;
+  };
+  return formSender;
 });
 app.factory('keySenderService',function($http){
   var keySender = {};

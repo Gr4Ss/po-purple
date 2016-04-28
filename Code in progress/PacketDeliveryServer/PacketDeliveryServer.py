@@ -21,8 +21,14 @@ class PacketDeliveryServer:
         self.current_position = start_position
         self.current_parcel = None
         self.parcel_picked_up = False
+    '''
+    Return the edges of the map
+    '''
     def get_edges():
         return self.map.get('edges')
+    '''
+    Return the vertices of the map
+    '''
     def get_vertices():
         return self.map.get('vertices')
     '''

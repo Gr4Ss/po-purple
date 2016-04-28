@@ -7,16 +7,18 @@ Rightengine = None
 Perimeter = None
 Gearratio = None
 Widthcar = None
+Distancesensor = None
 Init = False
 Going = False
 DEBUG = False
 
-def init(leftengine,rightengine,perimeter,gearratio,widthcar):
-    global Leftengine, Rightengine, Perimeter, Gearratio, Widthcar,  Init
+def init(leftengine,rightengine,distancesensor,perimeter,gearratio,widthcar):
+    global Leftengine, Rightengine, Distancesensor, Perimeter, Gearratio, Widthcar,  Init
     if isinstance(leftengine,Engine.Engine) and isinstance(rightengine,Engine.Engine)
             and isinstance(perimeter,float) and isinstance(gearratio,float) and isinstance(widthcar,float):
         Leftengine = leftengine
         Rightengine = rightengine
+        Distancesensor = distancesensor
         Perimeter = perimeter
         Gearratio = gearratio
         Widthcar = widthcar
@@ -96,7 +98,6 @@ def left():
 
 # A method to turn right
 def right():
-
     manual_rotate(-1)
 
 # A method to stop driving
@@ -206,7 +207,7 @@ def rotate(radial):
         inner_engine.set_speed(speed2)
         time.sleep(0.1)
 
-def ride_polygon(sides,distance):
+def ride_polygon(distance,sides=4):
     angle = math.pi - (math.pi * (sides-2)/sides) + 0.2
     while sides > 0:
         ride_distance(distance)

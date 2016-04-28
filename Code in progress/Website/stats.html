@@ -44,6 +44,15 @@
     <div class="container" id='home'>
 		    <div class="starter-template">
           <div id ='statController' ng-app='statApp' ng-controller='statController'>
+              <div class ='purpleData'>
+                <h2>Eigen data</h2>
+                <p><b> Huidig pakje: </b></p>
+                <p><b> Aantal afgeleverde pakjes: </b></p>
+                <p><b> Huidige positie: </b></p>
+                <p><b> Status: </b> </p>
+              </div>
+                <div>
+                  <h2> Globale data </h2>
                   <div>
                     <canvas id="myChart" width="400" height="400"></canvas>
                     <script>
@@ -61,22 +70,11 @@
                       <div class="teamInfo" ng-show='showTeamInfo'>
                         <div id='leftTeamInfo'>
                           <h1 ng-name="selectedTeam"></h1>
-                          <div id="teamDeliveredParcels">
-                            <h3> Deliveries </h3>
-                            <ul>
-                              <li ng-repeat = 'delivery in deliveries'>
-                                Delivered parcel number: {{delivery[1]}} at {{delivery[0]}}
-                              </li>
-                            </ul>
-                          </div>
-                          <div id="teamPositions">
-                            <h3>Positions</h3>
-                            <ul>
-                              <li ng-repeat = "position in positions">
-                                {{position}}
-                              </li>
-                            </ul>
-                          </div>
+                          <p><b> Huidig pakje: </b></p>
+                          <p><b> Aantal afgeleverde pakjes: </b></p>
+                          <p><b> Huidige positie: </b></p>
+                          <p><b> Status: </b></p>
+                          <p><b> Gemiddelde levertijd: </b></p>
                         </div>
                         <div id='rightTeamInfo'>
                           <canvas id="teamChart" width="400" height="400"></canvas>
@@ -111,6 +109,7 @@
                       </div>
                   </div>
                 </div>
+              </div>
             </div>
           </div>
         </div>

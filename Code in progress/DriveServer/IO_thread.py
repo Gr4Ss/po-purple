@@ -44,10 +44,7 @@ class IO_Thread:
         # update values of the engines
         k = 0
         while self.__going:
-            k += 1
-            if k == 5:
-                k = 0
-                for sensor in self.__sensors:
-                    sensor.update_value()
+            for sensor in self.__sensors:
+                sensor.update_value()
             BrickPiUpdateValues()
             time.sleep(0.01)

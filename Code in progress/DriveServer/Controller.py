@@ -25,7 +25,7 @@ class Controller:
         self.__perimeter = 2*math.pi* 2.579
         ControllerCommands.init(self.__leftengine,self.__rightengine,self.__distance_sensor,self.__perimeter,self.__gearratio,self.__widthcar)
         # Storing a reference to a brickpi thread
-        self.__io = IO_Thread(self.__engines)
+        self.__io = IO_Thread([self.__leftengine,self.__rightengine],[self.__distance_sensor])
         self.__command_going = False
         self.__command_thread = None
         self.__parcours = None

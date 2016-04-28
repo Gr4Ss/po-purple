@@ -6,13 +6,21 @@ var halted = 0;
 var mjpeg_mode = 0;
 
 function reload_img () {
-  if(!halted) mjpeg_img.src = 'http://pipurple/cam.jpg?time=' + new Date().getTime();//setTimeout("mjpeg_img.src = 'http://192.168.0.98/cam.jpg?time=' + new Date().getTime()", 100);
-  else 
-	setTimeout("reload_img()", 100);
+  if(!halted)
+    {
+      mjpeg_img.src = 'http://pipurple/cam.jpg?time=' + new Date().getTime();
+    }//setTimeout("mjpeg_img.src = 'http://192.168.0.98/cam.jpg?time=' + new Date().getTime()", 100);
+  else
+    {
+      setTimeout("reload_img()", 100);
+    }
+
 }
 
 function error_img () {
-  setTimeout("mjpeg_img.src = 'http://pipurple/cam.jpg?time=' + new Date().getTime();", 100);
+  mjpeg_img.onload = null;
+  mjpeg_img.src = "/images/no_stream.jpg";
+  setTimeout("mjpeg_img.onload=reload_img();mjpeg_img.src = 'http://pipurple/cam.jpg?time=' + new Date().getTime()", 10000);
 }
 
 //

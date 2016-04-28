@@ -50,5 +50,15 @@ def func_stop(identifier,argument,lock):
         except:
             return 'FAILURE'
 
-def follow_path(identifier,argument,lock):
-    return 'OK'
+def func_command(identifier,argument,lock):
+    controller = argument[0]
+    command = argument[1]
+    arg = argument[2]
+    if not lock.has_lock(identifier):
+        return 'SORRY'
+    else:
+        try:
+            controller.start_command(command,arg)
+            return 'OK'
+        except:
+            return 'FAILURE'

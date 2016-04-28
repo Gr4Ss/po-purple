@@ -1,6 +1,6 @@
 # The distance for a straight must be at least 20 (otherwise big proportional error)
 # The distance for a straight is at max 600 (not sure when overflow of encoders happen)
-def constraint_strait(distance):
+def constraint_straight(distance):
     try:
          distance = int(distance)
          return distance >= 20 and distance <= 600

@@ -11,6 +11,7 @@ import json, random
 app = Bottle()
 # Storing a refence to the location of the static files
 static_root = 'Static/'
+image_root = 'Images/'
 data_logger = data.Data()
 data_logger.start()
 # Returning the home page
@@ -49,6 +50,9 @@ def control():
 @app.route('/static/<filename>')
 def server_static(filename):
     return static_file(filename,root=static_root)
+@app.route('/images/<filename>')
+def images(filename):
+    return static_file(filename,root=image_root)
 @app.route('/stats/data')
 def get_data():
     d = data_logger.get_data()
@@ -115,6 +119,22 @@ def keys():
         except:
         	abort(500,'Socket timeout')
 
+@app.post('/drive')
+def drive():
+    ID = request.get_cookie('ID')
+    if not ID:
+        abort(404,"No cookie found")
+    inp = request.json
+    if inp == None:
+        return 'FAILURE'
+    command = inp.get('command',False)
+    argument = inp.get('arguments',False)
+    dictionnary = {'command' :command,'argument':argument,'ID':ID}
+    try:
+        t = DriverCom.send(dictionnary)
+        return "OK" if t else "SORRY"
+    except:
+        abort(500,'Socket timeout')
 @app.post('/parcours')
 def parcours():
     ID = request.get_cookie('ID')

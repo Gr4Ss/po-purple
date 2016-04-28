@@ -5,7 +5,7 @@ import cPickle
 from commands import *
 
 # Setting up a new a new socket server
-socket = sockets_server.CustomSocketServer(5064)
+socket = sockets_server.SocketServer(6000)
 # Create a lock entity with a lock time of 20 minutes
 lock = Locker.Lock(1200)
 # Import controller, entity responsible for starting and stopping controller commands
@@ -33,9 +33,9 @@ ControllerCommands.stop)
 commands = {
 'LOCK':{'nb_of_arguments':0,'function':func_lock},
 'UNLOCK':{'nb_of_arguments':0,'function':func_unlock},
-'STRAIGHT':{'nb_of_arguments':1,'constraint':c.constraint_strait},
-'CIRC':{'nb_of_arguments':1,'constraint':c.constraint_circ},
-'SQUARE':{'nb_of_arguments':1,'constraint':c.constraint_square},
+'STRAIGHT':{'nb_of_arguments':1,'function':func_command,'optional_arguments':[controller,ControllerCommands.ride_distance],'constraint':c.constraint_straight},
+'CIRC':{'nb_of_arguments':1,'function':func_command,'optional_arguments':[controller,ControllerCommands.ride_circ],'constraint':c.constraint_circ},
+'SQUARE':{'nb_of_arguments':1,'function':func_command,'optional_arguments':[controller,ControllerCommands.ride_polygon],'constraint':c.constraint_square},
 'SUPERLOCK':{'nb_of_arguments':1,'function':func_superlock},
 'SUPERUNLOCK':{'nb_of_arguments':1,'function':func_superunlock},
 'FStart':{'nb_of_arguments':0,'function':func_add_direction,'optional_arguments':[manualDrive,'forward']},
