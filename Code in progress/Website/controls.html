@@ -11,7 +11,7 @@
     <script src="static/bootstrap.min.js"></script>
     <link rel="stylesheet" href="static/bootstrap.min.css">
     <link rel="stylesheet" href="static/bootstrap-theme.min.css" >
-    <script src="/static/controller.js"></script>
+    <script src="static/controller.js"></script>
     <link rel="stylesheet" href="static/cssv2.css">
   <script>window.addEventListener("keydown", function(e) {
   // space and arrow keys
@@ -22,7 +22,7 @@
   </script>
 </head>
 
-<body  data-spy="scroll" data-target=".navbar" data-offset="50" onload="setTimeout('init();', 100);"  ng-app='controllerApp' ng-controller='controllerController' ng-keydown = "keyDown($event)" ng-keyup ="keyUp($event)">
+<body  data-spy="scroll" data-target=".navbar" data-offset="50"   ng-app='controllerApp' ng-controller='controllerController' ng-keydown = "keyDown($event)" ng-keyup ="keyUp($event)">
   <div >
     <nav class="navbar navbar-inverse navbar-fixed-top">
       <div class="container">
@@ -105,18 +105,17 @@
 								The input of the second PID-controller is supplied with the distance difference between the
 								left and the right wheel, and present at it's output the speed differce between both engines.
 							</p>
-              <div ng-app="formStraight" ng-controller="controllerStraight">
+
 							<div class="form1" >
 								<form class="form-horizontal"  novalidate>
 									<div class="form-group">
 										<label for="distance">Distance</label>
-										<input type="number"  id="distance"  ng-model="straightDistance"  name='straight'>
+										<input type="number"  id="distance" placeholder="in cm" ng-model="straightDistance"  name='straight'>
 									</div>
                   <p ng-show='invalidStraightDistance'> Please enter a value between 20 and 600 </p>
 									<button type="submit" class="btn btn-default btn-lg btn-block" value="Submit" ng-click="straightSubmit()">Drive straight</button>
 								</form>
 							</div>
-            </div>
 						</div>
 					</div>
 				</div>

@@ -41,7 +41,8 @@ class PacketDeliveryServer:
 
     '''
     def main(self,direction,meta=None):
-        pass
+        if self.current_parcel == None:
+            new_parcel
     def new_direction(self,target):
         path = find_path(self.get_vertices(),self.get_edges(),self.current_position,target)
         # You are comming from self.current_position[0] at node self.current_position[1] and to path[0]

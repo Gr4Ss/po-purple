@@ -6,8 +6,10 @@ def find_path(vertices, edges, current, target):
     shortestPath = {}
     currentDistance = 0
     unvisited[current] = currentDistance
+    # Target is unreachable
     if target not in unvisited:
         return None
+    # You are already on the target
     if current == target:
         return [current,target]
 
@@ -38,4 +40,3 @@ def find_path(vertices, edges, current, target):
         del unvisited[current]
         candidates = [node for node in unvisited.items() if node[1]]
         current, currentDistance = sorted(candidates, key = lambda x: x[1])[0]
-

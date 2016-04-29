@@ -13,11 +13,11 @@ app.controller('controllerController',function($scope,lockClaimerService,formSen
   $scope.moveRight = 0;
   $scope.moveDown = 0;
   $scope.moveUp = 0;
-  $scope.straightDistance = 50;
+  $scope.straightDistance = null;
   $scope.invalidStraightDistance = false;
-  $scope.circRadius = 50;
+  $scope.circRadius = null;
   $scope.invalidCircRaidus = false;
-  $scope.squareSide = 50;
+  $scope.squareSide = null;
   $scope.invalidSquareSide = false;
   hide_all_messages = function(){
     $scope.failure = false;
