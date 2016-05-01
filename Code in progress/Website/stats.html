@@ -68,7 +68,7 @@
                           <option style="" value="">select a team</option>
                       </select>
                       <div class="teamInfo" ng-show='showTeamInfo'>
-                        <h1 ng-name="selectedTeam"></h1>
+                        <h1 ng-bind="selectedTeam"></h1>
                         <p><b> Huidig pakje: </b> {{selectedCurrentParcel}}</p>
                         <p><b> Aantal afgeleverde pakjes: </b> {{selectedNbDeliveredParcels}}</p>
                         <p><b> Huidige positie: </b> {{selectedCurrentPosition}}</p>

@@ -217,10 +217,35 @@
 							<div class="form6">
 								<form class="form-horizontal">
 									<div class="form-group">
-										<label for="radius">Radius</label>
-										<input type="text"  id="radius" placeholder="in cm">
-									</div>
-									<button type="submit" class="btn btn-default btn-lg btn-block">Drive Circle</button>
+                    <div class="touch-keys" >
+                      <div class="row">
+                        <div class="col-xs-4 col-xs-offset-4">
+                          <button class="btn btn-default btn-block driveForward not_pressed" ng-mouseup="keyUpReleased()" ng-mousedown="keyUpPressed()">
+                          F
+                          </button>
+                        </div>
+                      </div>
+                      <div class="row">
+                        <div class="col-xs-4">
+                          <button class="btn btn-default btn-block driveLeft not_pressed" ng-mouseup="keyLeftReleased()" ng-mousedown="keyLeftPressed()">
+                          L
+                          </button>
+                        </div>
+                        <div class="col-xs-4">
+                          <button class="btn btn-default btn-block driveReverse not_pressed" ng-mouseup="keyDownReleased()" ng-mousedown="keyDownPressed()">
+                          B
+                          </button>
+                        </div>
+                        <div class="col-xs-4">
+                          <button class="btn btn-default btn-block driveRight not_pressed" ng-mouseup="keyRightReleased()" ng-mousedown="keyRightPressed()">
+                          R
+                          </button>
+                        </div>
+                      </div>
+                    </div>
+                    <div class="keyboard-keys">
+                      Or press the keyboard arrow keys to control the vehicle!
+                    </div>
 								</form>
 							</div>
 						</div>
