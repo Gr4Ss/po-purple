@@ -164,7 +164,6 @@ class Packet_Delivery_Server:
         positions = self.restclient.get_positions()
         edges = update_edges_traffic(positions,self.current_position,self.get_edges(),self.teamname)
         path = find_path(self.get_vertices(),edges,current,target)
-        print 'Path', path
         # You are comming from self.current_position[0] at node self.current_position[1] and to path[0]
         return self.to_left_right_straight(current,frm,path[1])
     '''
@@ -238,7 +237,6 @@ class Packet_Delivery_Server:
             if value == frm:
                 from_direction = directions.index(key)
                 break
-        print to
         to_direction = (from_direction+directions.index(to))%len(directions)
         return node_data[directions[to_direction]]
 def  generate_real_edges(mapje):

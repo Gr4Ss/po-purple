@@ -122,7 +122,6 @@ class Vehicle(RestClient):
                         edges.remove(edge)
                         continue
             if x[1] == position[0] and x[1] != x[2]:
-                print edges
                 try:
                     i = edges.index([x[1], x[2], self.get_edge_length([x[1], x[2]], edges)])
                     edge = edges.pop(i)
@@ -145,6 +144,7 @@ class Vehicle(RestClient):
     	        target = parcel[2]
 
             time.sleep(float(length)/self.get_speed())
+            print 'pushposition', self.get_teamname(), " " ,position[1]
             self.pushposition(position[1])
             if position[1] == target:
                 if self.get_parcel_status():
@@ -153,9 +153,9 @@ class Vehicle(RestClient):
                 elif not self.get_parcel_status():
                     self.inv_parcel_status()
                 continue
-            print ('pathfinding, ', position[1], target)
             path = find_path(self.get_vertices(), self.update_edges_traffic(), position[1], target)
             self.pushposition([path[0],path[1]])
+            print 'pushposition ', self.get_teamname(), " " ,[path[0],path[1]]
 '''
 {
 "available-parcels": [

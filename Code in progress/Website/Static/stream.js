@@ -19,7 +19,7 @@ function reload_img () {
 
 function error_img () {
   mjpeg_img.onload = null;
-  mjpeg_img.src = "/images/no_stream.jpg";
+  mjpeg_img.src = "/images/streaming.jpg";
   setTimeout("mjpeg_img.onload=reload_img();mjpeg_img.src = 'http://pipurple/cam.jpg?time=' + new Date().getTime()", 10000);
 }
 
