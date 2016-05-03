@@ -175,7 +175,10 @@ def parcours():
         abort(404, "No cookie found.")
     parcours = request.json.get('parcours')
     print parcours
-    parcours= parse_parcours(parcours)
+    if parcours == 'PAUSE':
+        pass
+    parcours = parse_parcours(parcours)
+    print parcours
     if not check_parcours(parcours):
         return 'FAILURE'
     else:

@@ -37,7 +37,7 @@ app.controller('statController',function($scope,dataService){
 					$scope.selectedCurrentParcel = returndata.current_parcel;
 					$scope.selectedCurrentPosition = returndata.current_position;
 					$scope.selectedNbDeliveredParcels = returndata.deliveries;
-					$scope.selectedLastReload = Date.now();
+					$scope.selectedLastReload = Date.now().toString();
 					$scope.loadingTeamInfo = false;
 					$scope.showTeamInfo = true;
 		  	});

@@ -35,7 +35,7 @@ class Engine:
         speed = speed *(-1)
         if abs(speed) > 255:
             speed = sign(speed) * 255
-        if abs(speed)< 50:
+        if abs(speed)< 30:
             speed = 0
         BrickPi.MotorSpeed[self.__port] = int(speed)
         self.__speed = int(speed)

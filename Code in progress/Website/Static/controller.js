@@ -5,7 +5,11 @@ app.controller('controllerController',function($scope,lockClaimerService,formSen
   $scope.invalidMessage = false;
   $scope.locker = false;
   $scope.claimLock = false;
-
+  $scope.parcours = [];
+  $scope.str_parcours = "";
+  $scope.parcoursLeft;
+  $scope.parcoursRight;
+  $scope.parcours_paused = false;
   $scope.succes = false;
   $scope.unlock = false;
   $scope.superlock_password = 'Password';
@@ -19,6 +23,7 @@ app.controller('controllerController',function($scope,lockClaimerService,formSen
   $scope.invalidCircRaidus = false;
   $scope.squareSide = null;
   $scope.invalidSquareSide = false;
+
   hide_all_messages = function(){
     $scope.failure = false;
     $scope.noLock = false;
@@ -91,7 +96,7 @@ app.controller('controllerController',function($scope,lockClaimerService,formSen
 
   };
   $scope.keyDown = function(e){
-    console.log('Keypresed');
+    if ($("#collapseFive").attr('aria-expanded') == 'true'){
       switch (e.which) {
         case 37:
           $scope.keyLeftPressed();
@@ -106,8 +111,10 @@ app.controller('controllerController',function($scope,lockClaimerService,formSen
           $scope.keyDownPressed();
           break;
       }
+    }
   }
   $scope.keyUp = function(e){
+    if ($("#collapseFive").attr('aria-expanded') == 'true'){
       switch (e.which) {
         case 37:
           $scope.keyLeftReleased();
@@ -123,6 +130,7 @@ app.controller('controllerController',function($scope,lockClaimerService,formSen
           break;
       }
     e.preventDefault();
+    }
   }
   $scope.keyLeftPressed = function() {
     if ($scope.moveLeft == 0){
@@ -302,23 +310,17 @@ app.controller('controllerController',function($scope,lockClaimerService,formSen
   }
   $scope.parcoursSubmit = function(){
     hide_all_messages();
-    var valid_commands = ['Left','Right','Distance'];
-    var str = $scope.parcours;
-    /*
-    var steps = str.split(',');
-    var parsed_steps = []
-    for (var i = 0; i < steps.length-1; i++){
-      console.log(steps[i]);
-      var number = steps[i].match(/\(([^)]+)\)/)[1];
-      var command = steps[i].match(/(.*)\(/)[1];
-      if ($.inArray(command, valid_commands) && !isNaN(number)){
-        console.log('Idioot')
-        parsed_steps.push([command[0],parseInt(number)]);
-      }
-      console.log(arrayObj.join('\n'));
+    var pat = /(\w+)\((\d+)\)/g;
+    $scope.parcours = [];
+    console.log($scope.str_parcours);
+    var match = pat.exec($scope.str_parcours);
+    console.log(match)
+    while (match != null){
+      $scope.parcours.push({'direction':match[1],'count':match[2]});
+      match = pat.exec($scope.str_parcours);
     }
-    */
-    var promise = formSenderService.sendData({'parcours':str});
+    console.log($scope.parcours)
+    var promise = formSenderService.sendParcours($scope.parcours);
     promise.success(function(data,status){
         if (data == 'OK'){
           $scope.succes = true;
@@ -328,6 +330,24 @@ app.controller('controllerController',function($scope,lockClaimerService,formSen
         }
         else{
           $scope.claimLock = true;
+        }
+    });
+    promise.error(function(data,status){
+      $scope.failure = true;
+    });
+  }
+  $scope.parcoursReset = function(){
+    $scope.str_parcours = "";
+  }
+  $scope.parcoursAppend = function(appendix){
+    $scope.str_parcours = $scope.str_parcours.concat(appendix);
+  }
+  $scope.parcoursPause = function(){
+    hide_all_messages();
+    var promise = formSenderService.pauseParcours();
+    promise.success(function(data,status){
+        if (data == 'OK'){
+          $scope.parcoursPause = true;
         }
     });
     promise.error(function(data,status){
@@ -370,6 +390,20 @@ app.factory('formSenderService',function($http){
       });
     return promise;
   };
+  formSender.sendParcours = function(arguments){
+    var promise = $http({method:'POST',url:'/parcours',
+    data:JSON.stringify({'parcours':arguments}),
+    headers: {'Content-Type':'application/json'}
+    });
+    return promise;
+  }
+  formSender.pauseParcours = function(){
+    var promise = $http({method:'POST',url:'/parcours',
+    data:JSON.stringify({'parcours':'PAUSE'}),
+    headers: {'Content-Type':'application/json'}
+    });
+    return promise;
+  }
   return formSender;
 });
 app.factory('keySenderService',function($http){

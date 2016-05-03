@@ -12,6 +12,7 @@ def distance_detection(distance):
         closing_counter = 0
     if closing_counter >= 3:
         getting_closer = True
+
     if distance < 20:
         close_counter += 1
     else:
@@ -22,7 +23,8 @@ def distance_detection(distance):
     previous_distance = distance
     if too_close:
         return 255
-    elif getting_closer and distance <30:
-        return 2*(opd - distance)**2
+    #elif getting_closer and distance <40:
+    #    print 'Getting closer'
+    #    return 2*(opd - distance)**2
     else:
         return 0

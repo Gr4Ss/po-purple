@@ -32,6 +32,9 @@ class PID:
         proportional = error
         self.__previous_error = error
         return self.__kp*proportional + self.__ki * integral + self.__kd*differential
+    def reset(self):
+        self.__integral = 0
+        self.__previous_error = 0
 # A class concerning the PD controller
 class PD:
     # @param kp: the value of the proportional action
