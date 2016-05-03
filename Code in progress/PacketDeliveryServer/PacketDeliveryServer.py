@@ -9,10 +9,12 @@ scriptPath = os.path.realpath(os.path.dirname(sys.argv[0]))
 os.chdir(scriptPath)
 #append the relative location you want to import from
 sys.path.append("../RESTServer")
+sys.path.append("../Socket")
+from sockets_client import *
 from restclient import *
 
-class PacketDeliveryServer:
-    def __init__(self,start_position):
+class Packet_Delivery_Server:
+    def __init__(self,start_position,webserver,port):
         self.teamname = 'PAARS'
         self.restclient = RestClient("http://localhost:9000",self.teamname)
         self.restclient.add_team()
@@ -23,24 +25,35 @@ class PacketDeliveryServer:
         self.current_parcel = None
         self.parcel_picked_up = False
         self.split_from = None
-        self.status = "NORMAL"
+        self.status = "Normal driving from %s to %s"%(self.current_position[0],self.current_position[0])
+        self.socket = SocketClient(webserver,port)
+        self.socket.connect()
     '''
     Return the edges of the map
     '''
-    def get_edges():
-        return self.map.get('edges')
+    def get_edges(self):
+        return list(self.map.get('edges'))
     '''
     Return the vertices of the map
     '''
-    def get_vertices():
-        return self.map.get('vertices')
+    def get_vertices(self):
+        return list(self.map.get('vertices'))
+    '''
+        Method to send data to the webserver
+    '''
+    def send_data(self):
+        data = {'Position': self.current_position, 'Status':self.status, 'Parcel':self.current_parcel}
+        if not self.socket.connected:
+            self.socket.connect()
+        self.socket.send_data(data)
+
     '''
     Method to update position of the car.
     Sends new position to rest server and update it locally
     '''
     def update_position(self,position):
         # Update at restserver
-        self.restclient.update_position(position[0],postion[1])
+        self.restclient.update_position(position[0],position[1])
         # Update locally
         self.current_position = position
     '''
@@ -49,15 +62,15 @@ class PacketDeliveryServer:
     def update_edge_length(self,edge,lenght):
         if edge in self.real_edges_lenght.keys():
             # For each edge we keep a list of distance so we can take the median
-            self.real_edges_lenght[edge].append(length)
+            self.real_edges_lenght[edge].append(lenght)
     '''
     Method that return the estimate of the distance of an edge.
     '''
     def get_edge_lenght(self,edge):
         # Determine the length of the edge
-        length = len(self.real_edges_lenght)
+        lenght = len(self.real_edges_lenght[edge])
         # Get a sorted copy
-        copy = sorted(self.real_edges_length)
+        copy = sorted(self.real_edges_lenght[edge])
         # if no element return None
         if lenght == 0:
             return None
@@ -76,37 +89,52 @@ class PacketDeliveryServer:
     def at_split(self,lenght=None):
         # Update the length of the current edge
         if lenght != None:
-            self.update_edge_length(position,lenght)
+            self.update_edge_length(self.current_position,lenght)
         # If the car has no parcel determine new one
+        if self.current_position[0] == self.current_position[1]:
+            self.current_position = (self.split_from,self.current_position[1])
         if self.current_parcel == None:
-            new_parcel()
-            target = self.current_parcel[1]
+            self.new_parcel()
+            if self.current_position[1] == self.current_parcel[1]:
+                self.parcel_picked_up = True
+                target = self.current_parcel[2]
+            else:
+                target = self.current_parcel[1]
+            self.status = "New parcel selected. Driving to %s"%target
         # If we have a goal package but didn't pick it up
         elif self.parcel_picked_up == False and self.current_position[1] != self.current_parcel[1]:
             target = self.current_parcel[1]
+            self.status = "Parcel not yet picked up. Driving to %s"%target
         elif self.parcel_picked_up == False:
             self.parcel_picked_up = True
             target = self.current_parcel[2]
+            self.status = "Parcel picked up. Driving to %s"%target
         # A parcel is picked up, driving to target
         elif self.parcel_picked_up == True and self.current_position[1] != self.current_parcel[2]:
             target = self.current_parcel[2]
+            self.status = "Parcel picked up. Driving to %s"%target
         else:
-            deliver_parcel()
-            new_parcel()
+            self.deliver_parcel()
+            self.new_parcel()
             if self.current_position[1] != self.current_parcel[1]:
                 target = self.current_parcel[1]
+                self.status = "Parcel delivered, new parcel selected. Now driving to %s"%target
             else:
                 self.parcel_picked_up = True
                 target  = self.current_parcel[2]
+                self.status = "Parcel delivered, new parcel already picked up. Now driving to %s"%target
         self.split_from = self.current_position[0]
         self.update_position((self.current_position[1],self.current_position[1]))
+        self.send_data()
         return self.new_direction(self.split_from,self.current_position[1],target)
     '''
         Method to call when the car has turned around.
     '''
-    def turned_arround(self):
+    def turned_around(self):
+        self.status = "Turned around now driving from %s to %s"%(self.current_position[1],self.current_position[0])
         # New position found by swapping the position elements
         self.update_position((self.current_position[1],self.current_position[0]))
+        self.send_data()
     '''
         Method to check if the car can turn around given its current position
     '''
@@ -122,6 +150,8 @@ class PacketDeliveryServer:
     def turned(self,direction):
         new_target = self.to_node_number(self.current_position[1],self.split_from,direction)
         self.update_position((self.current_position[1],new_target))
+        self.status = "Successfully turned. Now driving from %s to %s"%(self.current_position[0],self.current_position[1])
+        self.send_data()
         return self.get_edge_lenght(self.current_position)
     '''
         Method that returns the new direction (left,right,straight) at a split
@@ -130,9 +160,13 @@ class PacketDeliveryServer:
         target: target node
     '''
     def new_direction(self,frm,current,target):
-        path = find_path(self.get_vertices(),self.get_edges(),current,target)
+
+        positions = self.restclient.get_positions()
+        edges = update_edges_traffic(positions,self.current_position,self.get_edges(),self.teamname)
+        path = find_path(self.get_vertices(),edges,current,target)
+        print 'Path', path
         # You are comming from self.current_position[0] at node self.current_position[1] and to path[0]
-        return self.to_left_right_straight(current,frm,path[0])
+        return self.to_left_right_straight(current,frm,path[1])
     '''
         Method to get new parcel
     '''
@@ -141,11 +175,13 @@ class PacketDeliveryServer:
         while not succes:
             available_parcels = self.restclient.get_parcels().get('available-parcels')
             positions = self.restclient.get_positions()
+            print positions
             edges = update_edges_traffic(positions,self.current_position,self.get_edges(),self.teamname)
-            parcel = select_parcel(edges, self.get_vertices(), position, parcels.get('available-parcels'))
+            parcel = select_parcel(edges, self.get_vertices(), self.current_position, available_parcels)
             if parcel != False:
-                success = self.restclient.claim_parcel(parcel[0])
-            print "ERROR: Couldn't claim parcel"
+                succes = self.restclient.claim_parcel(parcel[0])
+            else:
+                print "ERROR: Couldn't claim parcel"
         self.current_parcel = parcel
     '''
         Method to deliver parcels
@@ -158,7 +194,7 @@ class PacketDeliveryServer:
         Method to get info about vertices
     '''
     def get_data_node(self,node):
-        for vertice in self.map["vertices"]:
+        for vertice in self.get_vertices():
             if vertice[0] == node:
                 return vertice[1]
         return None
@@ -183,24 +219,28 @@ class PacketDeliveryServer:
         #[3, {"origin": 2, "straight": 1, "left": 4}],
         # [4, {"origin": 3, "straight": 1, "left": 2}]],
         #"edges": [[1, 2, 0.3],[1, 3, 0.5],[3, 1, 0.5], ... ]}
-        # First of all loop through the vertices to find the right data
+        # You are already there no need for turning
+        if node == to:
+            return None
+
         directions = ["origin","right","straight","left"]
         node_data = self.get_data_node(node)
         for key in node_data:
             if node_data[key] == frm:
                 from_point = directions.index(key)
-            elif node_data[key] == to:
+            if node_data[key] == to:
                 end_point = directions.index(key)
         return directions[(end_point-from_point)%len(directions)]
     def to_node_number(self,node,frm,to):
         directions = ["origin","right","straight","left"]
         node_data = self.get_data_node(node)
-        for key,value in node_data.iteritems()::
+        for key,value in node_data.iteritems():
             if value == frm:
                 from_direction = directions.index(key)
                 break
+        print to
         to_direction = (from_direction+directions.index(to))%len(directions)
-        return node_data[to_direction]
+        return node_data[directions[to_direction]]
 def  generate_real_edges(mapje):
     edges = mapje["edges"]
     result = dict()

@@ -2,11 +2,12 @@ from bottle import Bottle,run,static_file, request,post,error,response,abort
 import datetime
 from webserver_utility import *
 import data
-#import Communicate
+import Communicate
 import json, random
 
+
 # Interface hiding away problems with the Raspberry Pi
-#DriverCom = Communicate.DriverCommincator()
+DriverCom = Communicate.DriverCommincator()
 # Create a new Bottle app
 app = Bottle()
 # Storing a refence to the location of the static files
@@ -55,13 +56,13 @@ def images(filename):
 
 @app.route('/stats/data')
 def get_data():
-    print 'D', json.dumps(data.get_data())
     return json.dumps(data.get_data())
 @app.route('/stats/data/<team>')
 def get_team_data(team):
-    print data.get_data_team(team)
     return json.dumps(data.get_data_team(team))
-
+@app.route('/stats/owndata')
+def get_own_data():
+    return json.dumps(data.get_own_data())
 # Method when the user tries to get a lock
 @app.get('/lock')
 def lock():
@@ -72,12 +73,43 @@ def lock():
         abort(404, "No cookie found.")
     # Else prepare to send the lockrequest to drive server
     dictionnary = {'command':'LOCK','ID':ID}
+    #try:
+    t = DriverCom.send_message(dictionnary)
+    return "OK" if t else "SORRY"
+    #except:
+    #    abort(500,'Socket timeout')
+@app.post('/superlock')
+def superlock():
+    # Get the users cookie
+    ID = request.get_cookie('ID')
+    # If not abort with a 404 error
+    if not ID:
+        abort(404, "No cookie found.")
+    inp = request.json
+    password = inp['passw']
+    # Else prepare to send the lockrequest to drive server
+    dictionnary = {'command':'SUPERLOCK','ID':ID,'arguments':[password]}
     try:
         t = DriverCom.send_message(dictionnary)
         return "OK" if t else "SORRY"
     except:
-    	abort(500,'Socket timeout')
-
+        abort(500,'Socket timeout')
+@app.post('/superunlock')
+def superunlock():
+    # Get the users cookie
+    ID = request.get_cookie('ID')
+    # If not abort with a 404 error
+    if not ID:
+        abort(404, "No cookie found.")
+    inp = request.json
+    password = inp['passw']
+    # Else prepare to send the lockrequest to drive server
+    dictionnary = {'command':'SUPERUNLOCK','ID':ID,'arguments':[password]}
+    try:
+        t = DriverCom.send_message(dictionnary)
+        return "OK" if t else "SORRY"
+    except:
+        abort(500,'Socket timeout')
 @app.get('/unlock')
 def unlock():
     # # Get the users cookie
@@ -129,9 +161,9 @@ def drive():
         return 'FAILURE'
     command = inp.get('command',False)
     argument = inp.get('arguments',False)
-    dictionnary = {'command' :command,'argument':argument,'ID':ID}
+    dictionnary = {'command' :command,'arguments':argument,'ID':ID}
     try:
-        t = DriverCom.send(dictionnary)
+        t = DriverCom.send_message(dictionnary)
         return "OK" if t else "SORRY"
     except:
         abort(500,'Socket timeout')

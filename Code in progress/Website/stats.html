@@ -46,10 +46,10 @@
           <div id ='statController' ng-app='statApp' ng-controller='statController'>
               <div class ='purpleData'>
                 <h2>Eigen data</h2>
-                <p><b> Huidig pakje: </b></p>
-                <p><b> Aantal afgeleverde pakjes: </b></p>
-                <p><b> Huidige positie: </b></p>
-                <p><b> Status: </b> </p>
+                <p><b> Huidig pakje: </b> {{ownParcel}}</p>
+                <!--<p><b> Aantal afgeleverde pakjes: </b> {{{ownNumberOfPackages}}}</p> -->
+                <p><b> Huidige positie: </b> {{ownCurrentPosition}}</p>
+                <p><b> Status: </b> {{ownStatus}} </p>
               </div>
                 <div>
                   <h2> Globale data </h2>

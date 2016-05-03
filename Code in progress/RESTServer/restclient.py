@@ -2,11 +2,7 @@ import requests
 import json
 import random
 def generate_secret_key(length):
-    result = ""
-    for i in range(length):
-        rand = random.randint(97,122)
-        charac = chr(rand)
-        result += charac
+    result = '%030x' % random.randrange(16**30)
     return result
 
 class RestClient(object):

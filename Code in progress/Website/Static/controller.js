@@ -236,8 +236,9 @@ app.controller('controllerController',function($scope,lockClaimerService,formSen
       hide_all_messages();
       var promise = formSenderService.sendData('STRAIGHT',[$scope.straightDistance])
       promise.success(function(data,status){
+            console.log(data);
             if (data == 'OK'){
-              $scope.success = true;
+              $scope.succes = true;
             }
             else if (data == 'FAILURE'){
               $scope.failure = true;
@@ -261,7 +262,7 @@ app.controller('controllerController',function($scope,lockClaimerService,formSen
       var promise = formSenderService.sendData('CIRC',[$scope.circRadius])
       promise.success(function(data,status){
             if (data == 'OK'){
-              $scope.success = true;
+              $scope.succes = true;
             }
             else if (data == 'FAILURE'){
               $scope.failure = true;
@@ -285,7 +286,7 @@ app.controller('controllerController',function($scope,lockClaimerService,formSen
       var promise = formSenderService.sendData('SQUARE',[$scope.squareSide])
       promise.success(function(data,status){
             if (data == 'OK'){
-              $scope.success = true;
+              $scope.succes = true;
             }
             else if (data == 'FAILURE'){
               $scope.failure = true;

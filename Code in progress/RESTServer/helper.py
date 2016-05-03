@@ -49,7 +49,7 @@ class JsonBase:
 		[8, 7, 1.5]
 	]
 }
-        self.__parcels = {"available-parcels": [[142, 1, 2],[145, 2, 3],[147, 2, 1], [148, 1, 2], [149, 1, 2], [152, 1, 2], [162, 1, 2], [172, 1, 2]],"on-the-road-parcels": [],"delivered-parcels": []}
+        self.__parcels = {"available-parcels": [[142, 1, 2],[145, 2, 3],[147, 2, 1], [148, 4, 3], [149, 8, 1], [152, 8, 0], [162, 5, 3], [172, 7, 8]],"on-the-road-parcels": [],"delivered-parcels": []}
         self.__positions = {"positions":[]}
         self.__secret_key = 'SecretKey'
     def get_map(self):

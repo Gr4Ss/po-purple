@@ -9,6 +9,20 @@ app.controller('statController',function($scope,dataService){
 		$scope.selectedNbDeliveredParcels = null;
 		$scope.selectedCurrentPosition = null;
 	  $scope.selectedLastReload = Date.now();
+		$scope.ownParcel = null;
+		$scope.ownNumberOfPackages;
+		$scope.ownCurrentPosition = null;
+		$scope.ownStatus = null;
+
+		$scope.update_own_data = function(){
+			var promise = dataService.getOwnData();
+			promise.success(function(data){
+				$scope.ownParcel = data.Parcel;
+				$scope.ownCurrentPosition = data.Position;
+				$scope.ownStatus = data.Status;
+			})
+
+		}
 	  /*
 	  Method used when a new team is selected.
 	  */
@@ -42,15 +56,13 @@ app.controller('statController',function($scope,dataService){
 					teams.push(obj.name);
 					delivered_parcels.push(obj.deliveries);
 				});
-			console.log(teams);
-			console.log(delivered_parcels);
 			fn(teams,delivered_parcels);
 			});
 		}
 
 	$scope.loop = function(){
-		console.log('update');
 		$scope.get_global_data($scope.update_chart);
+		$scope.update_own_data();
 		setTimeout ($scope.loop,5000 );
 	}
 
@@ -102,5 +114,9 @@ app.factory('dataService',function($http){
 		var promise = $http({'method':'GET','url':url});
 		return promise;
 	};
+		dataGetter.getOwnData = function(){
+			var promise = $http({'method':'GET','url':'stats/owndata'});
+			return promise;
+		}
 	return dataGetter;
 });

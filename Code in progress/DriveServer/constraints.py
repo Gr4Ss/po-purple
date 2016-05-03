@@ -1,20 +1,23 @@
 # The distance for a straight must be at least 20 (otherwise big proportional error)
 # The distance for a straight is at max 600 (not sure when overflow of encoders happen)
-def constraint_straight(distance):
+def constraint_straight(arguments):
+    distance = arguments[0]
     try:
          distance = int(distance)
          return distance >= 20 and distance <= 600
     except:
         return False
 # The innerradius must be at least 20 and as max 200
-def constraint_circ(radius):
+def constraint_circ(arguments):
+    radius = arguments[0]
     try:
          distance = int(distance)
          return radius >= 20 and radius <= 200
     except:
         return False
 # Sides must be at least 20 cm long and at max 200 cm
-def constraint_square(side):
+def constraint_square(arguments):
+    side = arguments[0]
     try:
          distance = int(distance)
          return side >= 20 and side <= 200

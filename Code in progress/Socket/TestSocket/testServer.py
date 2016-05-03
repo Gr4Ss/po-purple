@@ -9,7 +9,7 @@ sck.start()
 try:
     while True:
         data = sck.get_data()
-        print data[1]
+        print 'Received: ',data[1]
         sck.send(data[0],'OK')
 except:
     print 'Stop connection'

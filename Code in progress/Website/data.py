@@ -1,16 +1,36 @@
-import time
+import time, threading
 import os,sys,inspect
 #first change the cwd to the script path
 scriptPath = os.path.realpath(os.path.dirname(sys.argv[0]))
 os.chdir(scriptPath)
 #append the relative location you want to import from
 sys.path.append("../RESTServer")
-
+sys.path.append("../Socket")
+from sockets_server import *
 from restclient import *
+
+
 RESTCLIENT = RestClient("http://localhost:9000")
 DATA = []
 UPDATE_TIME = None
+OWN_DATA = None
+SOCKET = SocketServer(7000)
+SOCKET.start()
 
+def own_data_updater():
+    global SOCKET, OWN_DATA
+    while True:
+        conn,data = SOCKET.get_data()
+        SOCKET.send(conn,'OK')
+        print data
+        OWN_DATA = data
+
+def get_own_data():
+    global OWN_DATA
+    return OWN_DATA
+t = threading.Thread(target=own_data_updater)
+t.setDaemon(True)
+t.start()
 def get_index_team(team):
     count = 0
     for d in DATA:

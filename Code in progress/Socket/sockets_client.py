@@ -9,15 +9,17 @@ class SocketClient:
     def __init__(self,serverIP,serverport,timeout = 10):
         self.serverIP = serverIP
         self.serverport = serverport
-        self.socket = socket.socket(socket.AF_INET, socket.SOCK_STREAM)
-        self.socket.settimeout(timeout)
+        self.timeout = timeout
         self.connected = False
     '''
     Method to connect to the server
     '''
     def connect(self):
         try:
-            if not connected:
+            if not self.connected:
+                print 'Connecting'
+                self.socket = socket.socket(socket.AF_INET, socket.SOCK_STREAM)
+                self.socket.settimeout(self.timeout)
                 self.socket.connect((self.serverIP,self.serverport))
                 self.connected = True
         except:
@@ -55,7 +57,7 @@ class SocketClient:
                 # send the actual data
                 self.socket.send(data)
                 # Receive the length of the ans
-                ans_len = self.socket.recv(1024)
+                ans_len = pickle.loads(self.socket.recv(1024))
                 # Acknowledge the received length
                 self.socket.send('OK')
                 # Receive the answer
@@ -66,8 +68,9 @@ class SocketClient:
                     self.socket.close()
                     self.connected = False
                     return None
-                return result
+                return pickle.loads(result)
         except socket.error:
             self.socket.close()
             self.connected = False
+            print "Error occured. Connection closed"
             return None
