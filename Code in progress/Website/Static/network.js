@@ -155,7 +155,7 @@ function colorAllPositions() {
 						changeEdgeColor(carPosMap[car][2], carPosMap[car][1], hexToRgbA(intToRGB(hashCode(carPosMap[car][0]))));
 					}
 			} else {	
-				console.log("New position: " + carPosMap[car][0] + "," + carPosMap[car][1] + ","+ carPosMap[car][2]+ ","+ carPrevPosMap[car][1]+ ","+ carPrevPosMap[car][2]);
+				//console.log("New position: " + carPosMap[car][0] + "," + carPosMap[car][1] + ","+ carPosMap[car][2]+ ","+ carPrevPosMap[car][1]+ ","+ carPrevPosMap[car][2]);
 				// ANDERE POSITIE
 				if (carPosMap[car][1] == carPosMap[car][2]) {
 					// HUIDIGE POSITIE: NODE
