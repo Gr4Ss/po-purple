@@ -1,22 +1,32 @@
 var Dataset = [];
 var first = true;
 
-/* Gets the dataset from the server and converts it to a usable one for vis.js*/
-$.getJSON("http://localhost:9000/map", function(data) {
-	Dataset = data;
-	console.log(data);
-	convertDataSet();
-	network.on("stabilized", function(params) {
-		
+function getData() {
+	
+	/* Gets the dataset from the server and converts it to a usable one for vis.js*/
+	return $.getJSON("http://localhost:9000/map", function(data) {
+		Dataset = data;
+		convertDataSet();
+	}).responseText;
+}
+
+function initNetwork() {
+	getData();
+	
+	window.setTimeout(function() {
 		network.fit();
-		if (first) {
-			console.log("stabilized");
-			colorAllPositions();
-			first = false;
-		}
+		colorAllPositions();
+	}, 4000);	
+	
+	window.setTimeout(function() {
 		makeExternalLegend();
-	});
-})
+	}, 4600);
+}
+
+function updateNetwork() {	
+	colorAllPositions();
+	
+}
 
 
 /* Variable for the nodes of the dataset */
@@ -38,7 +48,7 @@ function convertDataSet() {
 		var localset = new Set();
 		minVal = Math.min(Dataset["edges"][i][0], Dataset["edges"][i][1]);
 		maxVal = Math.max(Dataset["edges"][i][0], Dataset["edges"][i][1]);
-		localset = {from: Dataset["edges"][i][0], to: Dataset["edges"][i][1], label: Dataset["edges"][i][2], length: (Dataset["edges"][i][2])*(Dataset["edges"][i][2]), id: (7*minVal +11*maxVal)};
+		localset = {from: Dataset["edges"][i][0], to: Dataset["edges"][i][1], label: Dataset["edges"][i][2], length: (Dataset["edges"][i][2])/100, id: (7*minVal +11*maxVal)};
 		if (visSetEdges.get({filter: function (item) {return (item.from == localset.to && item.to ==localset.from);}}).length != 0) {
 			minVal = Math.min(localset.to, localset.from);
 			maxVal = Math.max(localset.to, localset.from);
@@ -97,7 +107,7 @@ var options = {
 		}
 	},
 	layout: {
-		randomSeed: 395813
+		randomSeed: 293556
 	}
 };
 
@@ -111,32 +121,6 @@ function changeEdgeColor(fromid, toid, newColor) {
 	data.edges.update([{id: (7*fromid + 11*toid), color:{color:newColor}}]);
 };
 
-/* Adds the team name to a give node */
-function addTeamNameNode(teamname, nodeId) {
-	data.nodes.update([{id: nodeId, label: nodeId + " (" + (teamname) + ")"}]);
-};
- /* Adds the team name to a given edge*/
-function addTeamNameEdge(teamname, fromNode, toNode, labelDist) {
-	data.edges.update([{id: (7*fromNode + 11*toNode), label: labelDist + " (" + (teamname) + ")"}]);
-};
- /* Deletes the team name from a given node */
-function deleteTeamNameNode(nodeId) {
-	data.nodes.update([{id: nodeId, label: nodeId}])
-};
- /* Deletes the team  name from a given edge */
-function removeTeamNameEdge(teamname, fromNode, toNode, labelDist) {
-	data.edges.update([{id: (7*fromNode + 11*toNode), label: labelDist}])
-};
-
-function changeTeamPosition(carTeam) {
-	if (hasNodePosition(car)) {
-		
-	}
-	else {
-		
-	}
-}
-
 
 //////////// SETTING UP NETWORK ////////////
 
@@ -145,13 +129,13 @@ var network = new vis.Network(container, data, options);
 
 var myPositions = "haha";
 
-carPrevPosMap = [];
-carPosMap = [];
-carHashMap = {};
+var carPrevPosMap = [];
+var carPosMap = [];
+var carHashMap = {};
 
 function colorAllPositions() {
-	$.getJSON("http://localhost:9000/positions", function(data) {
-		myPositions = data;
+	$.getJSON("http://localhost:9000/positions", function(myPositions) {
+		//var start = new Date().getTime();
 		for (i in myPositions["positions"]){
 			carPosMap[i] = [myPositions["positions"][i][0], myPositions["positions"][i][1], myPositions["positions"][i][2]];
 			carHashMap[hashCode(myPositions["positions"][i][0])] = myPositions["positions"][i][0];
@@ -162,28 +146,51 @@ function colorAllPositions() {
 			}
 		}
 		for (car in carPosMap) {
-			if (carPosMap[car] == carPrevPosMap[car]) {
+			if ((carPosMap[car][1] == carPrevPosMap[car][1] && carPosMap[car][2] == carPrevPosMap[car][2])
+				|| (carPosMap[car][1] == carPrevPosMap[car][2] && carPosMap[car][2] == carPrevPosMap[car][1])) {
+					if (carPosMap[car][1] == carPosMap[car][2]) {
+						changeNodeColor(carPosMap[car][1], hexToRgbA(intToRGB(hashCode(carPosMap[car][0]))));
+					} else {
+						changeEdgeColor(carPosMap[car][1], carPosMap[car][2], hexToRgbA(intToRGB(hashCode(carPosMap[car][0]))));
+						changeEdgeColor(carPosMap[car][2], carPosMap[car][1], hexToRgbA(intToRGB(hashCode(carPosMap[car][0]))));
+					}
+			} else {	
+				console.log("New position: " + carPosMap[car][0] + "," + carPosMap[car][1] + ","+ carPosMap[car][2]+ ","+ carPrevPosMap[car][1]+ ","+ carPrevPosMap[car][2]);
+				// ANDERE POSITIE
 				if (carPosMap[car][1] == carPosMap[car][2]) {
-					//addTeamNameNode(carPosMap[car][0], carPosMap[car][1])
-					changeNodeColor(carPosMap[car][1], hexToRgbA(intToRGB(hashCode(carPosMap[car][0]))));
+					// HUIDIGE POSITIE: NODE
+					if (carPrevPosMap[car][1] == carPrevPosMap[car][2]) {
+						// VORIGE POSITIE: NODE
+						changeNodeColor(carPrevPosMap[car][1], "#3399ff");
+						changeNodeColor(carPosMap[car][1], hexToRgbA(intToRGB(hashCode(carPosMap[car][0]))));
+					}
+					else {
+						// VORIGE POSITIE: EDGE
+						changeEdgeColor(carPrevPosMap[car][1], carPrevPosMap[car][2], "#3399ff");
+						changeEdgeColor(carPrevPosMap[car][2], carPrevPosMap[car][1], "#3399ff");
+						changeNodeColor(carPosMap[car][1], hexToRgbA(intToRGB(hashCode(carPosMap[car][0]))));
+					}
 				} else {
-					//addTeamNameEdge(carPosMap[car][0], carPosMap[car][1], carPosMap[car][2], 1);
-					//addTeamNameEdge(carPosMap[car][0], carPosMap[car][2], carPosMap[car][1], 1);
-					changeEdgeColor(carPosMap[car][1], carPosMap[car][2], hexToRgbA(intToRGB(hashCode(carPosMap[car][0]))));
-					changeEdgeColor(carPosMap[car][2], carPosMap[car][1], hexToRgbA(intToRGB(hashCode(carPosMap[car][0]))));
-				}
-			} else {
-				if (carPosMap[car][1] == carPosMap[car][2]) {
-					changeNodeColor(carPrevPosMap[car][1], hexToRgbA(intToRGB(hashCode(carPosMap[car][0]))));
-					changeEdgeColor(carPrevPosMap[car][1], carPrevPosMap[car][2], "#3399ff");
-				} else {
-					console.log(carPosMap[car][1]);
-					changeEdgeColor(carPosMap[car][1], carPosMap[car][2], hexToRgbA(intToRGB(hashCode(carPosMap[car][0]))));
-					changeNodeColor(carPrevPosMap[car][1], "#3399ff");
+					// HUIDIGE POSITIE: EDGE
+					if (carPrevPosMap[car][1] == carPrevPosMap[car][2]) {
+						// VORIGE POSITIE: NODE
+						changeNodeColor(carPrevPosMap[car][1], "#3399ff");
+						changeEdgeColor(carPosMap[car][1], carPosMap[car][2], hexToRgbA(intToRGB(hashCode(carPosMap[car][0]))));
+						changeEdgeColor(carPosMap[car][2], carPosMap[car][1], hexToRgbA(intToRGB(hashCode(carPosMap[car][0]))));
+					} else {
+						// VORIGE POSITIE: EDGE
+						changeEdgeColor(carPrevPosMap[car][1], carPrevPosMap[car][2], "#3399ff");
+						changeEdgeColor(carPrevPosMap[car][2], carPrevPosMap[car][1], "#3399ff");
+						changeEdgeColor(carPosMap[car][1], carPosMap[car][2], hexToRgbA(intToRGB(hashCode(carPosMap[car][0]))));
+						changeEdgeColor(carPosMap[car][2], carPosMap[car][1], hexToRgbA(intToRGB(hashCode(carPosMap[car][0]))));
+					}
 				}
 			}
 		}
-		carPrevPosMap = carPosMap;
+		carPrevPosMap = carPosMap.slice();
+		//var stop = new Date().getTime();
+		//tijd = stop-start;
+		//console.log("tijd: " + tijd);
 	});
 };
 
@@ -231,13 +238,13 @@ function makeExternalLegend() {
 		containerDiv.className = 'legend-element-container';
 		descriptionDiv.className = "description-container";
 
-		console.log(carPosMap[car][0]);
 		descriptionDiv.innerHTML = carPosMap[car][0];
 		
 		legendDiv.appendChild(containerDiv);
 		containerDiv.appendChild(descriptionDiv);
 		
 		containerDiv.style.width = "100%";
+		containerDiv.style.height = "100%";
 		descriptionDiv.style.width = 100/(carPosMap.length + 1) + '%';
 		descriptionDiv.style.float = 'left';
 		descriptionDiv.style.backgroundColor = hexToRgbA(intToRGB(hashCode(carPosMap[car][0])));
@@ -252,7 +259,6 @@ function makeExternalLegend() {
 function zoomToID(teamName) {
 	for (car in carPosMap) {
 		if (carPosMap[car][0] == teamName) {
-			console.log(carPosMap[car]);
 			zoomNodeID = [carPosMap[car][1], carPosMap[car][2]];
 			break;
 		}
@@ -265,7 +271,8 @@ function zoomToID(teamName) {
 				duration: 300,
 				easingFunction: "easeInQuad"
 			}
-			});
+		});
+		changeNodeColor(zoomNodeID[0], hexToRgbA(intToRGB(hashCode(teamName))));
 	} else {
 		nodePositions = network.getPositions(zoomNodeID);
 		valX1 = nodePositions[zoomNodeID[0]].x;
@@ -274,6 +281,9 @@ function zoomToID(teamName) {
 		valY2 = nodePositions[zoomNodeID[1]].y;
 		valX = (valX1 + valX2)/2;
 		valY = (valY1 + valY2)/2;
+		
+		changeEdgeColor(zoomNodeID[0], zoomNodeID[1], hexToRgbA(intToRGB(hashCode(teamName))));
+		changeEdgeColor(zoomNodeID[1], zoomNodeID[0], hexToRgbA(intToRGB(hashCode(teamName))));
 		
 		network.moveTo({
 			position: {x: valX, y: valY},
@@ -295,6 +305,7 @@ var stabilized = false;
 	});
 }*/
 
+initNetwork();
 
 //////////// MAINTAINING THE NETWORK ///////
 
@@ -327,6 +338,7 @@ String.prototype.hashCode = function(){
 	}
 	return hash;
 }
-	
+
+setInterval(function() {updateNetwork()}, 100);
 
 

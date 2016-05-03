@@ -27,7 +27,7 @@ t.setDaemon(True)
 t.start()
 for x in range(amount):
         ind = random.randint(0,len(teamnames)-1)
-        spooks.append(spook(teamnames.pop(ind), random.uniform(0.1,0.3)))
+        spooks.append(spook(teamnames.pop(ind), random.uniform(5,15)))
 for x in range(amount):
         spooks[x].start()
 while True:
