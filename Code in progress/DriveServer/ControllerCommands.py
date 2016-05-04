@@ -2,12 +2,14 @@ import time
 import PID
 import Engine
 from utility import *
+from follow_parcours import *
 Leftengine = None
 Rightengine = None
 Perimeter = None
 Gearratio = None
 Widthcar = None
 Distancesensor = None
+Ratio = None
 Init = False
 Going = False
 DEBUG = False
@@ -21,7 +23,29 @@ def init(leftengine,rightengine,distancesensor,perimeter,gearratio,widthcar):
         Perimeter = perimeter
         Gearratio = gearratio
         Widthcar = widthcar
+        Ratio = Ratio((0,287),(480,287),leftengine,rightengine,distancesensor,False,[])
         Init = True
+
+def follow_parcours(parcours):
+    Ratio.reset()
+    Ratio.packet_delivery = False
+    Ratio.append_directions(parcours)
+    while Going:
+        s = Ratio.get_speed()
+        Leftengine.set_speed(s[0])
+        Rightengine.set_speed(s[1])
+    Leftengine.set_speed(0)
+    Rightengine.set_speed(0)
+
+def restart_parcours():
+    Ratio.packet_delivery = False
+    while Going:
+        s = Ratio.get_speed()
+        Leftengine.set_speed(s[0])
+        Rightengine.set_speed(s[1])
+    Leftengine.set_speed(0)
+    Rightengine.set_speed(0)
+
 
 # A method to drive forward
 # going must store a pointer to list which first element indicates the going status

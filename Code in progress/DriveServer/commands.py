@@ -62,3 +62,9 @@ def func_command(identifier,argument,lock):
             return 'OK'
         except:
             return 'FAILURE'
+def func_pause_parcours(identifier,argument,lock):
+    pass
+def func_parcours(identifier,argument,lock):
+    pass
+def func_packet_delivery(identifier,argument,lock):
+    pass

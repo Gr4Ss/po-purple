@@ -29,8 +29,7 @@ class Ratio:
 		# If packet delivery flag is set the server will not follow the directions listed in
 		# direction list but instead use data from the packet delivery server to choose it next direction
 		self.packet_delivery = packet_delivery
-		if packet_delivery:
-			self.packet_delivery_server = Packet_Delivery_Server((1,2),'localhost',7000)
+		self.packet_delivery_server = Packet_Delivery_Server((1,2),'localhost',7000)
 		# Variabele storing the last used ratio
 		self.last_ratio = 0
 		# List storing the direction to be followed
@@ -62,7 +61,7 @@ class Ratio:
 		self.estimate_PID = PID(20,0.2,0.3,0.5)
 		self.left_engine = engine_left
 		self.right_engine = engine_right
-		self.recognize_direction_boundary = 0.3
+		self.recognize_direction_boundary = 0.35
 		# Variable storing the minimum speed
 		self.minimum_speed = 60
 		# Variable storing the maximum speed
@@ -74,9 +73,30 @@ class Ratio:
 		self.split_sharpness = [0,0,0]
 		self.next_direction = None
 		self.reversing_count = 0
-		self.reversing_limit = 0
+		self.reversing_limit = 10
 		self.block_count = 0
 		self.block_limit = 3
+	def reset(self):
+		self.clear_directions()
+		self.block_count = 0
+		self.reversing_count = 0
+		self.driving_state = 'normal'
+		self.last_ratio = 0
+		self.split_ratio = [0,0]
+		self.split_check_phase = 0
+		self.split_check_layout= []
+		self.split_layout = None
+		self.split_count = 0
+		self.back_on_track_count = 0
+		self.split_sharpness = [0,0,0]
+		self.reversing_count = 0
+		self.block_count = 0
+	def start_packet_delivery_mode(self):
+		self.packet_delivery = True
+	def stop_packet_delivery_mode(self):
+		self.packet_delivery = False
+	def update_position(self,position):
+		self.packet_delivery_server.update_position(position)
 	'''
 	Method to append a direction to direction list.
 	The given parameter may be a single direction or a list of directions.

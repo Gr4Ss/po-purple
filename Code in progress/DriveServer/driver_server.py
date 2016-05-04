@@ -42,15 +42,9 @@ manualDrive = None
 commands = {
 'LOCK':{'nb_of_arguments':0,'function':func_lock},
 'UNLOCK':{'nb_of_arguments':0,'function':func_unlock},
-'STRAIGHT':{'nb_of_arguments':1,'function':func_command,
-'optional_arguments':[controller,ControllerCommands.ride_distance],
-'constraint':c.constraint_straight},
-'CIRC':{'nb_of_arguments':1,'function':func_command,
-'optional_arguments':[controller,ControllerCommands.ride_circ],
-'constraint':c.constraint_circ},
-'SQUARE':{'nb_of_arguments':1,'function':func_command,
-'optional_arguments':[controller,ControllerCommands.ride_polygon],
-'constraint':c.constraint_square},
+'STRAIGHT':{'nb_of_arguments':1,'function':func_command,'optional_arguments':[controller,ControllerCommands.ride_distance],'constraint':c.constraint_straight},
+'CIRC':{'nb_of_arguments':1,'function':func_command,'optional_arguments':[controller,ControllerCommands.ride_circ],'constraint':c.constraint_circ},
+'SQUARE':{'nb_of_arguments':1,'function':func_command,'optional_arguments':[controller,ControllerCommands.ride_polygon],'constraint':c.constraint_square},
 'SUPERLOCK':{'nb_of_arguments':1,'function':func_superlock},
 'SUPERUNLOCK':{'nb_of_arguments':1,'function':func_superunlock},
 'FStart':{'nb_of_arguments':0,'function':func_add_direction,'optional_arguments':[manualDrive,'forward']},
@@ -62,7 +56,11 @@ commands = {
 'BStart':{'nb_of_arguments':0,'function':func_add_direction,'optional_arguments':[manualDrive,'backward']},
 'BStop':{'nb_of_arguments':0,'function':func_delete_direction,'optional_arguments':[manualDrive,'backward']},
 'STOP':{'nb_of_arguments':0,'function':func_stop,'optional_arguments':[manualDrive]},
-'PARCOURS':{'nb_of_arguments':1,'constraint':c.constraint_parcours}}
+'PARCOURS':{'nb_of_arguments':1,'constraint':c.constraint_parcours},
+'PAUSEPARCOUS':{'nb_of_arguments':1,'function':func_pause_parcours,'constraint':c.constraint_boolean},
+'PACKETDELIVERY':{'nb_of_arguments':1,'function':func_packet_delivery,'constraint':c.constraint_boolean}
+'UPDATEOWNPOSITION':{'nb_of_arguments':1,'function':func_update_own_position,'constraint':c.constraint_position},
+}
 
 # A method to chek the message
 # If the message isn't valid, False will be returned
