@@ -1,5 +1,5 @@
 import sockets_client
-IP_RASPBERRY = 'localhost'
+IP_RASPBERRY = '10.42.0.23'
 PORT = 6000
 
 

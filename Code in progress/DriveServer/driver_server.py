@@ -22,16 +22,14 @@ import ControllerCommands
 # Import manual drive is entity to select the right controller command given the chosen keys
 from ManualDrive import *
 # create controller entity
-
+print 'Start controller'
 controller = Controller.Controller()
 manualDrive = ManualDrive(controller.start_command,ControllerCommands.forward,
 ControllerCommands.backward,ControllerCommands.left,ControllerCommands.right,
-ControllerCommands.forward_leftforward_left,ControllerCommands.forward_right,
+ControllerCommands.forward_left,ControllerCommands.forward_right,
 ControllerCommands.backward_left,ControllerCommands.backward_right,
 ControllerCommands.stop)
 
-controller = None
-manualDrive = None
 
 # A dictionnary containing the possible commands (keys)
 # Correct formated command : {'command':'NameCommand','ID':ID,'arguments':[list of arguments]}
@@ -124,8 +122,8 @@ if __name__ == '__main__':
             if opt_arguments != None:
                 argument = opt_arguments + argument
             f = commands[command]['function']
-            # return_message = f(identifier,argument,lock)
-            return_message =  'OK'
+            return_message = f(identifier,argument,lock)
+
         else:
             return_message = 'ILLEGAL_MESSAGE'
         print 'Return message: ', return_message

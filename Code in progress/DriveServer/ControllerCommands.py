@@ -14,7 +14,9 @@ DEBUG = False
 
 def init(leftengine,rightengine,distancesensor,perimeter,gearratio,widthcar):
     global Leftengine, Rightengine, Distancesensor, Perimeter, Gearratio, Widthcar,  Init
+    print 'INIT'
     if isinstance(leftengine,Engine.Engine) and isinstance(rightengine,Engine.Engine) and isinstance(perimeter,float) and isinstance(gearratio,float) and isinstance(widthcar,float):
+        print leftengine
         Leftengine = leftengine
         Rightengine = rightengine
         Distancesensor = distancesensor

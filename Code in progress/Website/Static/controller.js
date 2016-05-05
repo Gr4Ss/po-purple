@@ -96,7 +96,7 @@ app.controller('controllerController',function($scope,lockClaimerService,formSen
 
   };
   $scope.keyDown = function(e){
-    if ($("#collapseFive").attr('aria-expanded') == 'true'){
+    if ($("#collapseSix").attr('aria-expanded') == 'true'){
       switch (e.which) {
         case 37:
           $scope.keyLeftPressed();
@@ -114,7 +114,7 @@ app.controller('controllerController',function($scope,lockClaimerService,formSen
     }
   }
   $scope.keyUp = function(e){
-    if ($("#collapseFive").attr('aria-expanded') == 'true'){
+    if ($("#collapseSix").attr('aria-expanded') == 'true'){
       switch (e.which) {
         case 37:
           $scope.keyLeftReleased();
