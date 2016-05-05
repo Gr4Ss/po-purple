@@ -79,10 +79,8 @@ def lock():
         return "OK" if t else "SORRY"
     except:
         abort(500,'Socket timeout')
-        
-@app.route('/stats/update_own_position')
-def update_own_position():
-    pass
+
+
 @app.post('/superlock')
 def superlock():
     # Get the users cookie
@@ -181,19 +179,24 @@ def parcours():
     parcours = request.json.get('parcours')
     print parcours
     if parcours == 'PAUSE':
-        pass
-    parcours = parse_parcours(parcours)
-    print parcours
-    if not check_parcours(parcours):
-        return 'FAILURE'
+        dictionnay = {'command':'PAUSEPARCOURS','ID':ID,'arguments':[False]}
+    elif parcours == 'RESTART':
+        dictionnay = {'command':'PAUSEPARCOURS','ID':ID,'arguments':[True}
     else:
-        dictionnary = {'command':'PARCOURS','ID':ID,'arguments':[parcours]}
-        try:
-            t = DriverCom.send_message(dictionnary)
-            return "OK" if t else "SORRY"
-        except:
-            abort(500,"Socket timeout")
-
+        parcours = parse_parcours(parcours)
+        print parcours
+        if not check_parcours(parcours):
+            return 'FAILURE'
+        else:
+            dictionnary = {'command':'PARCOURS','ID':ID,'arguments':[parcours]}
+    try:
+        t = DriverCom.send_message(dictionnary)
+        return "OK" if t else "SORRY"
+    except:
+        abort(500,"Socket timeout")
+@app.route('/stats/update_own_position')
+def update_own_position():
+    pass
 @app.error(404)
 def error404(error):
     return '<h1>Oops!</h1>'

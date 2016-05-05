@@ -56,9 +56,9 @@ commands = {
 'BStart':{'nb_of_arguments':0,'function':func_add_direction,'optional_arguments':[manualDrive,'backward']},
 'BStop':{'nb_of_arguments':0,'function':func_delete_direction,'optional_arguments':[manualDrive,'backward']},
 'STOP':{'nb_of_arguments':0,'function':func_stop,'optional_arguments':[manualDrive]},
-'PARCOURS':{'nb_of_arguments':1,'constraint':c.constraint_parcours},
-'PAUSEPARCOUS':{'nb_of_arguments':1,'function':func_pause_parcours,'constraint':c.constraint_boolean},
-'PACKETDELIVERY':{'nb_of_arguments':1,'function':func_packet_delivery,'constraint':c.constraint_boolean}
+'PARCOURS':{'nb_of_arguments':1,'function':func_parcours,'constraint':c.constraint_parcours,'optional_arguments':[controller,ControllerCommand.follow_parcours]},
+'PAUSEPARCOURS':{'nb_of_arguments':1,'function':func_pause_parcours,'constraint':c.constraint_boolean,'optional_arguments':[controller,ControllerCommand.restart_parcours]},
+'PACKETDELIVERY':{'nb_of_arguments':1,'function':func_packet_delivery,'constraint':c.constraint_boolean,'optional_arguments':[controller,ControllerCommand.packet_delivery]}
 'UPDATEOWNPOSITION':{'nb_of_arguments':1,'function':func_update_own_position,'constraint':c.constraint_position},
 }
 

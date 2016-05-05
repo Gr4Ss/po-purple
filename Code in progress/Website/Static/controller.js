@@ -404,6 +404,13 @@ app.factory('formSenderService',function($http){
     });
     return promise;
   }
+  formSender.pauseParcours = function(){
+    var promise = $http({method:'POST',url:'/parcours',
+    data:JSON.stringify({'parcours':'RESTART'}),
+    headers: {'Content-Type':'application/json'}
+    });
+    return promise;
+  }
   return formSender;
 });
 app.factory('keySenderService',function($http){

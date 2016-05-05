@@ -45,7 +45,16 @@ def restart_parcours():
         Rightengine.set_speed(s[1])
     Leftengine.set_speed(0)
     Rightengine.set_speed(0)
-
+def packet_delivery():
+    Ratio.reset()
+    Ratio.packet_delivery = True
+    Ratio.append_directions(parcours)
+    while Going:
+        s = Ratio.get_speed()
+        Leftengine.set_speed(s[0])
+        Rightengine.set_speed(s[1])
+    Leftengine.set_speed(0)
+    Rightengine.set_speed(0)
 
 # A method to drive forward
 # going must store a pointer to list which first element indicates the going status
@@ -128,11 +137,7 @@ def stop():
     Leftengine.set_speed(0)
     Rightengine.set_speed(0)
 
-def deliver_packets():
-    pass
 
-def follow_path(path):
-    pass
 
 def correct_speed3(lspeed,rspeed):
     MINIMUM_SPEED = 100

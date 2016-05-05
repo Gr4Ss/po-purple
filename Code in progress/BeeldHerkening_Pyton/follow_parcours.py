@@ -589,19 +589,3 @@ def calculate_ratio(speed):
 	else:
 		ratio = (1.0 - ratio)
 	return ratio
-leftengine = Engine('A')
-rightengine = Engine('B')
-sensor = DistanceSensor(17,4)
-brickpi = IO_Thread([leftengine,rightengine],[sensor])
-brickpi.on()
-
-rt = Ratio((0,287),(480,287),None,None,sensor,False,['right','straight','left','right','straight','right','right','straight','left','left'])
-while True:
-	start = time.time()
-	s = rt.get_speed()
-	#print s
-	leftengine.set_speed(s[0])
-	rightengine.set_speed(s[1])
-	end = time.time()
-	if end-start < 0.075:
-		time.sleep(0.075-(end-start))
