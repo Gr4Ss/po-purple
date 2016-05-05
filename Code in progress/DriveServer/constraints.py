@@ -24,22 +24,20 @@ def constraint_square(arguments):
     except:
         return False
 
-valid_parcours_steps = ['L','R','D']
+valid_parcours_steps = ['left','right','straight']
 def constraint_parcours(arguments):
     global valid_parcours_steps
     parcours = arguments[0]
     if isinstance(parcours,list):
         for step in parcours:
-            if isinstance(step,list):
-                if len(step) ==2 and step[0] in valid_parcours_steps and isinstance(step[1],int) :
-                    return True
-                else:
-                    return False
-            else:
+            if not step in valid_parcours_steps:
                 return False
+        return True
     else:
         return False
-
+def constraint_boolean(arguments):
+    argument = arguments[0]
+    return (argument==True or argument == False)
 # some tests
 if __name__ == '__main__':
     print 'Testing done'

@@ -34,6 +34,7 @@ def stats():
     return html
 
 
+
 @app.route('/control')
 def control():
     # Open the file
@@ -73,11 +74,15 @@ def lock():
         abort(404, "No cookie found.")
     # Else prepare to send the lockrequest to drive server
     dictionnary = {'command':'LOCK','ID':ID}
-    #try:
-    t = DriverCom.send_message(dictionnary)
-    return "OK" if t else "SORRY"
-    #except:
-    #    abort(500,'Socket timeout')
+    try:
+        t = DriverCom.send_message(dictionnary)
+        return "OK" if t else "SORRY"
+    except:
+        abort(500,'Socket timeout')
+        
+@app.route('/stats/update_own_position')
+def update_own_position():
+    pass
 @app.post('/superlock')
 def superlock():
     # Get the users cookie
