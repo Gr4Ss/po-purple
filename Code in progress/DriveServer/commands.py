@@ -59,13 +59,40 @@ def func_command(identifier,argument,lock):
         return 'SORRY'
     else:
         try:
-            controller.start_command(command,arg)
+            controller.start_command(command,[arg])
             return 'OK'
         except:
             return 'FAILURE'
 def func_pause_parcours(identifier,argument,lock):
-    pass
+    controller = argument[0]
+    func = argument[1]
+    boolean = argument[2]
+    if not lock.has_lock(identifier):
+        return 'SORRY'
+    else:
+        try:
+            if boolean:
+                controller.start_command(func)
+                return 'OK'
+            else:
+                controller.stop_command()
+                return 'OK'
+        except:
+            return 'FAILURE'
+
 def func_parcours(identifier,argument,lock):
-    pass
+    controller = argument[0]
+    func = argument[1]
+    parcours = argument[2]
+    if not lock.has_lock(identifier):
+        return 'SORRY'
+    else:
+        try:
+            controller.start_command(func,[parcours])
+            return 'OK'
+        except:
+            return 'FAILURE'
 def func_packet_delivery(identifier,argument,lock):
+    pass
+def func_update_own_position(identifier,argument,lock):
     pass

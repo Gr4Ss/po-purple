@@ -1,6 +1,7 @@
 import time
 import PID
 import Engine
+import math
 from utility import *
 from follow_parcours import *
 Leftengine = None
@@ -9,13 +10,13 @@ Perimeter = None
 Gearratio = None
 Widthcar = None
 Distancesensor = None
-Ratio = None
+Rt = None
 Init = False
 Going = False
-DEBUG = False
+DEBUG = True
 
 def init(leftengine,rightengine,distancesensor,perimeter,gearratio,widthcar):
-    global Leftengine, Rightengine, Distancesensor, Perimeter, Gearratio, Widthcar,  Init
+    global Leftengine, Rightengine, Distancesensor, Perimeter, Gearratio, Widthcar,  Init,Rt
     print 'INIT'
     if isinstance(leftengine,Engine.Engine) and isinstance(rightengine,Engine.Engine) and isinstance(perimeter,float) and isinstance(gearratio,float) and isinstance(widthcar,float):
         print leftengine
@@ -25,24 +26,24 @@ def init(leftengine,rightengine,distancesensor,perimeter,gearratio,widthcar):
         Perimeter = perimeter
         Gearratio = gearratio
         Widthcar = widthcar
-        Ratio = Ratio((0,287),(480,287),leftengine,rightengine,distancesensor,False,[])
+        Rt = Ratio((0,287),(480,287),leftengine,rightengine,distancesensor,False,[])
         Init = True
 
 def follow_parcours(parcours):
-    Ratio.reset()
-    Ratio.packet_delivery = False
-    Ratio.append_directions(parcours)
+    Rt.reset()
+    Rt.packet_delivery = False
+    Rt.append_directions(parcours)
     while Going:
-        s = Ratio.get_speed()
+        s = Rt.get_speed()
         Leftengine.set_speed(s[0])
         Rightengine.set_speed(s[1])
     Leftengine.set_speed(0)
     Rightengine.set_speed(0)
 
 def restart_parcours():
-    Ratio.packet_delivery = False
+    Rt.packet_delivery = False
     while Going:
-        s = Ratio.get_speed()
+        s = Rt.get_speed()
         Leftengine.set_speed(s[0])
         Rightengine.set_speed(s[1])
     Leftengine.set_speed(0)
@@ -129,12 +130,6 @@ def right():
 def stop():
     Leftengine.set_speed(0)
     Rightengine.set_speed(0)
-
-def deliver_packets():
-    pass
-
-def follow_path(path):
-    pass
 
 def correct_speed3(lspeed,rspeed):
     MINIMUM_SPEED = 100

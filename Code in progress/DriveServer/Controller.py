@@ -20,7 +20,7 @@ class Controller:
         # Storing the distance between the centers of the cars
         # TODO measure width and gearratio
         self.__widthcar = 20.
-        self.__gearratio = 3.
+        self.__gearratio = 1./3.
         # Storing the perimeter of the wheels (2*pi*r)
         self.__perimeter = 2*math.pi* 2.579
         print 'initing Controller'

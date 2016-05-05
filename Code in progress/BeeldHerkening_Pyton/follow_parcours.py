@@ -1,11 +1,9 @@
 import os,sys,inspect
 import time
 from math import *
-from Engine import *
-from PID import *
+import PID
 import distanceDetection as dist_detec
-from Sensor import *
-from IO_thread import *
+
 #first change the cwd to the script pathf
 scriptPath = os.path.realpath(os.path.dirname(sys.argv[0]))
 os.chdir(scriptPath)
@@ -29,7 +27,7 @@ class Ratio:
 		# If packet delivery flag is set the server will not follow the directions listed in
 		# direction list but instead use data from the packet delivery server to choose it next direction
 		self.packet_delivery = packet_delivery
-		self.packet_delivery_server = Packet_Delivery_Server((1,2),'localhost',7000)
+		self.packet_delivery_server = Packet_Delivery_Server((1,2),'10.42.0.1',7000)
 		# Variabele storing the last used ratio
 		self.last_ratio = 0
 		# List storing the direction to be followed
@@ -58,7 +56,7 @@ class Ratio:
 		# turn to determine if we are  on track
 		self.back_on_track_threshold = 3
 		self.estimate = None
-		self.estimate_PID = PID(20,0.2,0.3,0.5)
+		self.estimate_PID = PID.PID(20,0.2,0.3,0.5)
 		self.left_engine = engine_left
 		self.right_engine = engine_right
 		self.recognize_direction_boundary = 0.35
@@ -102,11 +100,11 @@ class Ratio:
 	The given parameter may be a single direction or a list of directions.
 	'''
 	def append_directions(self,directions):
-		if hasattr(directions, __iter__):
+		if hasattr(directions,'__iter__'):
 			for d in directions:
-				if d in valid_directions:
+				if d in self.valid_directions:
 					self.direction_list.append(d)
-		elif directions in valid_directions:
+		elif directions in self.valid_directions:
 			self.direction_list.append(directions)
 	'''
 	Method to clear the direction list.
@@ -343,7 +341,9 @@ class Ratio:
 				return self.last_ratio,1
 		elif current_layout == 'normal_straight':
 			ratio = self.to_ratio(mean_x(top))
+			sign = 1 if ratio > 0 else -1
 			if ratio != 0:
+				ratio = sign*(abs(ratio))**.75
 				speed_ratio = log(2./abs(ratio)**2,10)
 				return ratio,speed_ratio
 			else:
@@ -589,19 +589,3 @@ def calculate_ratio(speed):
 	else:
 		ratio = (1.0 - ratio)
 	return ratio
-leftengine = Engine('A')
-rightengine = Engine('B')
-sensor = DistanceSensor(17,4)
-brickpi = IO_Thread([leftengine,rightengine],[sensor])
-brickpi.on()
-
-rt = Ratio((0,287),(480,287),None,None,sensor,False,['right','straight','left','right','straight','right','right','straight','left','left'])
-while True:
-	start = time.time()
-	s = rt.get_speed()
-	#print s
-	leftengine.set_speed(s[0])
-	rightengine.set_speed(s[1])
-	end = time.time()
-	if end-start < 0.075:
-		time.sleep(0.075-(end-start))

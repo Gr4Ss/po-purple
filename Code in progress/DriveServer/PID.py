@@ -22,7 +22,7 @@ class PID:
     def value(self,error,dt):
         if abs(error) < self.__precision:
              return 0
-        if finite:
+        if self.__finite:
             self.__integral = self.__integral *0.9 + (error*dt*0.1)
             integral = self.__integral * 15
         else:

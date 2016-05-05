@@ -14,8 +14,8 @@ RESTCLIENT = RestClient("http://localhost:9000")
 DATA = []
 UPDATE_TIME = None
 OWN_DATA = None
-SOCKET = SocketServer(7000)
-SOCKET.start()
+#SOCKET = SocketServer(7000)
+#SOCKET.start()
 
 def own_data_updater():
     global SOCKET, OWN_DATA

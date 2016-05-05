@@ -37,17 +37,7 @@ def constraint_parcours(arguments):
         return False
 def constraint_boolean(arguments):
     argument = arguments[0]
+    print argument
     return (argument==True or argument == False)
-# some tests
-if __name__ == '__main__':
-    print 'Testing done'
-    assert constraint_strait(150)
-    assert not constraint_strait(10)
-    assert not constraint_strait(620)
-    assert constraint_circ(50)
-    assert not constraint_circ(10)
-    assert not constraint_circ(246)
-    assert constraint_square(50)
-    assert not constraint_square(10)
-    assert not constraint_square(300)
-    print 'Testing done'
+def constraint_position(argument):
+    return True
