@@ -278,6 +278,24 @@
 					</div>
 				</div>
 				</div>
+        <div class="panel panel-default">
+					<div class="panel-heading" role="tab" id="headingSeven">
+						<h4 class="panel-title">
+							<a class="collapsed" role="button" data-toggle="collapse" data-parent="#accordion" href="#collapseSeven" aria-expanded="false" aria-controls="collapseSeven">
+							Packet Delivery
+							</a>
+						</h4>
+					</div>
+					<div id="collapseSeven" class="panel-collapse collapse" role="tabpanel" aria-labelledby="headingSeven">
+						<div class="panel-body">
+							<form>
+                <input type='text' ng-model='packetDeliveryPosition'></input>
+                <input type='submit' ng-click='startPacketDelivery()' value='Start'></input>
+              </form>
+
+						</div>
+					</div>
+				</div>
 
 			</div>
 		</div>

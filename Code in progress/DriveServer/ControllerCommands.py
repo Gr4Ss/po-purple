@@ -28,6 +28,8 @@ def init(leftengine,rightengine,distancesensor,perimeter,gearratio,widthcar):
         Widthcar = widthcar
         Rt = Ratio((0,287),(480,287),leftengine,rightengine,distancesensor,False,[])
         Init = True
+def update_position(pos):
+    Rt.update_position(pos)
 
 def follow_parcours(parcours):
     Rt.reset()
@@ -48,10 +50,10 @@ def restart_parcours():
         Rightengine.set_speed(s[1])
     Leftengine.set_speed(0)
     Rightengine.set_speed(0)
-def packet_delivery():
+def packet_delivery(pos):
     Ratio.reset()
     Ratio.packet_delivery = True
-    Ratio.append_directions(parcours)
+    Rt.update_position(pos)
     while Going:
         s = Ratio.get_speed()
         Leftengine.set_speed(s[0])

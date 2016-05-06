@@ -23,7 +23,7 @@ app.controller('controllerController',function($scope,lockClaimerService,formSen
   $scope.invalidCircRaidus = false;
   $scope.squareSide = null;
   $scope.invalidSquareSide = false;
-
+  $scope.packetDeliveryPosition = null;
   hide_all_messages = function(){
     $scope.failure = false;
     $scope.noLock = false;
@@ -354,6 +354,33 @@ app.controller('controllerController',function($scope,lockClaimerService,formSen
       $scope.failure = true;
     });
   }
+  $scope.parsePosition = function(string){
+    var pat = /(\d)/;
+    var position = [0,0];
+    position[0] = pat.exec(position);
+    position[1] = pat.exec(position);
+  }
+  $scope.startPacketDelivery = function(){
+    console.log('start');
+    hide_all_messages();
+    var pos = $scope.parsePosition($scope.packetDeliveryPosition)
+    var promise = formSenderService.startPacketDelivery(pos);
+    promise.success(function(data,status){
+      if (data == 'OK'){
+        $scope.succes = true;
+      }
+      if (data == 'FAILURE'){
+        $scope.failure = true;
+      }
+      else{
+        $scope.claimLock = true;
+      }
+    });
+    promise.error(function(data,status){
+      $scope.failure = true;
+    });
+  }
+
 });
 app.factory('lockClaimerService',function($http){
   var lockClaimer = {};
@@ -407,6 +434,13 @@ app.factory('formSenderService',function($http){
   formSender.pauseParcours = function(){
     var promise = $http({method:'POST',url:'/parcours',
     data:JSON.stringify({'parcours':'RESTART'}),
+    headers: {'Content-Type':'application/json'}
+    });
+    return promise;
+  }
+  formSender.startPacketDelivery = function(pos){
+    var promise = $http({method:'POST',url:'/packet_delivery',
+    data:JSON.stringify({'position':pos}),
     headers: {'Content-Type':'application/json'}
     });
     return promise;

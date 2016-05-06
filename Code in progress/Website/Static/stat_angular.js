@@ -18,6 +18,7 @@ app.controller('statController',function($scope,dataService){
 		$scope.invalidPosition = false;
 
 		$scope.updateOwnPosition = function(){
+			console.log('updating');
 			var pos = $scope.parsePosition($scope.updatedOwnPosition);
 			var promise = dataService.updateOwnPosition(pos);
 			promise.success(function(data){
@@ -145,7 +146,10 @@ app.factory('dataService',function($http){
 			return promise;
 		}
 		dataGetter.updateOwnPosition = function(pos){
-			var promise = $http({method;'POST',url:'stats/update_own_position',data:pos});
+			var promise = $http({method:'POST',
+			url:'stats/update_own_position',
+			data:JSON.stringify({'position':pos}),
+			headers: {'Content-Type': 'application/json'}});
 			return promise;
 		}
 	return dataGetter;

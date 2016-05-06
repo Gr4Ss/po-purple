@@ -95,14 +95,23 @@ def func_parcours(identifier,argument,lock):
 def func_packet_delivery(identifier,argument,lock):
     controller = argument[0]
     func = argument[1]
+    pos = argument[2]
     if not lock.has_lock(identifier):
         return 'SORRY'
     else:
         try:
-            controller.start_command(func)
+            controller.start_command(func,[pos])
             return 'OK'
         except:
             return 'FAILURE'
 
 def func_update_own_position(identifier,argument,lock):
-    pass
+    controller = argument[1]
+    func = argument[2]
+    pos = argument[3]
+    pos = (pos[0],pos[1])
+    try:
+        func(pos)
+        return 'OK'
+    except:
+        return 'FAILURE'

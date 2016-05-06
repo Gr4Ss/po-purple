@@ -47,8 +47,6 @@ class Ratio:
 		# Storing a list with the layouts discovered during checking
 		self.split_check_layout= []
 		self.split_layout = None
-		#
-		self.split_count = 0
 		# Variable storing how many normal are seen after a split to check that we can go to normal state
 		self.back_on_track_count = 0
 		# Parameters to edit
@@ -57,6 +55,7 @@ class Ratio:
 		self.back_on_track_threshold = 3
 		self.estimate = None
 		self.estimate_PID = PID.PID(20,0.2,0.3,0.5)
+		self.normal_PID = PID.PID(1,0.1,0.05,0)
 		self.left_engine = engine_left
 		self.right_engine = engine_right
 		self.recognize_direction_boundary = 0.35
@@ -66,9 +65,6 @@ class Ratio:
 		self.maximum_speed = 115
 		self.turning_speed = 120
 		self.turning_reversing_speed = 0.7*60
-		# Variable storing the threshold value for going to split detection state.
-		self.split_count_threshold = 1
-		self.split_sharpness = [0,0,0]
 		self.next_direction = None
 		self.reversing_count = 0
 		self.reversing_limit = 10
@@ -84,9 +80,7 @@ class Ratio:
 		self.split_check_phase = 0
 		self.split_check_layout= []
 		self.split_layout = None
-		self.split_count = 0
 		self.back_on_track_count = 0
-		self.split_sharpness = [0,0,0]
 		self.reversing_count = 0
 		self.block_count = 0
 	def start_packet_delivery_mode(self):
@@ -144,34 +138,19 @@ class Ratio:
 				right_distance = self.right_engine.get_count()
 				distance_driven = (left_distance+right_distance)/2
 				estimate_speed = self.estimate_PID.get_value(self.estimate-distance_driven,1)
-			if current_layout == None or (not is_special(current_layout)):
+			if current_layout == None or current_layout == 'normal_straight':
 				r,sr = self.get_normal_ratio(left,top,right,current_layout)
-				#print 'speed ratio', sr,
-				bs = max(self.minimum_speed,min(sr*self.minimum_speed,self.maximum_speed))-slow_down
-				#bs = self.maximum_speed
-				#print ' basic speed', bs
-				if bs < self.minimum_speed:
-					return (0,0)
-				else:
-					return self.to_speed(r,bs)
+				self.last_ratio = r
+				if DEBUG:
+					print 'ratio',r,' speed ratio', sr,
+				bs = max(self.minimum_speed,min(sr*self.minimum_speed,self.maximum_speed))
+				if DEBUG:
+					print ' basic speed', bs
+				return self.to_speed(r,bs)
 			else:
-				self.split_count += 1
-				if (self.split_count >= self.split_count_threshold):
-					self.driving_state = 'split_detection'
-					return (0,0)
-				else:
-					if current_layout == 'T_flat':
-						left_des = mean_y(left)
-						right_des = mean_y(right)
-						ratio = self.to_ratio(((left_des[0] + right_des[0])/2,(left_des[1]+right_des[1])/2))
-						s = self.to_speed(ratio,self.minimum_speed)
-						self.last_ratio = ratio
-						return s
-					else:
-						ratio = self.to_ratio(mean_x(top))
-						s = self.to_speed(ratio,self.minimum_speed)
-						self.last_ratio = ratio
-						return s
+				print 'To split detection'
+				self.driving_state = 'split_detection'
+				return (0,0)
 		# A possible split is detected, extra check is preformed.
 		elif self.driving_state == 'split_detection':
 			if self.split_check_phase == 0:
@@ -186,14 +165,9 @@ class Ratio:
 				else:
 					self.split_check_phase += 1
 					return (0,0)
-			#If we are in split_check_phase 0-4 we just look straight at the intersect
 			elif self.split_check_phase < 5:
 				self.split_check_layout.append(current_layout)
 				self.split_check_phase += 1
-				l,r = self.calculate_turn_sharpness(left,right)
-				self.split_sharpness[0] += l
-				self.split_sharpness[1] += r
-				self.split_sharpness[2] += 1.
 				return (0,0)
 			else:
 				split_layout = find_layout(self.split_check_layout)
@@ -218,37 +192,34 @@ class Ratio:
 						direction = self.packet_delivery_server.at_split()
 						if direction == 'origin':
 							self.driving_state = 'reversing'
+							print 'To reversing state'
 						else:
 							self.driving_state = 'split_turning'
 							print ' To split turning'
 							self.next_direction = direction
-					#self.expected_turning_frames = self.calculate_expected_turning_frames()
-					self.expected_turning_frames = 0
-				self.split_sharpness = [0,0,0]
 				return (-self.minimum_speed,-self.minimum_speed)
 		elif self.driving_state == 'normal_turning':
 			if current_layout == None:
-				self.back_on_track_count += 0.5
+				self.back_on_track_count += 0.3
 			elif current_layout == "normal_straight":
 				self.back_on_track_count += 1
 			else:
 				self.back_on_track_count = 0
-			back_on_track = self.back_on_track()
-			if back_on_track:
+			if self.back_on_track():
 				print 'Correctly turned!'
 				# Return back to the normal state
 				self.driving_state = 'normal'
 				self.back_on_track_count = 0
 				r,sr = self.get_normal_ratio(left,top,right,current_layout)
-				bs = max(self.minimum_speed,min(sr*self.minimum_speed,self.maximum_speed))-slow_down
-				#bs = self.maximum_speed
-				if bs < self.minimum_speed:
-					return (0,0)
-				else:
-					return self.to_speed(r,sr)
+				self.last_ratio = r
+				if DEBUG:
+					print 'ratio: ',r,' speed ratio: ',sr
+				bs = max(self.minimum_speed,min(sr*self.minimum_speed,self.maximum_speed))
+				return self.to_speed(r,sr)
 			else:
 				r = self.get_normal_turning_ratio(left,top,right,current_layout)
 				self.last_ratio = r
+				print 'ratio: ',r
 				return self.to_speed(r,self.turning_speed)
 		elif self.driving_state == 'reversing':
 			if self.reversing_count >= self.reversing_limit:
@@ -263,8 +234,7 @@ class Ratio:
 
 			else:
 				self.reversing_count += 1
-				return (-self.maximum_speed,self.maximum_speed)
-
+				return (-self.minimum_speed,self.minimum_speed)
 		# If turning on a split
 		elif self.driving_state == 'split_turning':
 			if current_layout == None:
@@ -277,18 +247,19 @@ class Ratio:
 			else:
 				self.back_on_track_count = 0
 			# Check if we are back on track after the split
-			back_on_track = self.back_on_track()
-			if back_on_track:
+			if self.back_on_track():
 				last_direction = self.recognize_direction()
 				if self.packet_delivery:
+					print 'Turned to ',last_direction
 					distance = self.packet_delivery_server.turned(last_direction)
 					self.estimate = distance
 					if distance != None:
 						self.estimate_PID.reset()
 						self.left_engine.reset_count()
 						self.right_engine.reset_count()
+
 				else:
-					if last_direction == self.direction_list[0]:
+					if last_direction == self.next_direction:
 						print 'turned correctly to the ' + last_direction
 						self.direction_list.pop(0)
 					else:
@@ -297,41 +268,21 @@ class Ratio:
 				self.driving_state = 'normal'
 				self.split_ratio = [0,0]
 				self.back_on_track_count = 0
-				r,sr = self.get_normal_ratio(left,top,right,current_layout)
-				self.last_ratio = r
-				bs = max(self.minimum_speed,min(sr*self.minimum_speed,self.maximum_speed))-slow_down
-				#bs = self.maximum_speed
-				if bs < self.minimum_speed:
-					return (0,0)
+				if current_layout == None or current_layout == 'normal_straight':
+					r,sr = self.get_normal_ratio(left,top,right,current_layout)
+					bs = max(self.minimum_speed,min(sr*self.minimum_speed,self.maximum_speed))
 				else:
-					return (0,0)
+					r = self.get_normal_turning_ratio(left,top,right,current_layout)
+					bs = self.turning_speed
+				self.last_ratio = r
+				return self.to_speed(r,bs)
 
 			else:
-				ratio = self.get_split_ratio(left,top,right,current_layout,self.direction_list[0])
+				ratio = self.get_split_ratio(left,top,right,current_layout,self.next_direction)
 				self.split_ratio[0] += ratio
 				self.split_ratio[1] += 1
-				s = self.to_speed(ratio,self.turning_speed)
 				self.last_ratio = ratio
-				return s
-
-	def get_normal_turning_ratio(self,left,top,right,current_layout):
-		if current_layout == None:
-			return self.last_ratio
-		elif current_layout == 'normal_straight':
-			ratio = self.to_ratio(mean_x(top))
-			return ratio
-		elif self.split_layout == 'normal_left':
-			if current_layout == 'normal_left' or current_layout == 'T_left' or current_layout == 'crossroads' or current_layout =='T_flat':
-				ratio = self.to_ratio(mean_y(left))
-				return ratio
-			else:
-				return self.last_ratio
-		elif self.split_layout == 'normal_right':
-			if current_layout == 'normal_right' or current_layout == 'T_right' or current_layout == 'crossroads' or current_layout =='T_flat':
-				ratio = self.to_ratio(mean_y(right))
-				return ratio
-			else:
-				return self.last_ratio
+				return self.to_speed(ratio,self.turning_speed)
 
 	def get_normal_ratio(self,left,top,right,current_layout):
 		if current_layout == None:
@@ -341,23 +292,38 @@ class Ratio:
 				return self.last_ratio,1
 		elif current_layout == 'normal_straight':
 			ratio = self.to_ratio(mean_x(top))
-			sign = 1 if ratio > 0 else -1
-			if ratio != 0:
-				ratio = sign*(abs(ratio))**.75
-				speed_ratio = log(2./abs(ratio)**2,10)
-				return ratio,speed_ratio
+			pid_ratio = self.normal_PID.value(ratio,1.)
+			if DEBUG:
+				print 'Original ratio: ',ratio,' PID ratio: ',pid_ratio
+			if pid_ratio != 0:
+				speed_ratio = log(3./abs(ratio)**2,10)
+				return pid_ratio,speed_ratio
 			else:
-				return ratio,1
-		elif current_layout == 'normal_left':
-			ratio = self.to_ratio(mean_y(left))
-			return ratio,0
-		elif current_layout == 'normal_right':
-			ratio = self.to_ratio(mean_y(right))
-			return ratio,0
+				return pid_ratio,1
+		else:
+			raise Exception('Only none or straight')
 
+	def get_normal_turning_ratio(self,left,top,right,current_layout):
+		if current_layout == None:
+			return self.last_ratio
+		elif current_layout == 'normal_straight':
+			ratio = self.to_ratio(mean_x(top))
+			return ratio
+		elif self.split_layout == 'normal_left':
+			if current_layout in ['normal_left','T_left','crossroads','T_flat']:
+				ratio = self.to_ratio(mean_y(left))
+				return ratio
+			else:
+				return self.last_ratio
+		elif self.split_layout == 'normal_right':
+			if current_layout in ['normal_right','T_right','crossroads','T_flat']:
+				ratio = self.to_ratio(mean_y(right))
+				return ratio
+			else:
+				return self.last_ratio
 
 	def get_split_ratio(self,left,top,right,layout,next_direction):
-		if layout == None or (not is_special(layout) and self.split_ratio[1] < self.expected_turning_frames):
+		if layout == None or (not is_special(layout)):
 			return self.last_ratio
 		elif layout == 'normal_straight':
 			return self.to_ratio(mean_x(top))
@@ -446,40 +412,8 @@ class Ratio:
 			elif (lspeed < self.minimum_speed):
 				rspeed = self.minimum_speed/(1.+ratio)
 				lspeed = self.minimum_speed
-			return (lspeed,basic_speed)
+			return (lspeed,rspeed)
 
-	"""
-	Method to calculate the sharpness of the turn
-	INPUT:
-		- left: points on the left edge
-		- right: point on the right edge
-	OUTPUT:
-		- tuple with (left,right) sharpness
-	"""
-	def calculate_turn_sharpness(self,left,right):
-		l = 0
-		r = 0
-		if len(left) > 0:
-			pl = maximum(left,1)
-			l = atan2((self.right_wheel[1] - pl[1]),float((self.right_wheel[0] -pl[0])))
-		if len(right) > 0:
-			pr = maximum(right,1)
-			r = atan2((self.left_wheel[1] - pr[1]),float((pr[0]-self.left_wheel[0])))
-		return l,r
-	def calculate_expected_turning_frames(self):
-
-		if self.next_direction == "left":
-			s = self.split_sharpness[0]/self.split_sharpness[2]
-			if s == 0:
-				s = 1
-			return min(15,7.5/s)
-		elif self.next_direction == "right":
-			s = self.split_sharpness[1]/self.split_sharpness[2]
-			if s == 0:
-				s =1
-			return min(15,7.5/s)
-		else:
-			return 0
 # Returns the x coordinate of the first point and the average
 # x coordinate for all points
 def mean_x(points):
@@ -578,14 +512,4 @@ def is_special(layout):
 		return False
 	else:
 		return (layout.split('_')[0]!= 'normal')
-def calculate_ratio(speed):
-	if (speed[0] == 0 and speed[1] == 0):
-		return 0
-	elif (speed[0] == 0):
-		return -1
-	ratio = abs(speed[1]/speed[0])
-	if ratio > 1:
-		ratio = (-1)*(1.0 - 1.0/ratio)
-	else:
-		ratio = (1.0 - ratio)
-	return ratio
+		

@@ -81,9 +81,7 @@ def lock():
         abort(500,'Socket timeout')
 
 
-@app.route('/stats/update_own_position')
-def update_own_position():
-    pass
+
 
 @app.post('/superlock')
 def superlock():
@@ -198,7 +196,29 @@ def parcours():
         return "OK" if t else "SORRY"
     except:
         abort(500,"Socket timeout")
-
+@app.post('/stats/update_own_position')
+def update_own_position():
+    ID = request.get_cookie('ID')
+    pos = request.json.get('position')
+    dictionnary = {'command':'UPDATEOWNPOSITION','ID':ID,'arguments':[pos]}
+    try:
+        t = DriverCom.send_message(dictionnary)
+        return "OK" if t else "SORRY"
+    except:
+        abort(500,'Socket timeout')
+@app.post('/packet_delivery')
+def start_packet_delivery():
+    ID = request.get_cookie('ID')
+    # If not abort with a 404 error
+    if not ID:
+        abort(404, "No cookie found.")
+    position = request.json.get('position')
+    dictionnary = {'command':'PACKETDELIVERY','ID':ID,'arguments':[position]}
+    try:
+        t = DriverCom.send_message(dictionnary)
+        return "OK" if t else "SORRY"
+    except:
+        abort(500,'Socket timeout')
 @app.error(404)
 def error404(error):
     return '<h1>Oops!</h1>'
