@@ -46,7 +46,7 @@ class Lock:
         else:
             return False
     def free_super_lock(self,passw,identifier):
-        if has_lock(identifier) and self.__superlock and passw == 'purplerain':
+        if self.has_lock(identifier) and self.__superlock and passw == 'purplerain':
             self.__lock = False
             self.__superlock = False
             self.__lock_id = None

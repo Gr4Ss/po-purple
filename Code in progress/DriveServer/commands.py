@@ -8,7 +8,7 @@ def func_unlock(identifier,argument,lock):
 
 def func_superlock(identifier,passw,lock):
     lock_acquired = lock.claim_super_lock(passw[0],identifier)
-    return 'OK' if has_super_lock(identifier) else 'SORRY'
+    return 'OK' if lock.has_super_lock(identifier) else 'SORRY'
 
 def func_superunlock(identifier,passw,lock):
     unlock_acquired = lock.free_super_lock(passw[0],identifier)
@@ -17,6 +17,7 @@ def func_superunlock(identifier,passw,lock):
 def func_add_direction(identifier,argument,lock):
     manualDrive = argument[0]
     direction = argument[1]
+    print direction
     if not lock.has_lock(identifier):
         return 'SORRY'
     else:
@@ -58,7 +59,7 @@ def func_command(identifier,argument,lock):
         return 'SORRY'
     else:
         try:
-            controller.start_command(command,arg)
+            controller.start_command(command,[arg])
             return 'OK'
         except:
             return 'FAILURE'
@@ -77,26 +78,31 @@ def func_pause_parcours(identifier,argument,lock):
             return 'OK'
         except:
             return 'FAILURE'
+
+
 def func_parcours(identifier,argument,lock):
     controller = argument[0]
-    command = argument[1]
+    func = argument[1]
     parcours = argument[2]
     if not lock.has_lock(identifier):
         return 'SORRY'
     else:
         try:
-            controller.start_command(command,parcours)
+            controller.start_command(func,[parcours])
             return 'OK'
         except:
             return 'FAILURE'
 def func_packet_delivery(identifier,argument,lock):
     controller = argument[0]
-    command = argument[1]
+    func = argument[1]
     if not lock.has_lock(identifier):
         return 'SORRY'
     else:
         try:
-            controller.start_command(command,parcours)
+            controller.start_command(func)
             return 'OK'
         except:
             return 'FAILURE'
+
+def func_update_own_position(identifier,argument,lock):
+    pass
