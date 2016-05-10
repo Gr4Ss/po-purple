@@ -48,7 +48,14 @@
                 <h2>Eigen data</h2>
                 <p><b> Huidig pakje: </b> {{ownParcel}}</p>
                 <!--<p><b> Aantal afgeleverde pakjes: </b> {{{ownNumberOfPackages}}}</p> -->
-                <p><b> Huidige positie: </b> {{ownCurrentPosition}}</p>
+                <p><b> Huidige positie: </b> {{ownCurrentPosition}}<button ng-click='showUpdatingPosition()'>Update </button></p>
+                <div ng-show='updatingOwnPosition'>
+                  <form>
+                    <input type='text' ng-model='updatedOwnPosition'></input>
+                    <input type='submit' ng-click='updateOwnPosition()'></input>
+                    <p ng-show="invalidPosition">Please enter a valid position</p>
+                  </form>
+                </div>
                 <p><b> Status: </b> {{ownStatus}} </p>
               </div>
                 <div>

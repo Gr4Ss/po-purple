@@ -16,22 +16,20 @@ socket.start()
 # Create a lock entity with a lock time of 20 minutes
 lock = Locker.Lock(1200)
 # Import controller, entity responsible for starting and stopping controller commands
-#import Controller
+import Controller
 # Import commands that the controller can start
-#import ControllerCommands
+import ControllerCommands
 # Import manual drive is entity to select the right controller command given the chosen keys
-#from ManualDrive import *
+from ManualDrive import *
 # create controller entity
-"""
+print 'Start controller'
 controller = Controller.Controller()
 manualDrive = ManualDrive(controller.start_command,ControllerCommands.forward,
 ControllerCommands.backward,ControllerCommands.left,ControllerCommands.right,
-ControllerCommands.forward_leftforward_left,ControllerCommands.forward_right,
+ControllerCommands.forward_left,ControllerCommands.forward_right,
 ControllerCommands.backward_left,ControllerCommands.backward_right,
 ControllerCommands.stop)
-"""
-controller = None
-manualDrive = None
+
 
 # A dictionnary containing the possible commands (keys)
 # Correct formated command : {'command':'NameCommand','ID':ID,'arguments':[list of arguments]}
@@ -42,15 +40,9 @@ manualDrive = None
 commands = {
 'LOCK':{'nb_of_arguments':0,'function':func_lock},
 'UNLOCK':{'nb_of_arguments':0,'function':func_unlock},
-'STRAIGHT':{'nb_of_arguments':1,'function':func_command,
-#'optional_arguments':[controller,ControllerCommands.ride_distance],
-'constraint':c.constraint_straight},
-'CIRC':{'nb_of_arguments':1,'function':func_command,
-#'optional_arguments':[controller,ControllerCommands.ride_circ],
-'constraint':c.constraint_circ},
-'SQUARE':{'nb_of_arguments':1,'function':func_command,
-#'optional_arguments':[controller,ControllerCommands.ride_polygon],
-'constraint':c.constraint_square},
+'STRAIGHT':{'nb_of_arguments':1,'function':func_command,'optional_arguments':[controller,ControllerCommands.ride_distance],'constraint':c.constraint_straight},
+'CIRC':{'nb_of_arguments':1,'function':func_command,'optional_arguments':[controller,ControllerCommands.ride_circ],'constraint':c.constraint_circ},
+'SQUARE':{'nb_of_arguments':1,'function':func_command,'optional_arguments':[controller,ControllerCommands.ride_polygon],'constraint':c.constraint_square},
 'SUPERLOCK':{'nb_of_arguments':1,'function':func_superlock},
 'SUPERUNLOCK':{'nb_of_arguments':1,'function':func_superunlock},
 'FStart':{'nb_of_arguments':0,'function':func_add_direction,'optional_arguments':[manualDrive,'forward']},
@@ -62,7 +54,12 @@ commands = {
 'BStart':{'nb_of_arguments':0,'function':func_add_direction,'optional_arguments':[manualDrive,'backward']},
 'BStop':{'nb_of_arguments':0,'function':func_delete_direction,'optional_arguments':[manualDrive,'backward']},
 'STOP':{'nb_of_arguments':0,'function':func_stop,'optional_arguments':[manualDrive]},
-'PARCOURS':{'nb_of_arguments':1,'constraint':c.constraint_parcours}}
+'PARCOURS':{'nb_of_arguments':1,'function':func_parcours,'constraint':c.constraint_parcours,'optional_arguments':[controller,ControllerCommands.follow_parcours]},
+'PAUSEPARCOURS':{'nb_of_arguments':1,'function':func_pause_parcours,'constraint':c.constraint_boolean,'optional_arguments':[controller,ControllerCommands.restart_parcours]},
+'PACKETDELIVERY':{'nb_of_arguments':1,'function':func_packet_delivery,'constraint':c.constraint_position,'optional_arguments':[controller,ControllerCommands.packet_delivery]}
+'UPDATEOWNPOSITION':{'nb_of_arguments':1,'function':func_update_own_position,'constraint':c.constraint_position,'optional_arguments':[controller,ControllerCommands.update_position]},
+
+}
 
 # A method to chek the message
 # If the message isn't valid, False will be returned
@@ -124,8 +121,8 @@ if __name__ == '__main__':
             if opt_arguments != None:
                 argument = opt_arguments + argument
             f = commands[command]['function']
-            # return_message = f(identifier,argument,lock)
-            return_message =  'OK'
+            return_message = f(identifier,argument,lock)
+
         else:
             return_message = 'ILLEGAL_MESSAGE'
         print 'Return message: ', return_message

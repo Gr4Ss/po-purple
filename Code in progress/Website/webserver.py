@@ -34,6 +34,7 @@ def stats():
     return html
 
 
+
 @app.route('/control')
 def control():
     # Open the file
@@ -73,11 +74,15 @@ def lock():
         abort(404, "No cookie found.")
     # Else prepare to send the lockrequest to drive server
     dictionnary = {'command':'LOCK','ID':ID}
-    #try:
-    t = DriverCom.send_message(dictionnary)
-    return "OK" if t else "SORRY"
-    #except:
-    #    abort(500,'Socket timeout')
+    try:
+        t = DriverCom.send_message(dictionnary)
+        return "OK" if t else "SORRY"
+    except:
+        abort(500,'Socket timeout')
+
+
+
+
 @app.post('/superlock')
 def superlock():
     # Get the users cookie
@@ -175,17 +180,45 @@ def parcours():
         abort(404, "No cookie found.")
     parcours = request.json.get('parcours')
     print parcours
-    parcours= parse_parcours(parcours)
-    if not check_parcours(parcours):
-        return 'FAILURE'
+    if parcours == 'PAUSE':
+        dictionnary = {'command':'PAUSEPARCOURS','ID':ID,'arguments':[False]}
+    elif parcours == 'RESTART':
+        dictionnary = {'command':'PAUSEPARCOURS','ID':ID,'arguments':[True]}
     else:
-        dictionnary = {'command':'PARCOURS','ID':ID,'arguments':[parcours]}
-        try:
-            t = DriverCom.send_message(dictionnary)
-            return "OK" if t else "SORRY"
-        except:
-            abort(500,"Socket timeout")
-
+        parcours = parse_parcours(parcours)
+        print parcours
+        if not check_parcours(parcours):
+            return 'FAILURE'
+        else:
+            dictionnary = {'command':'PARCOURS','ID':ID,'arguments':[parcours]}
+    try:
+        t = DriverCom.send_message(dictionnary)
+        return "OK" if t else "SORRY"
+    except:
+        abort(500,"Socket timeout")
+@app.post('/stats/update_own_position')
+def update_own_position():
+    ID = request.get_cookie('ID')
+    pos = request.json.get('position')
+    dictionnary = {'command':'UPDATEOWNPOSITION','ID':ID,'arguments':[pos]}
+    try:
+        t = DriverCom.send_message(dictionnary)
+        return "OK" if t else "SORRY"
+    except:
+        abort(500,'Socket timeout')
+@app.post('/packet_delivery')
+def start_packet_delivery():
+    ID = request.get_cookie('ID')
+    # If not abort with a 404 error
+    if not ID:
+        abort(404, "No cookie found.")
+    position = request.json.get('position')
+    dictionnary = {'command':'PACKETDELIVERY','ID':ID,'arguments':[position]}
+    try:
+        t = DriverCom.send_message(dictionnary)
+        return "OK" if t else "SORRY"
+    except:
+        abort(500,'Socket timeout')
 @app.error(404)
 def error404(error):
     return '<h1>Oops!</h1>'

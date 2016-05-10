@@ -13,7 +13,34 @@ app.controller('statController',function($scope,dataService){
 		$scope.ownNumberOfPackages;
 		$scope.ownCurrentPosition = null;
 		$scope.ownStatus = null;
+		$scope.updatingOwnPosition = false;
+		$scope.updatedOwnPosition = "";
+		$scope.invalidPosition = false;
 
+		$scope.updateOwnPosition = function(){
+			console.log('updating');
+			var pos = $scope.parsePosition($scope.updatedOwnPosition);
+			var promise = dataService.updateOwnPosition(pos);
+			promise.success(function(data){
+				if (data == 'OK'){
+					$scope.updatingOwnPosition = false;
+				}
+				else{
+					$scope.invalidPosition = true;
+				}
+			});
+
+		}
+		$scope.parsePosition = function(string){
+			var pat = /(\d)/;
+			var position = [0,0];
+			position[0] = pat.exec(position);
+			position[1] = pat.exec(position);
+		}
+
+		$scope.showUpdatingPosition = function(){
+			$scope.updatingOwnPosition = true;
+		}
 		$scope.update_own_data = function(){
 			var promise = dataService.getOwnData();
 			promise.success(function(data){
@@ -116,6 +143,13 @@ app.factory('dataService',function($http){
 	};
 		dataGetter.getOwnData = function(){
 			var promise = $http({'method':'GET','url':'stats/owndata'});
+			return promise;
+		}
+		dataGetter.updateOwnPosition = function(pos){
+			var promise = $http({method:'POST',
+			url:'stats/update_own_position',
+			data:JSON.stringify({'position':pos}),
+			headers: {'Content-Type': 'application/json'}});
 			return promise;
 		}
 	return dataGetter;

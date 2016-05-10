@@ -1,5 +1,5 @@
 import sockets_client
-IP_RASPBERRY = 'localhost'
+IP_RASPBERRY = '10.42.0.23'
 PORT = 6000
 
 
@@ -8,7 +8,7 @@ class DriverCommincator:
     def __init__(self):
         global IP_RASPBERRY,PORT
         # Setting up a socket to communicate with the driving server
-        self.__socket = sockets_client.SocketClient(IP_RASPBERRY,PORT)
+        self.__socket = sockets_client.SocketClient(IP_RASPBERRY,PORT,3)
         self.__socket.connect()
     def send_message(self,dictionnary):
         try:

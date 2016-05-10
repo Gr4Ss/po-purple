@@ -1,0 +1,6 @@
+#!/bin/bash
+echo 'Starting up RESTServer'
+x-terminal-emulator -e python ~/Documenten/Ku\ Leuven/PenO/po-purple/Code\ in\ progress/RESTServer/restserver.py 
+echo 'Starting webserver'
+x-terminal-emulator -e python ~/Documenten/Ku\ Leuven/PenO/po-purple/Code\ in\ progress/Webserver/webserver.py
+

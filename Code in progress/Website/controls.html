@@ -186,21 +186,50 @@
 					</div>
 					<div id="collapseFive" class="panel-collapse collapse" role="tabpanel" aria-labelledby="headingFive">
 						<div class="panel-body">
-							<div class="form5">
-								<p> <strong>Note:</strong> Coming soon </p>
-								<form class="form-horizontal">
-									<p>
-										<textarea  rows="3" class="form-control" placeholder="Send list of commands"></textarea>
-									</p>
-									<p>
-										<button type="submit" class="btn btn-default btn-lg btn-block">Send</button>
-									</p>
-								</form>
-							</div>
+              <ul ng-repeat="obj in parcours">
+                <li>{{obj.direction}} {{obj.count}}</li>
+              </ul>
+              <p ng-show="parcours_paused"> Paused </p>
+              <form class="form-horizontal">
+                 <p>
+                    <textarea  rows="3" class="form-control commandList" placeholder="Send list of commands" name='commands' ng-model ="str_parcours"></textarea>
+                 </p>
+                 <p>
+                   <div class="col-md-4">
+                     <button type="button" ng-click="parcoursSubmit()" class="btn btn-default btn-lg btn-block">Send</button>
+                   </div>
+                 </p>
+                 <p>
+                   <div class="col-md-4">
+                    <button type="button" ng-click ="parcoursReset()" class="btn btn-default btn-lg btn-block">Reset</button>
+                  </div>
+                 </p>
+                 <p>
+                   <div class="col-md-4">
+                    <button type="button" ng-click="parcoursPause()" class="btn btn-default btn-lg btn-block">Pause</button>
+                  </div>
+                 </p>
+              </form>
+              <br>
+               <p>
+                 <div class="row">
+                   <div class="col-xs-3">
+                     <input type="number" ng-model='parcoursLeft' class="valueLeft" placeholder="left"></input>
+                   </div>
+                   <div class="col-xs-3">
+                     <button ng-click="parcoursAppend('left(' + parcoursLeft +'),')" class="btn btn-default btn-block nextLeft">Left</button>
+                   </div>
+                   <div class="col-xs-3">
+                     <input type="number" ng-model='parcoursRight' class="valueRight" placeholder="right"></input>
+                   </div>
+                   <div class="col-xs-3">
+                     <button ng-click="parcoursAppend('right(' + parcoursRight +'),')" class="btn btn-default btn-block nextStraight">Right</button>
+                   </div>
+                 </div>
+               </p>
 						</div>
 					</div>
 				</div>
-
 				<div class="panel panel-default">
 					<div class="panel-heading" role="tab" id="headingSix">
 						<h4 class="panel-title">
@@ -211,9 +240,6 @@
 					</div>
 					<div id="collapseSix" class="panel-collapse collapse" role="tabpanel" aria-labelledby="headingSix">
 						<div class="panel-body">
-							<p>
-								<strong>Note: </strong> The given radius is the radius of the circle driven by the centermost wheel.
-							</p>
 							<div class="form6">
 								<form class="form-horizontal">
 									<div class="form-group">
@@ -252,6 +278,24 @@
 					</div>
 				</div>
 				</div>
+        <div class="panel panel-default">
+					<div class="panel-heading" role="tab" id="headingSeven">
+						<h4 class="panel-title">
+							<a class="collapsed" role="button" data-toggle="collapse" data-parent="#accordion" href="#collapseSeven" aria-expanded="false" aria-controls="collapseSeven">
+							Packet Delivery
+							</a>
+						</h4>
+					</div>
+					<div id="collapseSeven" class="panel-collapse collapse" role="tabpanel" aria-labelledby="headingSeven">
+						<div class="panel-body">
+							<form>
+                <input type='text' ng-model='packetDeliveryPosition'></input>
+                <input type='submit' ng-click='startPacketDelivery()' value='Start'></input>
+              </form>
+
+						</div>
+					</div>
+				</div>
 
 			</div>
 		</div>
@@ -266,22 +310,6 @@
       });
       </script>
 
-      <script>
-      $('.nextLeft').click(function(){
-        $('.commandList').val($('.commandList').val() + 'Left(' + $('.valueLeft').val() + '),');
-        $('.valueLeft').val('');
-      });
-
-      $('.nextStraight').click(function(){
-        $('.commandList').val($('.commandList').val() + 'Right(' + $('.valueRight').val() + '),');
-        $('.valueRight').val('');
-      });
-
-      $('.nextDistance').click(function(){
-        $('.commandList').val($('.commandList').val() + 'Distance(' + $('.valueDistance').val() + '),');
-        $('.valueDistance').val('');
-      });
-      </script>
 
     </div>
 

@@ -19,11 +19,13 @@ class Controller:
         self.__distance_sensor = DistanceSensor(17,4)
         # Storing the distance between the centers of the cars
         # TODO measure width and gearratio
-        self.__widthcar = None
-        self.__gearratio = None
+        self.__widthcar = 20.
+        self.__gearratio = 1./3.
         # Storing the perimeter of the wheels (2*pi*r)
         self.__perimeter = 2*math.pi* 2.579
+        print 'initing Controller'
         ControllerCommands.init(self.__leftengine,self.__rightengine,self.__distance_sensor,self.__perimeter,self.__gearratio,self.__widthcar)
+        print 'Controller inited'
         # Storing a reference to a brickpi thread
         self.__io = IO_Thread([self.__leftengine,self.__rightengine],[self.__distance_sensor])
         self.__command_going = False

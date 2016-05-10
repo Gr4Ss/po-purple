@@ -1,27 +1,65 @@
 import time
 import PID
 import Engine
+import math
 from utility import *
+from follow_parcours import *
 Leftengine = None
 Rightengine = None
 Perimeter = None
 Gearratio = None
 Widthcar = None
 Distancesensor = None
+Rt = None
 Init = False
 Going = False
-DEBUG = False
+DEBUG = True
 
 def init(leftengine,rightengine,distancesensor,perimeter,gearratio,widthcar):
-    global Leftengine, Rightengine, Distancesensor, Perimeter, Gearratio, Widthcar,  Init
+    global Leftengine, Rightengine, Distancesensor, Perimeter, Gearratio, Widthcar,  Init,Rt
+    print 'INIT'
     if isinstance(leftengine,Engine.Engine) and isinstance(rightengine,Engine.Engine) and isinstance(perimeter,float) and isinstance(gearratio,float) and isinstance(widthcar,float):
+        print leftengine
         Leftengine = leftengine
         Rightengine = rightengine
         Distancesensor = distancesensor
         Perimeter = perimeter
         Gearratio = gearratio
         Widthcar = widthcar
+        Rt = Ratio((0,287),(480,287),leftengine,rightengine,distancesensor,False,[])
         Init = True
+def update_position(pos):
+    Rt.update_position(pos)
+
+def follow_parcours(parcours):
+    Rt.reset()
+    Rt.packet_delivery = False
+    Rt.append_directions(parcours)
+    while Going:
+        s = Rt.get_speed()
+        Leftengine.set_speed(s[0])
+        Rightengine.set_speed(s[1])
+    Leftengine.set_speed(0)
+    Rightengine.set_speed(0)
+
+def restart_parcours():
+    Rt.packet_delivery = False
+    while Going:
+        s = Rt.get_speed()
+        Leftengine.set_speed(s[0])
+        Rightengine.set_speed(s[1])
+    Leftengine.set_speed(0)
+    Rightengine.set_speed(0)
+def packet_delivery(pos):
+    Ratio.reset()
+    Ratio.packet_delivery = True
+    Rt.update_position(pos)
+    while Going:
+        s = Ratio.get_speed()
+        Leftengine.set_speed(s[0])
+        Rightengine.set_speed(s[1])
+    Leftengine.set_speed(0)
+    Rightengine.set_speed(0)
 
 # A method to drive forward
 # going must store a pointer to list which first element indicates the going status
@@ -104,11 +142,6 @@ def stop():
     Leftengine.set_speed(0)
     Rightengine.set_speed(0)
 
-def deliver_packets():
-    pass
-
-def follow_path(path):
-    pass
 
 def correct_speed3(lspeed,rspeed):
     MINIMUM_SPEED = 100
