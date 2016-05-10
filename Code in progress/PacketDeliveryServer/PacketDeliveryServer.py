@@ -16,7 +16,7 @@ from restclient import *
 class Packet_Delivery_Server:
     def __init__(self,start_position,webserver,port):
         self.teamname = 'PAARS'
-        self.restclient = RestClient("http://10.42.0.1:9000",self.teamname)
+        self.restclient = RestClient("http://localhost:9000",self.teamname)
         self.restclient.add_team()
         self.map = self.restclient.get_map()
         #self.map = {"vertices": [[1, {"origin": 3, "straight": 2, "left": 4}],[2, {"origin": 1, "straight": 3,"left": 4}],[3, {"origin": 2, "straight": 1, "left": 4}],[4, {"origin": 3, "straight": 1, "left": 2}]],"edges": [[1, 2, 0.3],[1, 3, 0.5],[3, 1, 0.5],[2, 3, 0.1],[3, 4, 0.7],[4, 2, 0.3],[4, 1, 0.8]]}
