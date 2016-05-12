@@ -26,7 +26,7 @@ class Ratio:
 		# If packet delivery flag is set the server will not follow the directions listed in
 		# direction list but instead use data from the packet delivery server to choose it next direction
 		self.packet_delivery = packet_delivery
-		self.packet_delivery_server = Packet_Delivery_Server((1,2),'10.42.0.1',7000)
+		self.packet_delivery_server = Packet_Delivery_Server((1,2))
 		# Variabele storing the last used ratio
 		self.last_ratio = 0
 		# List storing the direction to be followed
@@ -69,6 +69,7 @@ class Ratio:
 		self.reversing_limit = 10
 		self.block_count = 0
 		self.block_limit = 10
+		self.socket = None
 	def reset(self):
 		self.clear_directions()
 		self.block_count = 0
@@ -89,6 +90,16 @@ class Ratio:
 		self.packet_delivery = False
 	def update_position(self,position):
 		self.packet_delivery_server.update_position(position)
+	def set_socket(self,socket):
+		self.socket = socket
+		self.packet_delivery_server.set_socket(socket)
+	def send_data(self,data):
+		data = {'Type':'parcoursUpdate','data':data}
+		if self.socket != None:
+            if not self.socket.connected:
+                self.socket.connect()
+            self.socket.send_data(data)
+
 	'''
 	Method to append a direction to direction list.
 	The given parameter may be a single direction or a list of directions.
@@ -275,6 +286,10 @@ class Ratio:
 				else:
 					if last_direction == self.next_direction:
 						print 'turned correctly to the ' + last_direction
+						if self.next_direction == 'straight':
+							self.send_data('straight')
+						else:
+							self.send_data('turned')
 						self.direction_list.pop(0)
 					else:
 						print 'turned incorrectly to the '+ last_direction +' !'

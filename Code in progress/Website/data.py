@@ -8,13 +8,15 @@ sys.path.append("../RESTServer")
 sys.path.append("../Socket")
 from sockets_server import *
 from restclient import *
-
+SOCKETPORT = 7000
 
 RESTCLIENT = RestClient("http://localhost:9000")
 DATA = []
 UPDATE_TIME = None
 OWN_DATA = None
-SOCKET = SocketServer(7001)
+COMPLETED = []
+PARCOURS_ID =
+SOCKET = SocketServer(SOCKETPORT)
 SOCKET.start()
 
 def own_data_updater():
@@ -23,8 +25,19 @@ def own_data_updater():
         conn,data = SOCKET.get_data()
         SOCKET.send(conn,'OK')
         print data
-        OWN_DATA = data
-
+        if data["Type"] == "Status":
+            OWN_DATA = data
+        elif data["Type"] == "ParcoursID":
+            PARCOURS_ID = data['ID']
+        else:
+            COMPLETED.append(data["data"])
+def get_completed(iden):
+    if PARCOURS_ID == iden:
+        r = COMPLETED
+        COMPLETED = []
+        return r
+    else:
+        return []
 def get_own_data():
     global OWN_DATA
     return OWN_DATA

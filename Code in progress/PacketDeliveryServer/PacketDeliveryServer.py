@@ -5,16 +5,10 @@ from updateEdgesTraffic import *
 # ------------------IMPORT sockets ------------------------
 import os,sys,inspect
 #first change the cwd to the script path
-scriptPath = os.path.realpath(os.path.dirname(sys.argv[0]))
-os.chdir(scriptPath)
-#append the relative location you want to import from
-sys.path.append("../RESTServer")
-sys.path.append("../Socket")
-from sockets_client import *
 from restclient import *
 
 class Packet_Delivery_Server:
-    def __init__(self,start_position,webserver,port):
+    def __init__(self,start_position):
         self.teamname = 'PAARS'
         self.restclient = RestClient("http://localhost:9000",self.teamname)
         self.restclient.add_team()
@@ -26,7 +20,10 @@ class Packet_Delivery_Server:
         self.parcel_picked_up = False
         self.split_from = None
         self.status = "Normal driving from %s to %s"%(self.current_position[0],self.current_position[0])
-        self.socket = SocketClient(webserver,port)
+        self.socket = None
+
+    def set_socket(self,socket):
+        self.socket = socket
         self.socket.connect()
     '''
     Return the edges of the map
@@ -42,10 +39,11 @@ class Packet_Delivery_Server:
         Method to send data to the webserver
     '''
     def send_data(self):
-        data = {'Position': self.current_position, 'Status':self.status, 'Parcel':self.current_parcel}
-        if not self.socket.connected:
-            self.socket.connect()
-        self.socket.send_data(data)
+        data = {'Type':'Status','Position': self.current_position, 'Status':self.status, 'Parcel':self.current_parcel}
+        if self.socket != None:
+            if not self.socket.connected:
+                self.socket.connect()
+            self.socket.send_data(data)
 
     '''
     Method to update position of the car.

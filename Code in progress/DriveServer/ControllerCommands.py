@@ -4,6 +4,11 @@ import Engine
 import math
 from utility import *
 from follow_parcours import *
+scriptPath = os.path.realpath(os.path.dirname(sys.argv[0]))
+os.chdir(scriptPath)
+#append the relative location you want to import from
+sys.path.append("../Socket")
+from sockets_client import *
 Leftengine = None
 Rightengine = None
 Perimeter = None
@@ -14,6 +19,7 @@ Rt = None
 Init = False
 Going = False
 DEBUG = True
+Socket = None
 
 def init(leftengine,rightengine,distancesensor,perimeter,gearratio,widthcar):
     global Leftengine, Rightengine, Distancesensor, Perimeter, Gearratio, Widthcar,  Init,Rt
@@ -28,13 +34,24 @@ def init(leftengine,rightengine,distancesensor,perimeter,gearratio,widthcar):
         Widthcar = widthcar
         Rt = Ratio((0,287),(480,287),leftengine,rightengine,distancesensor,False,[])
         Init = True
+def init_socket(IP,port):
+    Socket = SocketClient(IP,port)
+    Rt.set_socket(Socket)
+def send_id(iden):
+    data = {'Type':'ParcoursID','ID':iden}
+    if Socket != None:
+        if not Socket.connected:
+            Socket.connect()
+        Socket.send_data(data)
+
 def update_position(pos):
     Rt.update_position(pos)
 
-def follow_parcours(parcours):
+def follow_parcours(parcours,iden):
     Rt.reset()
     Rt.packet_delivery = False
     Rt.append_directions(parcours)
+    send_id(iden)
     done = False
     while Going and not done:
         s = Rt.get_speed()

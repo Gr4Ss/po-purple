@@ -1,13 +1,14 @@
 from bottle import Bottle,run,static_file, request,post,error,response,abort
 import datetime
 from webserver_utility import *
-import data
+from data import *
 import Communicate
 import json, random
 
 
 # Interface hiding away problems with the Raspberry Pi
 DriverCom = Communicate.DriverCommincator()
+DriverCom.send_message({'command':'INITSOCKET','port':SOCKETPORT,'adress':'10.42.0.1'})
 # Create a new Bottle app
 app = Bottle()
 # Storing a refence to the location of the static files
@@ -200,6 +201,13 @@ def parcours():
         return "OK" if t else "SORRY"
     except:
         abort(500,"Socket timeout")
+@app.post('/parcours/update')
+def parcoursUpdate():
+    ID = request.get_cookie('ID')
+    # If not abort with a 404 error
+    if not ID:
+        abort(404, "No cookie found.")
+    return json.dumps({'data':data.get_completed())
 @app.post('/stats/update_own_position')
 def update_own_position():
     ID = request.get_cookie('ID')

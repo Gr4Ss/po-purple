@@ -187,8 +187,20 @@
 					</div>
 					<div id="collapseFive" class="panel-collapse collapse" role="tabpanel" aria-labelledby="headingFive">
 						<div class="panel-body">
-              <ul ng-repeat="obj in parcours">
-                <li>{{obj.direction}} {{obj.count}}</li>
+              <ul ng-repeat="obj in toDoParcours">
+                <li>{{obj.direction}} {{obj.count}} <span class="glyphicon glyphicon-ok" aria-hidden="true"></span></li>
+              </ul>
+              <ul ng-repeat="obj in completedParcours">
+                <li>{{obj.direction}} {{obj.toDo}}
+                  <button type="button" class="btn btn-default btn-sm">
+        								<span class="glyphicon glyphicon-remove" aria-hidden="true"></span>
+        					</button>
+                  <button type="button" class="btn btn-default btn-sm">
+        								<span class="glyphicon glyphicon-arrow-up" aria-hidden="true"></span>
+        					</button>
+        					<button type="button" class="btn btn-default btn-sm">
+        								<span class="glyphicon glyphicon-arrow-down" aria-hidden="true"></span>
+        					</button></li>
               </ul>
               <p ng-show="parcours_paused"> Paused </p>
               <form class="form-horizontal">

@@ -88,7 +88,7 @@ def func_parcours(identifier,argument,lock):
         return 'SORRY'
     else:
         try:
-            controller.start_command(func,[parcours])
+            controller.start_command(func,[parcours,identifier])
             return 'OK'
         except:
             return 'FAILURE'
