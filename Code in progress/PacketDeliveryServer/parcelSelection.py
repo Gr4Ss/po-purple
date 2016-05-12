@@ -13,6 +13,7 @@ def select_parcel(edges, vertices, position, parcels):
         shortest_path = distanceTo.values()
         shortest_path_copy = distanceTo.values()
         distanceTo = distanceTo.items()
+        #print 'distanceTo', distanceTo
         shortest_path.sort()
         shortest_path.pop(0)
         for x in range(len(shortest_path)):

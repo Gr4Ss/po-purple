@@ -13,7 +13,7 @@ from PacketDeliveryServer import *
 
 #-----------END IMPORTS------------------
 
-DEBUG = True
+DEBUG = False
 '''
 '''
 class Ratio:
@@ -54,16 +54,16 @@ class Ratio:
 		self.back_on_track_threshold = 3
 		self.estimate = None
 		self.estimate_PID = PID.PID(20,0.2,0.3,0.5)
-		self.normal_PID = PID.PID(1,0.1,0.05,0)
+		self.normal_PID = PID.PID(0.9,0.1,0.05,0)
 		self.left_engine = engine_left
 		self.right_engine = engine_right
 		self.recognize_direction_boundary = 0.35
 		# Variable storing the minimum speed
-		self.minimum_speed = 60
+		self.minimum_speed = 80
 		# Variable storing the maximum speed
 		self.maximum_speed = 115
 		self.turning_speed = 120
-		self.turning_reversing_speed = 0.7*60
+		self.turning_reversing_speed = 0.7*80
 		self.next_direction = None
 		self.reversing_count = 0
 		self.reversing_limit = 10
@@ -82,6 +82,7 @@ class Ratio:
 		self.back_on_track_count = 0
 		self.reversing_count = 0
 		self.block_count = 0
+		self.normal_PID.reset()
 	def start_packet_delivery_mode(self):
 		self.packet_delivery = True
 	def stop_packet_delivery_mode(self):
@@ -120,10 +121,11 @@ class Ratio:
 			slow_down = 0
 		if slow_down >= 255 and not self.driving_state == 'reversing':
 			self.block_count += 1
-			if (self.block_count >= self.block_limit) and self.packet_delivery:
-				if self.packet_delivery_server.can_turn_around():
+			if (self.block_count >= self.block_limit):
+				if not self.packet_delivery or self.packet_delivery_server.can_turn_around():
 					self.driving_state = 'reversing'
 					self.block_count = 0
+					print 'TO REVERSING STATE'
 				else:
 					self.block_count = 0
 					return (0,0)
@@ -177,11 +179,13 @@ class Ratio:
 					self.driving_state = 'normal'
 					print  'To normal state'
 				elif split_layout == 'normal_left' or split_layout == 'normal_right':
+					self.normal_PID.reset()
 					self.estimate = None
 					self.driving_state = 'normal_turning'
 					self.split_layout = split_layout
 					print 'To normal turning'
 				else:
+
 					self.split_layout = split_layout
 					if not self.packet_delivery:
 
@@ -212,6 +216,7 @@ class Ratio:
 			if self.back_on_track():
 				print 'Correctly turned!'
 				# Return back to the normal state
+				self.normal_PID.reset()
 				self.driving_state = 'normal'
 				self.back_on_track_count = 0
 				r,sr = self.get_normal_ratio(left,top,right,current_layout)
@@ -226,6 +231,7 @@ class Ratio:
 				print 'ratio: ',r
 				return self.to_speed(r,self.turning_speed)
 		elif self.driving_state == 'reversing':
+			print self.reversing_count
 			if self.reversing_count >= self.reversing_limit:
 				if current_layout == "normal_straight":
 					self.driving_state = 'normal'
@@ -234,7 +240,10 @@ class Ratio:
 						self.packet_delivery_server.turned_around()
 					r,sr = self.get_normal_ratio(left,top,right,current_layout)
 					self.last_ratio = r
-					return to_speed(r,self.maximum_speed)
+					return self.to_speed(r,self.maximum_speed)
+				else:
+					self.reversing_count += 1
+					return (-self.minimum_speed,self.minimum_speed)
 
 			else:
 				self.reversing_count += 1
@@ -252,6 +261,7 @@ class Ratio:
 				self.back_on_track_count = 0
 			# Check if we are back on track after the split
 			if self.back_on_track():
+				self.normal_PID.reset()
 				last_direction = self.recognize_direction()
 				if self.packet_delivery:
 					print 'Turned to ',last_direction
@@ -272,12 +282,8 @@ class Ratio:
 				self.driving_state = 'normal'
 				self.split_ratio = [0,0]
 				self.back_on_track_count = 0
-				if current_layout == None or current_layout == 'normal_straight':
-					r,sr = self.get_normal_ratio(left,top,right,current_layout)
-					bs = max(self.minimum_speed,min(sr*self.minimum_speed,self.maximum_speed))
-				else:
-					r = self.get_normal_turning_ratio(left,top,right,current_layout)
-					bs = self.turning_speed
+				r,sr = self.get_normal_ratio(left,top,right,current_layout,False)
+				bs = max(self.minimum_speed,min(sr*self.minimum_speed,self.maximum_speed))
 				self.last_ratio = r
 				return self.to_speed(r,bs)
 
@@ -288,7 +294,7 @@ class Ratio:
 				self.last_ratio = ratio
 				return self.to_speed(ratio,self.turning_speed)
 
-	def get_normal_ratio(self,left,top,right,current_layout):
+	def get_normal_ratio(self,left,top,right,current_layout,PID=False):
 		if current_layout == None:
 			if self.last_ratio != 0:
 				return self.last_ratio,log(2./abs(self.last_ratio)**2,10)
@@ -296,16 +302,25 @@ class Ratio:
 				return self.last_ratio,1
 		elif current_layout == 'normal_straight':
 			ratio = self.to_ratio(mean_x(top))
-			pid_ratio = self.normal_PID.value(ratio,1.)
 			if DEBUG:
-				print 'Original ratio: ',ratio,' PID ratio: ',pid_ratio
-			if pid_ratio != 0:
+				print 'Original ratio: ',ratio
+			if PID:
+				ratio = self.normal_PID.value(ratio,1.)
+				if DEBUG:
+					print ' PID ratio: ',ratio
+			if ratio != 0:
 				speed_ratio = log(3./abs(ratio)**2,10)
-				return pid_ratio,speed_ratio
+				return ratio,speed_ratio
 			else:
-				return pid_ratio,1
+				return ratio,1
+		elif current_layout == 'normal_left':
+			ratio = self.to_ratio(mean_y(left))
+			return ratio,1
+		elif current_layout == 'normal_right':
+			ratio = self.to_ratio(mean_y(right))
+			return ratio,1
 		else:
-			raise Exception('Only none or straight')
+			raise Exception('POM')
 
 	def get_normal_turning_ratio(self,left,top,right,current_layout):
 		if current_layout == None:

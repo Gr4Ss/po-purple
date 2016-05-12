@@ -98,24 +98,24 @@
           <div class="touch-keys" >
             <div class="row">
               <div class="col-xs-4 col-xs-offset-4">
-                <button class="btn btn-default btn-block driveForward not_pressed" ng-mouseup="keyUpReleased()" ng-mousedown="keyUpPressed()">
+                <button class="btn btn-default btn-block driveForward not_pressed" ng-mouseup="keyUpReleased()" ng-mousedown="keyUpPressed()" ng-touchstart="keyUpPressed()" ng-touchend="keyUpReleased()">
                 F
                 </button>
               </div>
             </div>
             <div class="row">
               <div class="col-xs-4">
-                <button class="btn btn-default btn-block driveLeft not_pressed" ng-mouseup="keyLeftReleased()" ng-mousedown="keyLeftPressed()">
+                <button class="btn btn-default btn-block driveLeft not_pressed" ng-mouseup="keyLeftReleased()" ng-mousedown="keyLeftPressed()" ng-touchstart="keyLeftPressed()" ng-touchstart="keyLeftReleased()">
                 L
                 </button>
               </div>
               <div class="col-xs-4">
-                <button class="btn btn-default btn-block driveReverse not_pressed" ng-mouseup="keyDownReleased()" ng-mousedown="keyDownPressed()">
+                <button class="btn btn-default btn-block driveReverse not_pressed" ng-mouseup="keyDownReleased()" ng-mousedown="keyDownPressed()" ng-touchstart="keyDownPressed()" ng-touchend="keyDownReleased()">
                 B
                 </button>
               </div>
               <div class="col-xs-4">
-                <button class="btn btn-default btn-block driveRight not_pressed" ng-mouseup="keyRightReleased()" ng-mousedown="keyRightPressed()">
+                <button class="btn btn-default btn-block driveRight not_pressed" ng-mouseup="keyRightReleased()" ng-mousedown="keyRightPressed()" ng-touchstart="keyRightPressed()" ng-touchstart="keyDownReleased()">
                 R
                 </button>
               </div>
@@ -144,6 +144,7 @@
       <img class="img-responsive center-block" id="mjpeg_dest"  width=720px height=400px>
       </div>
       </div>
+      <button onclick="pause_stream()">Pause</button>
 
       <div class='container'id='about'>
       <div class="starter-template">

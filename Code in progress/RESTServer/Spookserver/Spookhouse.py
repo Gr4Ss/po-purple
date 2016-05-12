@@ -22,9 +22,9 @@ def add_parcels():
         requests.put("http://localhost:9000/parcels/add", json=json.dumps({"secretkey":"SecretKey","newParcels":[[count,random.randint(1,4),random.randint(1,4)]]}))
         count += 1
         time.sleep(5)
-t = threading.Thread(target = add_parcels)
-t.setDaemon(True)
-t.start()
+#t = threading.Thread(target = add_parcels)
+#t.setDaemon(True)
+#t.start()
 for x in range(amount):
         ind = random.randint(0,len(teamnames)-1)
         spooks.append(spook(teamnames.pop(ind), random.uniform(5,15)))

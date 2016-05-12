@@ -14,7 +14,7 @@ JBase = helper.JsonBase()
 def register(team):
     try:
         # Try to get the post value
-        value = request.forms.get('key',False)
+        value = request.text
         print value
         # If no key posted, send SORRY
         if not value:
@@ -73,7 +73,7 @@ def add_parcels():
 def claim_parcel(team,parcel_nb):
     try:
 
-        value = request.forms.get('key',False)
+        value = request.text
         # If there is no key specified return SORRY
         if not value:
             return 'SORRY'
@@ -88,7 +88,7 @@ def claim_parcel(team,parcel_nb):
 @app.put('/robots/<team>/delivered/<parcel_nb:int>')
 def deliver_parcel(team,parcel_nb):
     try:
-        value = request.forms.get('key',False)
+        value = request.text
         # If there is no key specified return SORRY
         if not value:
             return 'SORRY'
@@ -105,7 +105,7 @@ def set_position(team,from_node,to_node):
     try:
 
         # Try to get the post value
-        value = request.forms.get('key',False)
+        value = request.text
         # If there is no key specified return SORRY
         if not value:
             return 'SORRY'

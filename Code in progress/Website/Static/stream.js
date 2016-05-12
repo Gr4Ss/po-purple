@@ -8,7 +8,7 @@ var mjpeg_mode = 0;
 function reload_img () {
   if(!halted)
     {
-      mjpeg_img.src = 'http://pipurple/cam.jpg?time=' + new Date().getTime();
+      mjpeg_img.src = 'http://10.42.0.23/cam.jpg?time=' + new Date().getTime();
     }//setTimeout("mjpeg_img.src = 'http://192.168.0.98/cam.jpg?time=' + new Date().getTime()", 100);
   else
     {
@@ -20,7 +20,13 @@ function reload_img () {
 function error_img () {
   mjpeg_img.onload = null;
   mjpeg_img.src = "/images/streaming.jpg";
-  setTimeout("mjpeg_img.onload=reload_img();mjpeg_img.src = 'http://pipurple/cam.jpg?time=' + new Date().getTime()", 10000);
+  setTimeout("mjpeg_img.onload=reload_img;mjpeg_img.src = 'http://10.42.0.23/cam.jpg?time=' + new Date().getTime()", 10000);
+}
+
+function pause_stream(){
+  console.log('Pieter')
+  halted = (halted + 1)%2;
+  console.log(halted);
 }
 
 //
