@@ -316,10 +316,55 @@ app.controller('controllerController',function($scope,lockClaimerService,formSen
     $scope.completedParcours = [];
     $scope.toDoParcours = [];
     var match = pat.exec($scope.str_parcours);
+    var ind = 0;
     while (match != null){
-      $scope.toDoParcours.push({'direction':match[1],'count':match[2],'toDo':match[2]});
+      $scope.toDoParcours.push({'index':ind,'direction':match[1],'count':match[2],'toDo':match[2]});
       match = pat.exec($scope.str_parcours);
     }
+    var promise = formSenderService.sendParcours($scope.toDoParcours);
+    promise.success(function(data,status){
+        if (data == 'OK'){
+          $scope.succes = true;
+          $scope.getParcoursUpdate();
+        }
+        else if (data == 'FAILURE'){
+          $scope.failure = true;
+        }
+        else{
+          $scope.claimLock = true;
+        }
+    });
+    promise.error(function(data,status){
+      $scope.failure = true;
+    });
+  }
+  $scope.removeFromParcours(obj){
+    for (var i=0;i<$scope.toDoParcours;i++){
+      if(obj.index == $scope.toDoParcours.index){
+        $scope.toDoParcours.splice(i,1);
+      }
+    }
+  }
+  $scope.arraymove(arr, fromIndex, toIndex) {
+    var element = arr[fromIndex];
+    window.alert(element);
+    arr.splice(fromIndex, 1);
+    arr.splice(toIndex, 0, element);
+  }
+  $scope.moveUpParcours(obj){
+    for (var i=1;i<$scope.toDoParcours;i++){
+      if(obj.index == $scope.toDoParcours.index){
+        $scope.arraymove($scope.toDoParcours,i,i-1);
+    }
+  }
+  $scope.moveDownParcours(obj){
+    for (var i=0;i<$scope.toDoParcours-1;i++){
+      if(obj.index == $scope.toDoParcours.index){
+        $scope.arraymove($scope.toDoParcours,i,i+1);
+      }
+    }
+  }
+  $scope.updateParcours(){
     var promise = formSenderService.sendParcours($scope.toDoParcours);
     promise.success(function(data,status){
         if (data == 'OK'){

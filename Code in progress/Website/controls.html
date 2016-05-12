@@ -191,17 +191,22 @@
                 <li>{{obj.direction}} {{obj.count}} <span class="glyphicon glyphicon-ok" aria-hidden="true"></span></li>
               </ul>
               <ul ng-repeat="obj in completedParcours">
-                <li>{{obj.direction}} {{obj.toDo}}
-                  <button type="button" class="btn btn-default btn-sm">
+                <li>{{obj.direction      obj.toDo
+                  <button type="button" class="btn btn-default btn-sm" onclick="removeFromParcours(obj)">
         								<span class="glyphicon glyphicon-remove" aria-hidden="true"></span>
         					</button>
-                  <button type="button" class="btn btn-default btn-sm">
+                  <button type="button" class="btn btn-default btn-sm" onclick="moveUpParcours(obj)">
         								<span class="glyphicon glyphicon-arrow-up" aria-hidden="true"></span>
         					</button>
-        					<button type="button" class="btn btn-default btn-sm">
+        					<button type="button" class="btn btn-default btn-sm" onclick="moveDownParcours(obj)">
         								<span class="glyphicon glyphicon-arrow-down" aria-hidden="true"></span>
-        					</button></li>
+        					</button>
+                  }}
+                </li>
               </ul>
+              <button onclick="updateParcours()">
+                Update!
+              </button>
               <p ng-show="parcours_paused"> Paused </p>
               <form class="form-horizontal">
                  <p>
