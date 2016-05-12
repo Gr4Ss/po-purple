@@ -13,13 +13,13 @@ app = Bottle()
 # Storing a refence to the location of the static files
 static_root = 'Static/'
 image_root = 'Images/'
+font_root = 'fonts/'
 
 # Returning the home page
 @app.route('/')
 def home():
     # Open the file
-    #html = open('home.html','r')
-    html = open('fake_home.html')
+    html = open('home.html','r')
     # Check if the user has already a cookie, if not create one
     if not request.get_cookie('ID'):
         # Cookie expires over 1 year
@@ -39,8 +39,8 @@ def stats():
 @app.route('/control')
 def control():
     # Open the file
-    #html = open('controls.html','r')
-    html = open('fake_control.html')
+    html = open('controls.html','r')
+
     # Check if the user has already a cookie, if not create one
     if not request.get_cookie('ID'):
         # Cookie expires over 1 year
@@ -56,7 +56,9 @@ def server_static(filename):
 @app.route('/Images/<filename>')
 def images(filename):
     return static_file(filename,root=image_root)
-
+@app.route('/fonts/<filename>')
+def fonts(filename):
+    return static_file(filename,root=font_root)
 @app.route('/stats/data')
 def get_data():
     return json.dumps(data.get_data())
