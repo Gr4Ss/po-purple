@@ -1,1 +1,4 @@
-
+- Fix stream
+- Opdrachten lijst bij parcours
+- Data sturen van Pi naar website
+-

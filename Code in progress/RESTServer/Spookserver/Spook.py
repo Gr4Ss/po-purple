@@ -15,7 +15,8 @@ sys.path.append("../../PacketDeliveryServer")
 from pathFinding import *
 from parcelSelection import *
 from findAllPaths import *
-root = 'http://192.168.2.21:5000'
+#root = 'http://192.168.2.21:5000'
+root = 'http://localhost:9000'
 
 def generate_vehicle(teamname, speed):
     vehicle = Vehicle(root, teamname, speed)
