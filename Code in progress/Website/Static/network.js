@@ -2,9 +2,9 @@ var Dataset = [];
 var first = true;
 
 function getData() {
-	
+
 	/* Gets the dataset from the server and converts it to a usable one for vis.js*/
-	return $.getJSON("http://localhost:9000/map", function(data) {
+	return $.getJSON("http://192.168.2.21:5000/map", function(data) {
 		Dataset = data;
 		convertDataSet();
 	}).responseText;
@@ -12,20 +12,20 @@ function getData() {
 
 function initNetwork() {
 	getData();
-	
+
 	window.setTimeout(function() {
 		network.fit();
 		colorAllPositions();
-	}, 4000);	
-	
+	}, 4000);
+
 	window.setTimeout(function() {
 		makeExternalLegend();
 	}, 4600);
 }
 
-function updateNetwork() {	
+function updateNetwork() {
 	colorAllPositions();
-	
+
 }
 
 
@@ -134,7 +134,7 @@ var carPosMap = [];
 var carHashMap = {};
 
 function colorAllPositions() {
-	$.getJSON("http://localhost:9000/positions", function(myPositions) {
+	$.getJSON("http://192.168.2.21:5000/positions", function(myPositions) {
 		//var start = new Date().getTime();
 		for (i in myPositions["positions"]){
 			carPosMap[i] = [myPositions["positions"][i][0], myPositions["positions"][i][1], myPositions["positions"][i][2]];
@@ -154,7 +154,7 @@ function colorAllPositions() {
 						changeEdgeColor(carPosMap[car][1], carPosMap[car][2], hexToRgbA(intToRGB(hashCode(carPosMap[car][0]))));
 						changeEdgeColor(carPosMap[car][2], carPosMap[car][1], hexToRgbA(intToRGB(hashCode(carPosMap[car][0]))));
 					}
-			} else {	
+			} else {
 				//console.log("New position: " + carPosMap[car][0] + "," + carPosMap[car][1] + ","+ carPosMap[car][2]+ ","+ carPrevPosMap[car][1]+ ","+ carPrevPosMap[car][2]);
 				// ANDERE POSITIE
 				if (carPosMap[car][1] == carPosMap[car][2]) {
@@ -200,7 +200,7 @@ function hashCode(str) { // java String#hashCode
        hash = str.charCodeAt(i) + ((hash << 5) - hash);
     }
     return hash;
-} 
+}
 
 function intToRGB(i){
     var c = (i & 0x00FFFFFF)
@@ -239,20 +239,20 @@ function makeExternalLegend() {
 		descriptionDiv.className = "description-container";
 
 		descriptionDiv.innerHTML = carPosMap[car][0];
-		
+
 		legendDiv.appendChild(containerDiv);
 		containerDiv.appendChild(descriptionDiv);
-		
+
 		containerDiv.style.width = "100%";
 		containerDiv.style.height = "100%";
 		descriptionDiv.style.width = 100/(carPosMap.length + 1) + '%';
 		descriptionDiv.style.float = 'left';
 		descriptionDiv.style.backgroundColor = hexToRgbA(intToRGB(hashCode(carPosMap[car][0])));
-		
+
 		$(descriptionDiv).click(function(event) {
 			zoomToID(event.target.innerHTML);
 		});
-		
+
 	}
 }
 
@@ -263,7 +263,7 @@ function zoomToID(teamName) {
 			break;
 		}
 	}
-	
+
 	if (zoomNodeID[0] == zoomNodeID[1]) {
 		network.focus(zoomNodeID[0], {
 			scale: 2,
@@ -281,10 +281,10 @@ function zoomToID(teamName) {
 		valY2 = nodePositions[zoomNodeID[1]].y;
 		valX = (valX1 + valX2)/2;
 		valY = (valY1 + valY2)/2;
-		
+
 		changeEdgeColor(zoomNodeID[0], zoomNodeID[1], hexToRgbA(intToRGB(hashCode(teamName))));
 		changeEdgeColor(zoomNodeID[1], zoomNodeID[0], hexToRgbA(intToRGB(hashCode(teamName))));
-		
+
 		network.moveTo({
 			position: {x: valX, y: valY},
 			scale: 2,
@@ -294,7 +294,7 @@ function zoomToID(teamName) {
 			}
 		})
 	}
-} 
+}
 
 var stabilized = false;
 /*while (!stabilized) {
@@ -340,5 +340,3 @@ String.prototype.hashCode = function(){
 }
 
 setInterval(function() {updateNetwork()}, 100);
-
-

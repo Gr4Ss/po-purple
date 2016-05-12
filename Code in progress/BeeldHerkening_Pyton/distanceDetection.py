@@ -13,7 +13,7 @@ def distance_detection(distance):
     if closing_counter >= 3:
         getting_closer = True
 
-    if distance < 20:
+    if distance < 40:
         close_counter += 1
     else:
         close_counter = 0

@@ -15,7 +15,7 @@ sys.path.append("../../PacketDeliveryServer")
 from pathFinding import *
 from parcelSelection import *
 from findAllPaths import *
-root = 'http://localhost:9000'
+root = 'http://192.168.2.21:5000'
 
 def generate_vehicle(teamname, speed):
     vehicle = Vehicle(root, teamname, speed)
@@ -56,9 +56,10 @@ class Vehicle(RestClient):
     def choose_parcel(self):
         parcels = self.get_parcels()
         position = self.get_position()
-        for x in parcels.get('on-the-road-parcels'):
-            if x[3] == self.get_teamname():
-                return x
+        if parcels.get('on-the-road-parcels') != None:
+            for x in parcels.get('on-the-road-parcels'):
+                if x[3] == self.get_teamname():
+                    return x
         parcel = select_parcel(self.update_edges_traffic(), self.get_vertices(), position, parcels.get('available-parcels'))
         if parcel == False:
             return False

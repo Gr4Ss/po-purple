@@ -2,8 +2,8 @@ import requests
 import json
 import random
 def generate_secret_key(length):
-    result = '%030x' % random.randrange(16**30)
-    return result
+    result = '%030x' % random.randrange(16**100)
+    return '0x' + result
 
 class RestClient(object):
     def __init__(self,root,teamname = None):
@@ -13,7 +13,8 @@ class RestClient(object):
         self.__name = teamname
 
     def add_team(self):
-        resp = requests.post(self.__root + "/robots/"+self.__name,data={"key":self.__secret_key})
+        resp = requests.post(self.__root + "/robots/"+self.__name,data=self.__secret_key)
+        print resp.text
         if resp.text == 'OK':
             self.__registed = True
             return True
@@ -31,7 +32,7 @@ class RestClient(object):
         if not isinstance(parcel_nb,int):
             raise Exception('Parcel number must be int')
         if self.__registed:
-            resp = requests.put(self.__root + "/robots/"+self.__name+"/claim/" + str(parcel_nb),data={"key":self.__secret_key})
+            resp = requests.put(self.__root + "/robots/"+self.__name+"/claim/" + str(parcel_nb),data=self.__secret_key)
             return resp.text == 'OK'
         else:
             raise Error('Please add your team first.')
@@ -39,13 +40,13 @@ class RestClient(object):
         if not isinstance(parcel_nb,int):
             raise Exception('Parcel number must be int')
         if self.__registed:
-            resp = requests.put(self.__root + "/robots/"+self.__name+"/delivered/" + str(parcel_nb),data={"key":self.__secret_key})
+            resp = requests.put(self.__root + "/robots/"+self.__name+"/delivered/" + str(parcel_nb),data=self.__secret_key)
             return resp.text == 'OK'
         else:
             raise Error('Please add your team first.')
     def update_position(self, from_node,to_node):
         if self.__registed:
-            resp = requests.put(self.__root + "/positions/"+self.__name+"/"+ str(from_node)+"/"+str(to_node),data={"key":self.__secret_key})
+            resp = requests.put(self.__root + "/positions/"+self.__name+"/"+ str(from_node)+"/"+str(to_node),data=self.__secret_key)
             return resp.text == 'OK'
         else:
             raise Error('Please add your team first.')

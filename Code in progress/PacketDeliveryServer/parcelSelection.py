@@ -2,7 +2,7 @@ from sys import maxint
 from findAllPaths import *
 from pathFinding import *
 
-def select_parcel(edges, vertices, position, parcels, name):
+def select_parcel(edges, vertices, position, parcels):
     chosenParcel = None
     for parcel in parcels:
         if parcel[1] == position[1]:
