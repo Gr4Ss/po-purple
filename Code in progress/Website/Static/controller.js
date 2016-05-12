@@ -24,6 +24,7 @@ app.controller('controllerController',function($scope,lockClaimerService,formSen
   $scope.squareSide = null;
   $scope.invalidSquareSide = false;
   $scope.packetDeliveryPosition = null;
+  $scope.pauseString = "Pause";
   hide_all_messages = function(){
     $scope.failure = false;
     $scope.noLock = false;
@@ -344,10 +345,17 @@ app.controller('controllerController',function($scope,lockClaimerService,formSen
   }
   $scope.parcoursPause = function(){
     hide_all_messages();
-    var promise = formSenderService.pauseParcours();
+
+    var promise = formSenderService.pauseParcours($scope.parcoursPause);
     promise.success(function(data,status){
         if (data == 'OK'){
-          $scope.parcoursPause = true;
+          $scope.parcoursPause = !($scope.parcoursPause);
+          if ($scope.parcoursPause){
+            $scope.pauseString = "Restart"
+          }
+          else{
+            $scope.pauseString = "Pause"
+          }
         }
     });
     promise.error(function(data,status){

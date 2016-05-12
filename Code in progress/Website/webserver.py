@@ -18,7 +18,8 @@ image_root = 'Images/'
 @app.route('/')
 def home():
     # Open the file
-    html = open('home.html','r')
+    #html = open('home.html','r')
+    html = open('fake_home.html')
     # Check if the user has already a cookie, if not create one
     if not request.get_cookie('ID'):
         # Cookie expires over 1 year
@@ -38,7 +39,8 @@ def stats():
 @app.route('/control')
 def control():
     # Open the file
-    html = open('controls.html','r')
+    #html = open('controls.html','r')
+    html = open('fake_control.html')
     # Check if the user has already a cookie, if not create one
     if not request.get_cookie('ID'):
         # Cookie expires over 1 year
@@ -51,7 +53,7 @@ def control():
 @app.route('/static/<filename>')
 def server_static(filename):
     return static_file(filename,root=static_root)
-@app.route('/images/<filename>')
+@app.route('/Images/<filename>')
 def images(filename):
     return static_file(filename,root=image_root)
 

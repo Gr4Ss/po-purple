@@ -1,14 +1,13 @@
-import os,sys,inspect
-import time
+#import os,sys,inspect
 from math import *
 import PID
 import distanceDetection as dist_detec
 
 #first change the cwd to the script pathf
-scriptPath = os.path.realpath(os.path.dirname(sys.argv[0]))
-os.chdir(scriptPath)
+#scriptPath = os.path.realpath(os.path.dirname(sys.argv[0]))
+#os.chdir(scriptPath)
 #append the relative location you want to import from
-sys.path.append("../BeeldHerkening_Lua")
+#sys.path.append("../BeeldHerkening_Lua")
 from lua_python_bridge import *
 from PacketDeliveryServer import *
 
@@ -69,7 +68,7 @@ class Ratio:
 		self.reversing_count = 0
 		self.reversing_limit = 10
 		self.block_count = 0
-		self.block_limit = 3
+		self.block_limit = 10
 	def reset(self):
 		self.clear_directions()
 		self.block_count = 0
@@ -123,7 +122,7 @@ class Ratio:
 			self.block_count += 1
 			if (self.block_count >= self.block_limit) and self.packet_delivery:
 				if self.packet_delivery_server.can_turn_around():
-					self.driving_state == 'reversing'
+					self.driving_state = 'reversing'
 					self.block_count = 0
 				else:
 					self.block_count = 0
@@ -150,7 +149,7 @@ class Ratio:
 			else:
 				print 'To split detection'
 				self.driving_state = 'split_detection'
-				return (0,0)
+				return (-self.minimum_speed,-self.minimum_speed)
 		# A possible split is detected, extra check is preformed.
 		elif self.driving_state == 'split_detection':
 			if self.split_check_phase == 0:
@@ -185,9 +184,14 @@ class Ratio:
 				else:
 					self.split_layout = split_layout
 					if not self.packet_delivery:
-						self.driving_state = 'split_turning'
-						print ' To split turning'
-						self.next_direction = self.direction_list[0]
+
+						if len(self.direction_list) >0:
+							self.driving_state = 'split_turning'
+							print ' To split turning'
+							self.next_direction = self.direction_list[0]
+						else:
+							print 'No more directions'
+							return (False,False)
 					else:
 						direction = self.packet_delivery_server.at_split()
 						if direction == 'origin':
@@ -512,4 +516,3 @@ def is_special(layout):
 		return False
 	else:
 		return (layout.split('_')[0]!= 'normal')
-		

@@ -13,6 +13,7 @@
     <link rel="stylesheet" href="static/bootstrap-theme.min.css" >
     <script src="static/controller.js"></script>
     <link rel="stylesheet" href="static/cssv2.css">
+	<link href="//netdna.bootstrapcdn.com/bootstrap/3.0.0/css/bootstrap.min.css" rel="stylesheet">
   <script>window.addEventListener("keydown", function(e) {
   // space and arrow keys
   if([32, 37, 38, 39, 40].indexOf(e.keyCode) > -1) {
@@ -186,9 +187,37 @@
 					</div>
 					<div id="collapseFive" class="panel-collapse collapse" role="tabpanel" aria-labelledby="headingFive">
 						<div class="panel-body">
-              <ul ng-repeat="obj in parcours">
-                <li>{{obj.direction}} {{obj.count}}</li>
+              <ul>
+                <li>left 2 <span class="glyphicon glyphicon-ok" aria-hidden="true"></span></li> 
+				<li>left 1 <span class="glyphicon glyphicon-ok" aria-hidden="true"></span></li> 
+				<li>right 3 <button type="button" class="btn btn-default btn-sm">
+									<span class="glyphicon glyphicon-remove" aria-hidden="true"></span>
+								</button> <button type="button" class="btn btn-default btn-sm">
+									<span class="glyphicon glyphicon-arrow-up" aria-hidden="true"></span>
+								</button>
+								<button type="button" class="btn btn-default btn-sm">
+									<span class="glyphicon glyphicon-arrow-down" aria-hidden="true"></span>
+								</button></li> 
+				<li>left 2  <button type="button" class="btn btn-default btn-sm">
+									<span class="glyphicon glyphicon-remove" aria-hidden="true"></span>
+								</button> <button type="button" class="btn btn-default btn-sm">
+									<span class="glyphicon glyphicon-arrow-up" aria-hidden="true"></span>
+								</button>
+								<button type="button" class="btn btn-default btn-sm">
+									<span class="glyphicon glyphicon-arrow-down" aria-hidden="true"></span>
+								</button></li>
+				<li>right 2 <button type="button" class="btn btn-default btn-sm">
+									<span class="glyphicon glyphicon-remove" aria-hidden="true"></span>
+								</button> <button type="button" class="btn btn-default btn-sm">
+									<span class="glyphicon glyphicon-arrow-up" aria-hidden="true"></span>
+								</button>
+								<button type="button" class="btn btn-default btn-sm">
+									<span class="glyphicon glyphicon-arrow-down" aria-hidden="true"></span>
+								</button></li> 
+				
               </ul>
+			  <style>
+			  </style>
               <p ng-show="parcours_paused"> Paused </p>
               <form class="form-horizontal">
                  <p>
@@ -196,7 +225,7 @@
                  </p>
                  <p>
                    <div class="col-md-4">
-                     <button type="button" ng-click="parcoursSubmit()" class="btn btn-default btn-lg btn-block">Send</button>
+                     <button type="button" ng-click="parcoursSubmit()" class="btn btn-default btn-lg btn-block">Add</button>
                    </div>
                  </p>
                  <p>

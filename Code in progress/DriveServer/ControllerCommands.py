@@ -35,10 +35,14 @@ def follow_parcours(parcours):
     Rt.reset()
     Rt.packet_delivery = False
     Rt.append_directions(parcours)
-    while Going:
+    done = False
+    while Going and not done:
         s = Rt.get_speed()
-        Leftengine.set_speed(s[0])
-        Rightengine.set_speed(s[1])
+        if s[0] == False or s[1] == False:
+            done = True
+        else:
+            Leftengine.set_speed(s[0])
+            Rightengine.set_speed(s[1])
     Leftengine.set_speed(0)
     Rightengine.set_speed(0)
 
