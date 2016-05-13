@@ -357,13 +357,15 @@ app.controller('controllerController',function($scope,lockClaimerService,formSen
   $scope.parsePosition = function(string){
     var pat = /(\d)/;
     var position = [0,0];
-    position[0] = pat.exec(position);
-    position[1] = pat.exec(position);
+    position[0] = pat.exec(position)[0];
+    position[1] = pat.exec(position)[0];
+    return position;
   }
   $scope.startPacketDelivery = function(){
     console.log('start');
     hide_all_messages();
-    var pos = $scope.parsePosition($scope.packetDeliveryPosition)
+    var pos = $scope.parsePosition($scope.packetDeliveryPosition);
+    console.log(pos);
     var promise = formSenderService.startPacketDelivery(pos);
     promise.success(function(data,status){
       if (data == 'OK'){
@@ -439,6 +441,7 @@ app.factory('formSenderService',function($http){
     return promise;
   }
   formSender.startPacketDelivery = function(pos){
+    console.log(pos);
     var promise = $http({method:'POST',url:'/packet_delivery',
     data:JSON.stringify({'position':pos}),
     headers: {'Content-Type':'application/json'}

@@ -11,7 +11,7 @@ sys.path.append("../Socket")
 import sockets_server
 
 # Setting up a new a new socket server
-socket = sockets_server.SocketServer(6000)
+socket = sockets_server.SocketServer(6001)
 socket.start()
 # Create a lock entity with a lock time of 20 minutes
 lock = Locker.Lock(1200)
@@ -96,7 +96,7 @@ def check_message(message):
             # Check if there is any constraint
             constraint = commands[command].get('constraint',False)
             if constraint != False:
-                print constraint(arguments)
+                print 'Constraint',constraint(arguments)
                 return constraint(arguments)
             else:
                 return True
