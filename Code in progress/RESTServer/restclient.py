@@ -2,8 +2,8 @@ import requests
 import json
 import random
 def generate_secret_key(length):
-    result = '%030x' % random.randrange(16**100)
-    return '0x' + result
+    #result = '%030x' % random.randrange(16**100)
+    return '0x' + '111111'
 
 class RestClient(object):
     def __init__(self,root,teamname = None):

@@ -96,9 +96,9 @@ class Ratio:
 	def send_data(self,data):
 		data = {'Type':'parcoursUpdate','data':data}
 		if self.socket != None:
-            if not self.socket.connected:
-                self.socket.connect()
-            self.socket.send_data(data)
+			if not self.socket.connected:
+				self.socket.connect()
+			self.socket.send_data(data)
 
 	'''
 	Method to append a direction to direction list.

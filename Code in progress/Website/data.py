@@ -8,14 +8,14 @@ sys.path.append("../RESTServer")
 sys.path.append("../Socket")
 from sockets_server import *
 from restclient import *
-SOCKETPORT = 7000
+SOCKETPORT = 7002
 
-RESTCLIENT = RestClient("http://localhost:9000")
+RESTCLIENT = RestClient("http://192.168.2.21:5000")
 DATA = []
 UPDATE_TIME = None
 OWN_DATA = None
 COMPLETED = []
-PARCOURS_ID =
+PARCOURS_ID = None
 SOCKET = SocketServer(SOCKETPORT)
 SOCKET.start()
 

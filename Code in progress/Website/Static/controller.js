@@ -311,14 +311,14 @@ app.controller('controllerController',function($scope,lockClaimerService,formSen
     }
   }
   $scope.parcoursSubmit = function(){
-    $scope.hide_all_messages();
+    hide_all_messages();
     var pat = /(\w+)\((\d+)\)/g;
     $scope.completedParcours = [];
     $scope.toDoParcours = [];
     var match = pat.exec($scope.str_parcours);
     var ind = 0;
     while (match != null){
-      $scope.toDoParcours.push({'index':ind,'direction':match[1],'count':match[2],'toDo':match[2]});
+      $scope.completedParcours.push({'index':ind,'direction':match[1],'count':match[2],'toDo':match[2]});
       match = pat.exec($scope.str_parcours);
     }
     var promise = formSenderService.sendParcours($scope.toDoParcours);
@@ -338,33 +338,35 @@ app.controller('controllerController',function($scope,lockClaimerService,formSen
       $scope.failure = true;
     });
   }
-  $scope.removeFromParcours(obj){
+  $scope.removeFromParcours =function(obj){
     for (var i=0;i<$scope.toDoParcours;i++){
       if(obj.index == $scope.toDoParcours.index){
         $scope.toDoParcours.splice(i,1);
       }
     }
   }
-  $scope.arraymove(arr, fromIndex, toIndex) {
+  $scope.arraymove =function(arr, fromIndex, toIndex) {
     var element = arr[fromIndex];
     window.alert(element);
     arr.splice(fromIndex, 1);
     arr.splice(toIndex, 0, element);
   }
-  $scope.moveUpParcours(obj){
+  $scope.moveUpParcours=function(obj){
     for (var i=1;i<$scope.toDoParcours;i++){
       if(obj.index == $scope.toDoParcours.index){
         $scope.arraymove($scope.toDoParcours,i,i-1);
     }
   }
-  $scope.moveDownParcours(obj){
+}
+  $scope.moveDownParcours=function(obj){
     for (var i=0;i<$scope.toDoParcours-1;i++){
       if(obj.index == $scope.toDoParcours.index){
         $scope.arraymove($scope.toDoParcours,i,i+1);
       }
     }
   }
-  $scope.updateParcours(){
+  $scope.updateParcours=function(){
+    hide_all_messages();
     var promise = formSenderService.sendParcours($scope.toDoParcours);
     promise.success(function(data,status){
         if (data == 'OK'){
@@ -382,7 +384,7 @@ app.controller('controllerController',function($scope,lockClaimerService,formSen
       $scope.failure = true;
     });
   }
-  $scope.getParcoursUpdate(){
+  $scope.getParcoursUpdate=function(){
     if ($scope.toDoParcours != []){
       var promise = formSenderService.getParcoursUpdate();
       promise.success(function (data) {
@@ -427,10 +429,10 @@ app.controller('controllerController',function($scope,lockClaimerService,formSen
     });
   }
   $scope.parsePosition = function(string){
-    var pat = /(\d)/;
+    var pat = /(\d+)/g;
     var position = [0,0];
-    position[0] = pat.exec(position)[0];
-    position[1] = pat.exec(position)[0];
+    position[0] = pat.exec(string)[0];
+    position[1] = pat.exec(string)[0];
     return position;
   }
 
@@ -455,6 +457,7 @@ app.controller('controllerController',function($scope,lockClaimerService,formSen
       $scope.failure = true;
     });
   }
+
 
 });
 app.factory('lockClaimerService',function($http){

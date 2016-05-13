@@ -9,7 +9,7 @@ function reload_img () {
   if(!halted)
     {
       r = Math.floor((Math.random() * 1000) + 1);
-      mjpeg_img.src = 'http://10.42.0.23/cam.jpg?time=' + new Date().getTime() + r.toString(16);
+      mjpeg_img.src = 'http://192.168.2.33/cam.jpg?time=' + new Date().getTime() + r.toString(16);
     }//setTimeout("mjpeg_img.src = 'http://192.168.0.98/cam.jpg?time=' + new Date().getTime()", 100);
   else
     {
@@ -23,7 +23,7 @@ function error_img () {
   mjpeg_img.src = "/Images/streaming.jpg";
   r = Math.floor((Math.random() * 1000) + 1);
   $('#mjpeg_dest').css({'width':'720px','height':'400px'})
-  setTimeout("mjpeg_img.onload=reload_img;mjpeg_img.src = 'http://10.42.0.23/cam.jpg?time=' + new Date().getTime() + r.toString(16)", 10000);
+  setTimeout("mjpeg_img.onload=reload_img;mjpeg_img.src = 'http://192.168.2.33/cam.jpg?time=' + new Date().getTime() + r.toString(16)", 10000);
 }
 
 function pause_stream(){

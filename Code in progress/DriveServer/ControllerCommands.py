@@ -72,11 +72,11 @@ def restart_parcours():
     Leftengine.set_speed(0)
     Rightengine.set_speed(0)
 def packet_delivery(pos):
-    Ratio.reset()
-    Ratio.packet_delivery = True
+    Rt.reset()
+    Rt.packet_delivery = True
     Rt.update_position(pos)
     while Going:
-        s = Ratio.get_speed()
+        s = Rt.get_speed()
         Leftengine.set_speed(s[0])
         Rightengine.set_speed(s[1])
     Leftengine.set_speed(0)
