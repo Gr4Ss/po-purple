@@ -73,6 +73,7 @@ class JsonBase:
 		[15, 14, 115.0]
 	]
 }
+
         self.__parcels = {"available-parcels": [[142, 1, 2],[145, 2, 3],[147, 2, 1], [148, 4, 3], [149, 8, 1], [152, 8, 1], [162, 5, 3], [172, 7, 8]],"on-the-road-parcels": [],"delivered-parcels": []}
         self.__positions = {"positions":[]}
         self.__secret_key = 'SecretKey'

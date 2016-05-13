@@ -10,9 +10,7 @@
     <script src="static/angular.min.js"></script>
     <script src="static/jquery.min.js"></script>
     <script src="static/bootstrap.min.js"></script>
-    <link rel="shortcut icon" href="Images/favicon.ico"/>
     <script type="text/javascript" src="static/vis.min.js"></script>
-    <script src="static/stream.js"></script>
     <link rel="stylesheet" href="static/bootstrap.min.css">
     <link rel="stylesheet" href="static/bootstrap-theme.min.css" >
     <script src="/static/angular_controller.js"></script>
@@ -99,24 +97,24 @@
           <div class="touch-keys" >
             <div class="row">
               <div class="col-xs-4 col-xs-offset-4">
-                <button class="btn btn-default btn-block driveForward not_pressed" ng-mouseup="keyUpReleased()" ng-mousedown="keyUpPressed()" ng-touchstart="keyUpPressed()" ng-touchend="keyUpReleased()">
+                <button class="btn btn-default btn-block driveForward not_pressed" ng-mouseup="keyUpReleased()" ng-mousedown="keyUpPressed()">
                 F
                 </button>
               </div>
             </div>
             <div class="row">
               <div class="col-xs-4">
-                <button class="btn btn-default btn-block driveLeft not_pressed" ng-mouseup="keyLeftReleased()" ng-mousedown="keyLeftPressed()" ng-touchstart="keyLeftPressed()" ng-touchstart="keyLeftReleased()">
+                <button class="btn btn-default btn-block driveLeft not_pressed" ng-mouseup="keyLeftReleased()" ng-mousedown="keyLeftPressed()">
                 L
                 </button>
               </div>
               <div class="col-xs-4">
-                <button class="btn btn-default btn-block driveReverse not_pressed" ng-mouseup="keyDownReleased()" ng-mousedown="keyDownPressed()" ng-touchstart="keyDownPressed()" ng-touchend="keyDownReleased()">
+                <button class="btn btn-default btn-block driveReverse not_pressed" ng-mouseup="keyDownReleased()" ng-mousedown="keyDownPressed()">
                 B
                 </button>
               </div>
               <div class="col-xs-4">
-                <button class="btn btn-default btn-block driveRight not_pressed" ng-mouseup="keyRightReleased()" ng-mousedown="keyRightPressed()" ng-touchstart="keyRightPressed()" ng-touchstart="keyDownReleased()">
+                <button class="btn btn-default btn-block driveRight not_pressed" ng-mouseup="keyRightReleased()" ng-mousedown="keyRightPressed()">
                 R
                 </button>
               </div>
@@ -142,25 +140,13 @@
       <div class='container' id='videostream'>
       <div class="starter-template">
       <h1> Videostream </h1>
-      <div id='videoStreamContainer' width='720px' height='400px'>
-        <img class="img-responsive center-block" id="mjpeg_dest"  width='720px' height='400px' onclick="pause_stream()">
-        <img id="pauseImage" src='Images/pause.png' width='720px' height='400px' onclick="pause_stream()">
-      </div>
-      <button onclick="pause_stream()" type="button" class="btn btn-default btn-lg" id="pauseButton">
-          <span id="pauseIcon" class="glyphicon glyphicon-pause" aria-hidden="true"></span>
-      </button>
+      <img src="Images/stream.png"  width=720px height=400px>
       </div>
       </div>
-      <style>
-      #videoStreamContainer{position: relative;display: inline;}
-      #pauseImage{ position: absolute; bottom: 0; left: -360px;opacity: 0.7;display: none;}
-      </style>
-
 
       <div class='container'id='about'>
       <div class="starter-template">
       <h1> About us </h1>
-      <p>Wij zijn team paars. </p>
       <div id="carousel-example-generic" class="carousel slide" data-ride="carousel" style="max-width: 720px;width: 100%; margin: 0 auto">
       <!-- Indicators -->
         <ol class="carousel-indicators">
@@ -174,19 +160,19 @@
           <div class="item active">
             <img src="Images/voor.jpg" alt="Couldn't load image">
             <div class="carousel-caption">
-              <p> Front view </p>
+              <p> Rear view </p>
             </div>
           </div>
           <div class="item">
             <img src="Images/links.jpg" alt="Couldn't load image">
             <div class="carousel-caption">
-              <p> Left view </p>
+              <p> Side view </p>
             </div>
           </div>
           <div class="item">
             <img src="Images/rechts.jpg" alt="Couldn't load image">
             <div class="carousel-caption">
-              <p> Right view </p>
+              <p> Front view </p>
             </div>
           </div>
         </div>
@@ -213,6 +199,22 @@
       });
       </script>
 
+      <script>
+      $('.nextLeft').click(function(){
+        $('.commandList').val($('.commandList').val() + 'Left(' + $('.valueLeft').val() + '),');
+        $('.valueLeft').val('');
+      });
+
+      $('.nextStraight').click(function(){
+        $('.commandList').val($('.commandList').val() + 'Right(' + $('.valueRight').val() + '),');
+        $('.valueRight').val('');
+      });
+
+      $('.nextDistance').click(function(){
+        $('.commandList').val($('.commandList').val() + 'Distance(' + $('.valueDistance').val() + '),');
+        $('.valueDistance').val('');
+      });
+      </script>
 
 	  <script type="text/javascript" src="static/network.js"></script>
     </div>

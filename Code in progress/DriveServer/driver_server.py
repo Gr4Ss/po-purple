@@ -58,7 +58,6 @@ commands = {
 'PAUSEPARCOURS':{'nb_of_arguments':1,'function':func_pause_parcours,'constraint':c.constraint_boolean,'optional_arguments':[controller,ControllerCommands.restart_parcours]},
 'PACKETDELIVERY':{'nb_of_arguments':1,'function':func_packet_delivery,'constraint':c.constraint_position,'optional_arguments':[controller,ControllerCommands.packet_delivery]}
 'UPDATEOWNPOSITION':{'nb_of_arguments':1,'function':func_update_own_position,'constraint':c.constraint_position,'optional_arguments':[controller,ControllerCommands.update_position]},
-
 }
 
 # A method to chek the message
@@ -111,6 +110,8 @@ if __name__ == '__main__':
         lock.check_expire()
         print "Received request: ", message
         # Check if the incomming message is valid
+        if message.get('command',None) == 'INITSOCKET':
+            ControllerCommands.set_socket(message["adress"],message["port"])
         messageOK = check_message(message)
         return_message = 'SORRY'
         if (messageOK):

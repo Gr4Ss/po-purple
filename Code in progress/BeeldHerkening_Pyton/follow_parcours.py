@@ -1,14 +1,13 @@
-import os,sys,inspect
-import time
+#import os,sys,inspect
 from math import *
 import PID
 import distanceDetection as dist_detec
 
 #first change the cwd to the script pathf
-scriptPath = os.path.realpath(os.path.dirname(sys.argv[0]))
-os.chdir(scriptPath)
+#scriptPath = os.path.realpath(os.path.dirname(sys.argv[0]))
+#os.chdir(scriptPath)
 #append the relative location you want to import from
-sys.path.append("../BeeldHerkening_Lua")
+#sys.path.append("../BeeldHerkening_Lua")
 from lua_python_bridge import *
 from PacketDeliveryServer import *
 
@@ -27,7 +26,7 @@ class Ratio:
 		# If packet delivery flag is set the server will not follow the directions listed in
 		# direction list but instead use data from the packet delivery server to choose it next direction
 		self.packet_delivery = packet_delivery
-		self.packet_delivery_server = Packet_Delivery_Server((1,2),'10.42.0.1',7000)
+		self.packet_delivery_server = Packet_Delivery_Server((1,2))
 		# Variabele storing the last used ratio
 		self.last_ratio = 0
 		# List storing the direction to be followed
@@ -69,7 +68,8 @@ class Ratio:
 		self.reversing_count = 0
 		self.reversing_limit = 10
 		self.block_count = 0
-		self.block_limit = 3
+		self.block_limit = 10
+		self.socket = None
 	def reset(self):
 		self.clear_directions()
 		self.block_count = 0
@@ -90,6 +90,16 @@ class Ratio:
 		self.packet_delivery = False
 	def update_position(self,position):
 		self.packet_delivery_server.update_position(position)
+	def set_socket(self,socket):
+		self.socket = socket
+		self.packet_delivery_server.set_socket(socket)
+	def send_data(self,data):
+		data = {'Type':'parcoursUpdate','data':data}
+		if self.socket != None:
+            if not self.socket.connected:
+                self.socket.connect()
+            self.socket.send_data(data)
+
 	'''
 	Method to append a direction to direction list.
 	The given parameter may be a single direction or a list of directions.
@@ -122,7 +132,6 @@ class Ratio:
 			slow_down = 0
 		if slow_down >= 255 and not self.driving_state == 'reversing':
 			self.block_count += 1
-			print self.block_count
 			if (self.block_count >= self.block_limit):
 				if not self.packet_delivery or self.packet_delivery_server.can_turn_around():
 					self.driving_state = 'reversing'
@@ -153,7 +162,7 @@ class Ratio:
 			else:
 				print 'To split detection'
 				self.driving_state = 'split_detection'
-				return (0,0)
+				return (-self.minimum_speed,-self.minimum_speed)
 		# A possible split is detected, extra check is preformed.
 		elif self.driving_state == 'split_detection':
 			if self.split_check_phase == 0:
@@ -190,9 +199,14 @@ class Ratio:
 
 					self.split_layout = split_layout
 					if not self.packet_delivery:
-						self.driving_state = 'split_turning'
-						print ' To split turning'
-						self.next_direction = self.direction_list[0]
+
+						if len(self.direction_list) >0:
+							self.driving_state = 'split_turning'
+							print ' To split turning'
+							self.next_direction = self.direction_list[0]
+						else:
+							print 'No more directions'
+							return (False,False)
 					else:
 						direction = self.packet_delivery_server.at_split()
 						if direction == 'origin':
@@ -272,6 +286,10 @@ class Ratio:
 				else:
 					if last_direction == self.next_direction:
 						print 'turned correctly to the ' + last_direction
+						if self.next_direction == 'straight':
+							self.send_data('straight')
+						else:
+							self.send_data('turned')
 						self.direction_list.pop(0)
 					else:
 						print 'turned incorrectly to the '+ last_direction +' !'
