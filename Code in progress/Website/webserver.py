@@ -8,7 +8,8 @@ import json, random
 
 # Interface hiding away problems with the Raspberry Pi
 DriverCom = Communicate.DriverCommincator()
-DriverCom.send_message({'command':'INITSOCKET','port':data.SOCKETPORT,'adress':'192.168.2.35'})
+#DriverCom.send_message({'command':'INITSOCKET','port':data.SOCKETPORT,'adress':'192.168.2.35'})
+DriverCom.send_message({'command':'INITSOCKET','port':data.SOCKETPORT,'adress':'localhost'})
 # Create a new Bottle app
 app = Bottle()
 # Storing a refence to the location of the static files

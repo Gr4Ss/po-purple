@@ -10,7 +10,8 @@ from sockets_server import *
 from restclient import *
 SOCKETPORT = 7002
 
-RESTCLIENT = RestClient("http://192.168.2.21:5000")
+#RESTCLIENT = RestClient("http://192.168.2.21:5000")
+RESTCLIENT = RestClient("http://localhost:9000")
 DATA = []
 UPDATE_TIME = None
 OWN_DATA = None

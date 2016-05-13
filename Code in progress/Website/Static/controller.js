@@ -26,6 +26,7 @@ app.controller('controllerController',function($scope,lockClaimerService,formSen
   $scope.invalidSquareSide = false;
   $scope.packetDeliveryPosition = null;
   $scope.pauseString = "Pause";
+  $scope.parcoursSubmited = false;
   hide_all_messages = function(){
     $scope.failure = false;
     $scope.noLock = false;
@@ -318,13 +319,15 @@ app.controller('controllerController',function($scope,lockClaimerService,formSen
     var match = pat.exec($scope.str_parcours);
     var ind = 0;
     while (match != null){
-      $scope.completedParcours.push({'index':ind,'direction':match[1],'count':match[2],'toDo':match[2]});
+      $scope.toDoParcours.push({'index':ind,'direction':match[1],'count':match[2],'toDo':match[2]});
       match = pat.exec($scope.str_parcours);
+      ind++;
     }
     var promise = formSenderService.sendParcours($scope.toDoParcours);
     promise.success(function(data,status){
         if (data == 'OK'){
           $scope.succes = true;
+          $scope.parcoursSubmited = true;
           $scope.getParcoursUpdate();
         }
         else if (data == 'FAILURE'){
@@ -339,29 +342,31 @@ app.controller('controllerController',function($scope,lockClaimerService,formSen
     });
   }
   $scope.removeFromParcours =function(obj){
-    for (var i=0;i<$scope.toDoParcours;i++){
-      if(obj.index == $scope.toDoParcours.index){
+    for (var i=0;i<$scope.toDoParcours.length;i++){
+      console.log(obj.index);
+      console.log()
+      if(obj.index == $scope.toDoParcours[i].index){
         $scope.toDoParcours.splice(i,1);
       }
     }
   }
-  $scope.arraymove =function(arr, fromIndex, toIndex) {
+  $scope.arraymove = function(arr, fromIndex, toIndex) {
     var element = arr[fromIndex];
-    window.alert(element);
-    arr.splice(fromIndex, 1);
-    arr.splice(toIndex, 0, element);
+    arr[fromIndex] = arr[toIndex];
+    arr[toIndex] = element;
   }
-  $scope.moveUpParcours=function(obj){
-    for (var i=1;i<$scope.toDoParcours;i++){
-      if(obj.index == $scope.toDoParcours.index){
+  $scope.moveUpParcours = function(obj){
+    for (var i=1;i<$scope.toDoParcours.length;i++){
+      if(obj.index == $scope.toDoParcours[i].index){
         $scope.arraymove($scope.toDoParcours,i,i-1);
+      }
     }
   }
-}
   $scope.moveDownParcours=function(obj){
-    for (var i=0;i<$scope.toDoParcours-1;i++){
-      if(obj.index == $scope.toDoParcours.index){
+    for(var i=$scope.toDoParcours.length-2;i>-1;i--){
+      if(obj.index == $scope.toDoParcours[i].index){
         $scope.arraymove($scope.toDoParcours,i,i+1);
+
       }
     }
   }
@@ -446,7 +451,7 @@ app.controller('controllerController',function($scope,lockClaimerService,formSen
       if (data == 'OK'){
         $scope.succes = true;
       }
-      if (data == 'FAILURE'){
+      else if (data == 'FAILURE'){
         $scope.failure = true;
       }
       else{

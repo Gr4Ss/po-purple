@@ -187,24 +187,24 @@
 					</div>
 					<div id="collapseFive" class="panel-collapse collapse" role="tabpanel" aria-labelledby="headingFive">
 						<div class="panel-body">
-              <ul ng-repeat="obj in toDoParcours">
+              <ul ng-repeat="obj in completedParcours">
                 <li>{{obj.direction}} {{obj.count}} <span class="glyphicon glyphicon-ok" aria-hidden="true"></span></li>
               </ul>
-              <ul ng-repeat="obj in completedParcours">
-                <li>{{obj.direction      obj.toDo
-                  <button type="button" class="btn btn-default btn-sm" onclick="removeFromParcours(obj)">
+              <ul ng-repeat="obj in toDoParcours">
+                <li>{{obj.direction}}     {{ obj.toDo }}
+                  <button type="button" class="btn btn-default btn-sm" ng-click="removeFromParcours(obj)">
         								<span class="glyphicon glyphicon-remove" aria-hidden="true"></span>
         					</button>
-                  <button type="button" class="btn btn-default btn-sm" onclick="moveUpParcours(obj)">
+                  <button type="button" class="btn btn-default btn-sm" ng-click="moveUpParcours(obj)">
         								<span class="glyphicon glyphicon-arrow-up" aria-hidden="true"></span>
         					</button>
-        					<button type="button" class="btn btn-default btn-sm" onclick="moveDownParcours(obj)">
+        					<button type="button" class="btn btn-default btn-sm" ng-click="moveDownParcours(obj)">
         								<span class="glyphicon glyphicon-arrow-down" aria-hidden="true"></span>
         					</button>
-                  }}
+
                 </li>
               </ul>
-              <button onclick="updateParcours()">
+              <button ng-show='parcoursSubmited' ng-click="updateParcours()">
                 Update!
               </button>
               <p ng-show="parcours_paused"> Paused </p>

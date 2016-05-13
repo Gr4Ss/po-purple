@@ -5,12 +5,17 @@ from updateEdgesTraffic import *
 # ------------------IMPORT sockets ------------------------
 import os,sys,inspect
 #first change the cwd to the script path
+scriptPath = os.path.realpath(os.path.dirname(sys.argv[0]))
+os.chdir(scriptPath)
+#append the relative location you want to import from
+sys.path.append("../RESTServer")
 from restclient import *
 
 class Packet_Delivery_Server:
     def __init__(self,start_position):
         self.teamname = 'Paars'
-        self.restclient = RestClient("http://192.168.2.21:5000",self.teamname)
+        #self.restclient = RestClient("http://192.168.2.21:5000",self.teamname)
+        self.restclient = RestClient("http://localhost:9000",self.teamname)
         self.restclient.add_team()
         self.map = self.restclient.get_map()
         #self.map = {"vertices": [[1, {"origin": 3, "straight": 2, "left": 4}],[2, {"origin": 1, "straight": 3,"left": 4}],[3, {"origin": 2, "straight": 1, "left": 4}],[4, {"origin": 3, "straight": 1, "left": 2}]],"edges": [[1, 2, 0.3],[1, 3, 0.5],[3, 1, 0.5],[2, 3, 0.1],[3, 4, 0.7],[4, 2, 0.3],[4, 1, 0.8]]}
@@ -53,7 +58,7 @@ class Packet_Delivery_Server:
         # Update at restserver
         self.restclient.update_position(int(position[0]),int(position[1]))
         # Update locally
-        self.current_position = [int(position[0]),int(position[1])]
+        self.current_position = (int(position[0]),int(position[1]))
     '''
     Method to update the lenght of an edge. This is used as an estimate for the speed on a edge.
     '''
@@ -124,7 +129,6 @@ class Packet_Delivery_Server:
         self.split_from = self.current_position[0]
         self.update_position((self.current_position[1],self.current_position[1]))
         self.send_data()
-        print self.new_direction(self.split_from,self.current_position[1],target)
         return self.new_direction(self.split_from,self.current_position[1],target)
     '''
         Method to call when the car has turned around.
@@ -162,9 +166,7 @@ class Packet_Delivery_Server:
 
         positions = self.restclient.get_positions()
         edges = update_edges_traffic(positions,self.current_position,self.get_edges(),self.teamname)
-        print self.get_vertices(),edges,current,target
         path = find_path(self.get_vertices(),edges,int(current),int(target))
-        print path
         # You are comming from self.current_position[0] at node self.current_position[1] and to path[0]
         return self.to_left_right_straight(current,frm,path[1])
     '''
@@ -175,7 +177,6 @@ class Packet_Delivery_Server:
         while not succes:
             available_parcels = self.restclient.get_parcels().get('available-parcels')
             positions = self.restclient.get_positions()
-            print positions
             edges = update_edges_traffic(positions,self.current_position,self.get_edges(),self.teamname)
             parcel = select_parcel(edges, self.get_vertices(), self.current_position, available_parcels)
             if parcel != False:
@@ -195,7 +196,6 @@ class Packet_Delivery_Server:
     '''
     def get_data_node(self,node):
         for vertice in self.get_vertices():
-            print vertice[0],node
             if vertice[0] == node:
                 return vertice[1]
         return None
@@ -235,7 +235,9 @@ class Packet_Delivery_Server:
     def to_node_number(self,node,frm,to):
         directions = ["origin","right","straight","left"]
         node_data = self.get_data_node(node)
+        print frm
         for key,value in node_data.iteritems():
+            print key,value
             if value == frm:
                 from_direction = directions.index(key)
                 break

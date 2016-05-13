@@ -1,6 +1,7 @@
 import sockets_client
-IP_RASPBERRY = '192.168.2.33'
-PORT = 6000
+#IP_RASPBERRY = '192.168.2.33'
+IP_RASPBERRY = 'localhost'
+PORT = 6001
 
 
 # A class that communicate with the drive server
