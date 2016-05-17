@@ -64,7 +64,6 @@ class Ratio:
 		self.maximum_speed = 115
 		self.turning_speed = 110
 		self.turning_reversing_speed = 0.65*70
-		self.turning_reversing_speed_2 = 0.7*70
 		self.next_direction = None
 		self.reversing_count = 0
 		self.reversing_limit = 10
@@ -241,7 +240,7 @@ class Ratio:
 				r = self.get_normal_turning_ratio(left,top,right,current_layout)
 				self.last_ratio = r
 				print 'ratio: ',r
-				return self.to_speed(r,self.turning_speed,True)
+				return self.to_speed(r,self.turning_speed)
 		elif self.driving_state == 'reversing':
 			print self.reversing_count
 			if self.reversing_count >= self.reversing_limit:
@@ -308,7 +307,7 @@ class Ratio:
 				self.split_ratio[0] += ratio
 				self.split_ratio[1] += 1
 				self.last_ratio = ratio
-				return self.to_speed(ratio,self.turning_speed,True)
+				return self.to_speed(ratio,self.turning_speed)
 
 	def get_normal_ratio(self,left,top,right,current_layout,PID=False):
 		if current_layout == None:
@@ -424,16 +423,13 @@ class Ratio:
 	'''
 	def back_on_track(self):
 		return self.back_on_track_count > self.back_on_track_threshold
-	def to_speed(self,ratio,basic_speed,split = False):
+	def to_speed(self,ratio,basic_speed,turn_back = True):
 		# If ratio is bigger then one than left must drive a bigger distance then right
 		if ratio >= 0:
 			lspeed = basic_speed
 			rspeed = (1.-ratio)*basic_speed
 			# If the right speed is very low it must drive backward
-
-			if (rspeed < self.turning_reversing_speed) and split:
-				rspeed = (-1.)*self.minimum_speed
-			elif (rspeed < self.turning_reversing_speed_2) and not split:
+			if (rspeed < self.turning_reversing_speed) and turn_back:
 				rspeed = (-1.)*self.minimum_speed
 			# If the right speed is low it must drive the minimum speed
 			elif (rspeed < self.minimum_speed):
@@ -444,9 +440,7 @@ class Ratio:
 			lspeed = (1.+ratio)*basic_speed
 			rspeed = basic_speed
 			# If the left speed is very low it must drive backward
-			if (lspeed < self.turning_reversing_speed) and split:
-				lspeed = (-1.)*self.minimum_speed
-			elif (lspeed < self.turning_reversing_speed_2 and not split):
+			if (lspeed < self.turning_reversing_speed) and turn_back:
 				lspeed = (-1.)*self.minimum_speed
 			# If the right speed is low it must drive the minimum speed
 			elif (lspeed < self.minimum_speed):

@@ -4,7 +4,7 @@ var first = true;
 function getData() {
 
 	/* Gets the dataset from the server and converts it to a usable one for vis.js*/
-	return $.getJSON("http://192.168.2.21:5000/map", function(data) {
+	return $.getJSON("http://10.42.0.1:9000/map", function(data) {
 		Dataset = data;
 		convertDataSet();
 	}).responseText;
@@ -134,7 +134,7 @@ var carPosMap = [];
 var carHashMap = {};
 
 function colorAllPositions() {
-	$.getJSON("http://192.168.2.21:5000/positions", function(myPositions) {
+	$.getJSON("http://10.42.0.1:9000/positions", function(myPositions) {
 		//var start = new Date().getTime();
 		for (i in myPositions["positions"]){
 			carPosMap[i] = [myPositions["positions"][i][0], myPositions["positions"][i][1], myPositions["positions"][i][2]];
