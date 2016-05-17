@@ -8,7 +8,7 @@ sys.path.append("../RESTServer")
 sys.path.append("../Socket")
 from sockets_server import *
 from restclient import *
-SOCKETPORT = 7002
+SOCKETPORT = 7000
 
 RESTCLIENT = RestClient("http://192.168.2.21:5000")
 #RESTCLIENT = RestClient("http://localhost:9000")
@@ -21,7 +21,7 @@ SOCKET = SocketServer(SOCKETPORT)
 SOCKET.start()
 
 def own_data_updater():
-    global SOCKET, OWN_DATA
+    global SOCKET, OWN_DATA,PARCOURS_ID,COMPLETED
     while True:
         conn,data = SOCKET.get_data()
         SOCKET.send(conn,'OK')
@@ -29,12 +29,16 @@ def own_data_updater():
         if data["Type"] == "Status":
             OWN_DATA = data
         elif data["Type"] == "ParcoursID":
+            print 'updating parcoursID ',data['ID']
             PARCOURS_ID = data['ID']
         else:
             COMPLETED.append(data["data"])
 def get_completed(iden):
+    global PARCOURS_ID,COMPLETED
+    print PARCOURS_ID, iden, COMPLETED
     if PARCOURS_ID == iden:
         r = COMPLETED
+        print r
         COMPLETED = []
         return r
     else:

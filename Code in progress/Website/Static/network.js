@@ -339,4 +339,4 @@ String.prototype.hashCode = function(){
 	return hash;
 }
 
-setInterval(function() {updateNetwork()}, 100);
+setInterval(function() {updateNetwork()}, 1000);

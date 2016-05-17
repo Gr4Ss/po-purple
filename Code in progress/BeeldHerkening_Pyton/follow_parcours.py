@@ -59,11 +59,11 @@ class Ratio:
 		self.right_engine = engine_right
 		self.recognize_direction_boundary = 0.35
 		# Variable storing the minimum speed
-		self.minimum_speed = 80
+		self.minimum_speed = 70
 		# Variable storing the maximum speed
 		self.maximum_speed = 115
-		self.turning_speed = 120
-		self.turning_reversing_speed = 0.7*80
+		self.turning_speed = 110
+		self.turning_reversing_speed = 0.65*70
 		self.next_direction = None
 		self.reversing_count = 0
 		self.reversing_limit = 10
@@ -206,7 +206,7 @@ class Ratio:
 							self.next_direction = self.direction_list[0]
 						else:
 							print 'No more directions'
-							return (False,False)
+							return ('Done','Done')
 					else:
 						direction = self.packet_delivery_server.at_split()
 						if direction == 'origin':
@@ -440,7 +440,7 @@ class Ratio:
 			lspeed = (1.+ratio)*basic_speed
 			rspeed = basic_speed
 			# If the left speed is very low it must drive backward
-			if (lspeed < self.turning_reversing_speed):
+			if (lspeed < self.turning_reversing_speed) and turn_back:
 				lspeed = (-1.)*self.minimum_speed
 			# If the right speed is low it must drive the minimum speed
 			elif (lspeed < self.minimum_speed):

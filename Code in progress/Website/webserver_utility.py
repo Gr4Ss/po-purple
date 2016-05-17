@@ -22,14 +22,14 @@ def check_parcours(parcours):
         for item in parcours:
             if not (item in valid_parcours_steps):
                 return False
-            return True
+        return True
     else:
         return False
 def parse_parcours(commands):
     result = []
     for command in commands:
         direction = str(command["direction"])
-        count = int(command["count"])
+        count = int(command["toDo"])
         for i in range(0,count-1):
             result.append('straight')
         result.append(direction)
