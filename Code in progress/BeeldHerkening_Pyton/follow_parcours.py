@@ -136,6 +136,7 @@ class Ratio:
 				if not self.packet_delivery or self.packet_delivery_server.can_turn_around():
 					self.driving_state = 'reversing'
 					self.block_count = 0
+					self.update_map();
 					print 'TO REVERSING STATE'
 				else:
 					self.block_count = 0
