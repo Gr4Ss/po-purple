@@ -10,7 +10,6 @@ app.controller('controllerController',function($scope,lockClaimerService,formSen
   $scope.str_parcours = "";
   $scope.parcoursLeft;
   $scope.parcoursRight;
-  $scope.parcours_paused = false;
   $scope.succes = false;
   $scope.unlock = false;
   $scope.superlock_password = 'PieterIsDeBeste';
@@ -25,6 +24,7 @@ app.controller('controllerController',function($scope,lockClaimerService,formSen
   $scope.squareSide = null;
   $scope.invalidSquareSide = false;
   $scope.packetDeliveryPosition = null;
+  $scope.parcoursPaused = false;
   $scope.pauseString = "Pause";
   $scope.parcoursSubmited = false;
   hide_all_messages = function(){
@@ -328,6 +328,8 @@ app.controller('controllerController',function($scope,lockClaimerService,formSen
         if (data == 'OK'){
           $scope.succes = true;
           $scope.parcoursSubmited = true;
+          $scope.parcoursPaused = false;
+          $scope.pauseString = "Pause";
           $scope.getParcoursUpdate();
         }
         else if (data == 'FAILURE'){
@@ -376,6 +378,8 @@ app.controller('controllerController',function($scope,lockClaimerService,formSen
     promise.success(function(data,status){
         if (data == 'OK'){
           $scope.succes = true;
+          $scope.parcoursPaused = false;
+          $scope.pauseString = "Pause";
           $scope.getParcoursUpdate();
         }
         else if (data == 'FAILURE'){
@@ -393,10 +397,11 @@ app.controller('controllerController',function($scope,lockClaimerService,formSen
     if ($scope.toDoParcours != []){
       var promise = formSenderService.getParcoursUpdate();
       promise.success(function (data) {
+          console.log(data);
           if (data.data != []){
             for (var i=0;i<data.data.length;i++){
               if(data.data[i]=='straight'){
-                $scope.toDoParcours[0].count -= 1;
+                $scope.toDoParcours[0].toDo -= 1;
               }
               else{
                 var t = $scope.toDoParcours.shift();
@@ -404,8 +409,11 @@ app.controller('controllerController',function($scope,lockClaimerService,formSen
               }
             }
           }
+          if ($scope.toDoParcours.length >0){
+            setTimeout($scope.getParcoursUpdate,1000);
+          }
       });
-      setTimeout($scope.getParcoursUpdate,1000);
+
     }
   }
   $scope.parcoursReset = function(){
@@ -415,13 +423,13 @@ app.controller('controllerController',function($scope,lockClaimerService,formSen
     $scope.str_parcours = $scope.str_parcours.concat(appendix);
   }
   $scope.parcoursPause = function(){
-    $scope.hide_all_messages();
-
-    var promise = formSenderService.pauseParcours($scope.parcoursPause);
+    console.log('Pause');
+    hide_all_messages();
+    var promise = formSenderService.pauseParcours($scope.parcoursPaused);
     promise.success(function(data,status){
         if (data == 'OK'){
-          $scope.parcoursPause = !($scope.parcoursPause);
-          if ($scope.parcoursPause){
+          $scope.parcoursPaused = !($scope.parcoursPaused);
+          if ($scope.parcoursPaused){
             $scope.pauseString = "Restart"
           }
           else{
@@ -507,16 +515,16 @@ app.factory('formSenderService',function($http){
     });
     return promise;
   }
-  formSender.pauseParcours = function(){
+  formSender.pauseParcours = function(paused){
+    if (!paused){
+      pause = 'PAUSE';
+    }
+    else{
+      pause = 'RESTART';
+    }
+    console.log(pause)
     var promise = $http({method:'POST',url:'/parcours',
-    data:JSON.stringify({'parcours':'PAUSE'}),
-    headers: {'Content-Type':'application/json'}
-    });
-    return promise;
-  }
-  formSender.pauseParcours = function(){
-    var promise = $http({method:'POST',url:'/parcours',
-    data:JSON.stringify({'parcours':'RESTART'}),
+    data:JSON.stringify({'parcours':pause}),
     headers: {'Content-Type':'application/json'}
     });
     return promise;

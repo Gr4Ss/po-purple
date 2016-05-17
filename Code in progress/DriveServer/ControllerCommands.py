@@ -35,14 +35,17 @@ def init(leftengine,rightengine,distancesensor,perimeter,gearratio,widthcar):
         Rt = Ratio((0,287),(480,287),leftengine,rightengine,distancesensor,False,[])
         Init = True
 def init_socket(IP,port):
+    global Socket,Rt
     Socket = SocketClient(IP,port)
     Rt.set_socket(Socket)
 def send_id(iden):
+    global Socket
     data = {'Type':'ParcoursID','ID':iden}
     if Socket != None:
         if not Socket.connected:
             Socket.connect()
         Socket.send_data(data)
+        print 'ParcoursID sended'
 
 def update_position(pos):
     Rt.update_position(pos)
@@ -55,7 +58,7 @@ def follow_parcours(parcours,iden):
     done = False
     while Going and not done:
         s = Rt.get_speed()
-        if s[0] == False or s[1] == False:
+        if s[0] == 'Done' or s[1] == 'Done':
             done = True
         else:
             Leftengine.set_speed(s[0])
