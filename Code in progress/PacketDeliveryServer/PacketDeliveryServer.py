@@ -24,7 +24,7 @@ class Packet_Delivery_Server:
         self.current_parcel = None
         self.parcel_picked_up = False
         self.split_from = None
-        self.status = "Normal driving from %s to %s"%(self.current_position[0],self.current_position[0])
+        self.status = "Normal driving from %s to %s"%(self.current_position[0],self.current_position[1])
         self.socket = None
 
     def set_socket(self,socket):
@@ -70,14 +70,14 @@ class Packet_Delivery_Server:
     Method to update the map. This is used to remove unaccesible edges.
     '''
     def update_map(self):
-	edge = self.current_position
-        for x in (self.restclient.get_positions()).get('positions')
-	    if [x[1],x[2]] == edge and x[0] != self.teamname
-	        return False
-	edges = (self.map)['edges']
-	for x in range(len(edges))
-	    if [edges[x][1],edges[x][2]] == edge
-		del edges[x]
+        edge = self.current_position
+        for x in (self.restclient.get_positions()).get('positions'):
+            if [x[1],x[2]] == edge and x[0] != self.teamname:
+                return False
+        edges = (self.map)['edges']
+        for x in range(len(edges)):
+            if [edges[x][1],edges[x][2]] == edge:
+                del edges[x]
 		(self.map)['edges'] = edges
 		return True
 
