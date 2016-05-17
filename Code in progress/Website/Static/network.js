@@ -16,16 +16,15 @@ function initNetwork() {
 	window.setTimeout(function() {
 		network.fit();
 		colorAllPositions();
-	}, 4000);
+	}, 5000);
 
 	window.setTimeout(function() {
 		makeExternalLegend();
-	}, 4600);
+	}, 6000);
 }
 
 function updateNetwork() {
 	colorAllPositions();
-
 }
 
 
@@ -236,7 +235,7 @@ function makeExternalLegend() {
 		var descriptionDiv = document.createElement("button");
 
 		containerDiv.className = 'legend-element-container';
-		descriptionDiv.className = "description-container";
+		descriptionDiv.className = "description-container legend-button";
 
 		descriptionDiv.innerHTML = carPosMap[car][0];
 
@@ -248,7 +247,8 @@ function makeExternalLegend() {
 		descriptionDiv.style.width = 100/(carPosMap.length + 1) + '%';
 		descriptionDiv.style.float = 'left';
 		descriptionDiv.style.backgroundColor = hexToRgbA(intToRGB(hashCode(carPosMap[car][0])));
-
+		descriptionDiv.style.border = "none";
+	
 		$(descriptionDiv).click(function(event) {
 			zoomToID(event.target.innerHTML);
 		});
