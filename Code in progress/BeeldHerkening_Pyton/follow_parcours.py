@@ -17,7 +17,7 @@ DEBUG = False
 '''
 '''
 class Ratio:
-	def __init__(self,PositionLeftWheel,PositionRightWheel,engine_left,engine_right,distance_sensor,packet_delivery=False,directions=[]):
+	def __init__(self,PositionLeftWheel,PositionRightWheel,engine_left,engine_right,left_lamp,right_lamp,distance_sensor,packet_delivery=False,directions=[]):
 		self.distance_sensor = distance_sensor
 		# Storing the position of the left wheel
 		self.left_wheel = PositionLeftWheel
@@ -57,6 +57,8 @@ class Ratio:
 		self.normal_PID = PID.PID(0.9,0.1,0.05,0)
 		self.left_engine = engine_left
 		self.right_engine = engine_right
+		self.left_lamp = left_lamp
+		self.right_lamp = right_lamp
 		self.recognize_direction_boundary = 0.35
 		# Variable storing the minimum speed
 		self.minimum_speed = 70
@@ -205,6 +207,10 @@ class Ratio:
 							self.driving_state = 'split_turning'
 							print ' To split turning'
 							self.next_direction = self.direction_list[0]
+							if self.next_direction == 'left':
+								self.left_lamp.set_on()
+							elif self.next_direction == 'right':
+								self.right_lamp.set_on()
 						else:
 							print 'No more directions'
 							return ('Done','Done')
@@ -217,6 +223,10 @@ class Ratio:
 							self.driving_state = 'split_turning'
 							print ' To split turning'
 							self.next_direction = direction
+							if self.next_direction == 'left':
+								self.left_lamp.set_on()
+							elif self.next_direction == 'right':
+								self.right_lamp.set_on()
 				return (-self.minimum_speed,-self.minimum_speed)
 		elif self.driving_state == 'normal_turning':
 			if current_layout == None:
@@ -273,6 +283,8 @@ class Ratio:
 				self.back_on_track_count = 0
 			# Check if we are back on track after the split
 			if self.back_on_track():
+				self.left_lamp.set_off()
+				self.right_lamp.set_off()
 				self.normal_PID.reset()
 				last_direction = self.recognize_direction()
 				if self.packet_delivery:

@@ -2,6 +2,7 @@ import time
 import PID
 import Engine
 import math
+import Light
 from utility import *
 from follow_parcours import *
 scriptPath = os.path.realpath(os.path.dirname(sys.argv[0]))
@@ -20,8 +21,10 @@ Init = False
 Going = False
 DEBUG = True
 Socket = None
+LeftLamp = None
+RightLamp = None
 
-def init(leftengine,rightengine,distancesensor,perimeter,gearratio,widthcar):
+def init(leftengine,rightengine,distancesensor,perimeter,gearratio,widthcar,lled,rled):
     global Leftengine, Rightengine, Distancesensor, Perimeter, Gearratio, Widthcar,  Init,Rt
     print 'INIT'
     if isinstance(leftengine,Engine.Engine) and isinstance(rightengine,Engine.Engine) and isinstance(perimeter,float) and isinstance(gearratio,float) and isinstance(widthcar,float):
@@ -32,7 +35,9 @@ def init(leftengine,rightengine,distancesensor,perimeter,gearratio,widthcar):
         Perimeter = perimeter
         Gearratio = gearratio
         Widthcar = widthcar
-        Rt = Ratio((0,287),(480,287),leftengine,rightengine,distancesensor,False,[])
+        LeftLamp = lled
+        RightLamp = rled
+        Rt = Ratio((0,287),(480,287),leftengine,rightengine,LeftLamp,RightLamp,distancesensor,False,[])
         Init = True
 def init_socket(IP,port):
     global Socket,Rt

@@ -2,6 +2,7 @@ import threading
 import time
 import math
 from Engine import *
+import Light
 from Sensor import *
 from IO_thread import *
 import ControllerCommands
@@ -16,6 +17,8 @@ class Controller:
         # Storing the engines of this car
         self.__leftengine = Engine('A')
         self.__rightengine = Engine('B')
+        self.__leftled = Light.Light('D')
+        self.__rightled = Light.Light('C')
         self.__distance_sensor = DistanceSensor(17,4)
         # Storing the distance between the centers of the cars
         # TODO measure width and gearratio
@@ -24,10 +27,10 @@ class Controller:
         # Storing the perimeter of the wheels (2*pi*r)
         self.__perimeter = 2*math.pi* 2.579
         print 'initing Controller'
-        ControllerCommands.init(self.__leftengine,self.__rightengine,self.__distance_sensor,self.__perimeter,self.__gearratio,self.__widthcar)
+        ControllerCommands.init(self.__leftengine,self.__rightengine,self.__distance_sensor,self.__perimeter,self.__gearratio,self.__widthcar,self.__leftled,self.__rightled)
         print 'Controller inited'
         # Storing a reference to a brickpi thread
-        self.__io = IO_Thread([self.__leftengine,self.__rightengine],[self.__distance_sensor])
+        self.__io = IO_Thread([self.__leftengine,self.__rightengine],[self.__distance_sensor],[self.__leftled,self.__rightled])
         self.__command_going = False
         self.__command_thread = None
         self.__parcours = None

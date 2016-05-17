@@ -10,9 +10,10 @@ class IO_Thread:
     # Store the sensors of the brickpi
     # The thread is not yet going
     # There is no reference to a thread
-    def __init__(self,engines,sensors):
+    def __init__(self,engines,sensors,leds):
         self.__engines = engines
         self.__sensors = sensors
+        self.__leds = leds
         self.__going = False
         self.__thread = None
     # Turn the thread on
@@ -46,5 +47,7 @@ class IO_Thread:
         while self.__going:
             for sensor in self.__sensors:
                 sensor.update_value()
+            for led in self.__leds:
+                led.get_light()
             BrickPiUpdateValues()
             time.sleep(0.01)
