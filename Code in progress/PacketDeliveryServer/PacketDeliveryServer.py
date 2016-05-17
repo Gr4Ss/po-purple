@@ -67,6 +67,22 @@ class Packet_Delivery_Server:
             # For each edge we keep a list of distance so we can take the median
             self.real_edges_lenght[edge].append(lenght)
     '''
+    Method to update the map. This is used to remove unaccesible edges.
+    '''
+    def update_map(self):
+	edge = self.current_position
+        for x in (self.restclient.get_positions()).get('positions')
+	    if [x[1],x[2]] == edge and x[0] != self.teamname
+	        return False
+	edges = (self.map)['edges']
+	for x in range(len(edges))
+	    if [edges[x][1],edges[x][2]] == edge
+		del edges[x]
+		(self.map)['edges'] = edges
+		return True
+
+
+    '''
     Method that return the estimate of the distance of an edge.
     '''
     def get_edge_lenght(self,edge):
